@@ -1,4 +1,3 @@
-using System;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes.DTOs;
@@ -6,38 +5,33 @@ using SGE.Aplicacion.Excepciones;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
-public class ModificarCaratulaUseCase
+public class CambiarEstadoExpediente
 {
     private  IExpedienteRepository _iExpRepo;
     private  IAutorizacionService _autorizacion;
 
-    public ModificarCaratulaUseCase (IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+    public CambiarEstadoExpediente (IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
     {
         _iExpRepo=iExpRepo;
         _autorizacion=autorizacion;
     }
 
-    public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest req)
+    public CambiarEstadoExpResponse Ejecutar(CambiarEstadoExpRequest req)
     {
         if(!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.ExpedienteModificacion))
         {
-            throw new AutorizacionException("El usuario no tiene permisos para modificar expedientes");
+            throw new AutorizacionException("El usuario no tiene permisos para modificar el estado");
         }
 
-        var exp=_iExpRepo.ObtenerPorId(req.Id);
+        var exp=_iExpRepo.ObtenerPorId(req.IdExp);
         if (exp == null)
         {
             throw new AplicationException("El expediente solicitado no existe");
         }
 
-
-        Caratula car= new Caratula(req.NuevaCaratula);
-
-        exp.ModificarCaratula(car,req.IdUser);
-
         _iExpRepo.Modificar(exp);
 
-        return new ModificarCaratulaResponse(exp.Id, req.NuevaCaratula, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
+        return new CambiarEstadoExpResponse(exp.Id,exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
 
 }

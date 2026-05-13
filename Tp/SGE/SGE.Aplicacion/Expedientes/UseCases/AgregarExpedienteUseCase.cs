@@ -24,6 +24,7 @@ public class AgregarExpedienteUseCase
         // convierto el expediente en el DTO de respuesta
         return new AgregarExpedienteResponse(
             exp.Id,
+            exp.Estado,
             exp.Caratula.Valor,
             exp.UsuarioUltimoCambio,
             exp.FechaCreacion,
