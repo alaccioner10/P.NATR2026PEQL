@@ -24,14 +24,20 @@ public class EliminarExpedienteUseCase
     public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest req)
     {
 
+        if(req == null)
+        {
+            throw new AplicationException ("La solicitud no puede estar vacía."); 
+        }
+
         if (!_autorizacion.PoseeElPermiso(req.IdUsuario, Permiso.ExpedienteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar este expediente.");
         }
 
-        if(req == null)
+        var expedienteABorrar = _iExpRepo.ObtenerPorId(req.ExpedienteId);
+        if (expedienteABorrar == null)
         {
-            throw new AplicationException ("No se encontró el repositorio"); 
+            throw new AplicationException("No se encontró el expediente solicitado");
         }
 
         var tramites = _iTramRepo.ObtenerPorExpedienteId(req.ExpedienteId);
