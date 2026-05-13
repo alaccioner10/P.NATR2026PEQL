@@ -36,4 +36,11 @@ public class Tramite
         UsuarioUltCambio = user;
     }
 
+    public void ModificarContenido(Contenido nuevoContenido, Guid usuarioId)
+{
+    this.Contenido = nuevoContenido;
+    this.UsuarioUltCambio = usuarioId;
+    this.FechaUltModificacion = DateTime.Now;
+}
+
 }
