@@ -6,9 +6,9 @@ namespace SGE.Aplicacion.Expedientes.UseCases;
 
 public class EliminarExpedienteUseCase
 {
-    private readonly IExpedienteRepository _iExpRepo;
-    private readonly ITramiteRepository _iTramRepo;
-    private readonly IAutorizacionService _autorizacion;
+    private  IExpedienteRepository _iExpRepo;
+    private  ITramiteRepository _iTramRepo;
+    private  IAutorizacionService _autorizacion;
 
     public EliminarExpedienteUseCase(
         IExpedienteRepository iExpRepo, 

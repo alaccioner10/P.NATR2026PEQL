@@ -7,8 +7,8 @@ namespace SGE.Aplicacion.Expedientes.UseCases;
 
 public class ModificarCaratulaUseCase
 {
-    private readonly IExpedienteRepository _iExpRepo;
-    private readonly IAutorizacionService _autorizacion;
+    private  IExpedienteRepository _iExpRepo;
+    private  IAutorizacionService _autorizacion;
 
     public ModificarCaratulaUseCase (IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
     {
