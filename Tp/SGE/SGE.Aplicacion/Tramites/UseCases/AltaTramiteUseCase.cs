@@ -7,7 +7,7 @@ namespace SGE.Aplicacion.Tramites.UseCases;
 
 public class AgregarTramiteUseCase
 {
-    private readonly ITramiteRepository _tramiteRepo;
+    private ITramiteRepository _tramiteRepo;
 
     public AgregarTramiteUseCase(ITramiteRepository tramiteRepo)
     {
@@ -37,7 +37,9 @@ public class AgregarTramiteUseCase
             tramite.ExpedienteId,
             tramite.Etiqueta.ToString(),
             tramite.Contenido.Valor,
-            tramite.FechaCreacion
+            tramite.FechaCreacion,
+            tramite.FechaUltModificacion,
+            tramite.UsuarioUltCambio
         );
     }
 }

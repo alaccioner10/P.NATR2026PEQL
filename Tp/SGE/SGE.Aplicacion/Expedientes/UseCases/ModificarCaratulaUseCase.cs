@@ -2,6 +2,7 @@ using System;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes.DTOs;
+using SGE.Aplicacion.Excepciones;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
@@ -26,8 +27,9 @@ public class ModificarCaratulaUseCase
         var exp=_iExpRepo.ObtenerPorId(req.ExpedienteId);
         if (exp == null)
         {
-            throw new Exception("El expediente solicitado no existe");
+            throw new AplicationException("El expediente solicitado no existe");
         }
+
 
         Caratula car= new Caratula(req.NuevaCaratula);
 
@@ -35,7 +37,7 @@ public class ModificarCaratulaUseCase
 
         _iExpRepo.Modificar(exp);
 
-        return new ModificarCaratulaResponse(exp.Id, req.NuevaCaratula, exp.UsuarioUltimoCambio);
+        return new ModificarCaratulaResponse(exp.Id, req.NuevaCaratula, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
 
 }

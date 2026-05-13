@@ -1,6 +1,7 @@
 using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
+using SGE.Aplicacion.Excepciones;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
@@ -28,7 +29,7 @@ public class ModificarTramiteUseCase
         var tramite = _tramiteRepo.ObtenerPorId(req.TramiteId);
         if (tramite == null)
         {
-            throw new Exception("El trámite solicitado no existe");
+            throw new AplicationException("El trámite solicitado no existe");
         }
 
         // 3. Lógica de Dominio
@@ -46,7 +47,8 @@ public class ModificarTramiteUseCase
         return new ModificarTramiteResponse(
             tramite.Id, 
             tramite.Contenido.Valor, 
-            tramite.UsuarioUltCambio
+            tramite.UsuarioUltCambio,
+            tramite.FechaUltModificacion
         );
     }
 }

@@ -3,7 +3,7 @@ namespace SGE.Aplicacion.Tramites.DTOs;
 // Lo que recibimos de la UI/API
 public record AgregarTramiteRequest(
     Guid ExpedienteId, 
-    int Etiqueta, // O EtiquetaEnum directamente
+    int Etiqueta, 
     string Contenido, 
     Guid IdUser
 );
@@ -14,5 +14,8 @@ public record AgregarTramiteResponse(
     Guid ExpedienteId,
     string Etiqueta,
     string Contenido,
-    DateTime FechaCreacion
+    DateTime FechaCreacion,
+    DateTime FechaUltModificacion,
+    Guid UsuarioUltCambio
+    
 );

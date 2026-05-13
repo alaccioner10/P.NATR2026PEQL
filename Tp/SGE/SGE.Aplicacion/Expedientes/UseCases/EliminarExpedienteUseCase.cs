@@ -1,4 +1,5 @@
 using SGE.Aplicacion.Autorizacion;
+using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Tramites;
 
@@ -26,6 +27,11 @@ public class EliminarExpedienteUseCase
         if (!_autorizacion.PoseeElPermiso(req.IdUsuario, Permiso.ExpedienteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar este expediente.");
+        }
+
+        if(req == null)
+        {
+            throw new AplicationException ("No se encontró el repositorio"); 
         }
 
         var tramites = _iTramRepo.ObtenerPorExpedienteId(req.ExpedienteId);

@@ -9,5 +9,6 @@ public record ModificarTramiteRequest(
 public record ModificarTramiteResponse(
     Guid Id, 
     string ContenidoActualizado, 
-    Guid UsuarioModificador
+    Guid UsuarioModificador,
+    DateTime FechaUltimaModificacion
 );

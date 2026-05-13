@@ -1,13 +1,14 @@
 using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
+using SGE.Aplicacion.Excepciones;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
 public class EliminarTramiteUseCase
 {
-    private readonly ITramiteRepository _tramiteRepo;
-    private readonly IAutorizacionService _autorizacion;
+    private  ITramiteRepository _tramiteRepo;
+    private  IAutorizacionService _autorizacion;
 
     public EliminarTramiteUseCase(ITramiteRepository tramiteRepo, IAutorizacionService autorizacion)
     {
@@ -18,17 +19,17 @@ public class EliminarTramiteUseCase
     public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest req)
     {
         // 1. Validación de Seguridad
-        // Asumo que tienes un Permiso.TramiteBaja en tu sistema
+        
         if (!_autorizacion.PoseeElPermiso(req.IdUsuario, Permiso.TramiteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar trámites.");
         }
 
-        // 2. Verificar existencia (opcional pero recomendado para dar buen feedback)
+        // 2. Verificar existencia 
         var tramite = _tramiteRepo.ObtenerPorId(req.TramiteId);
         if (tramite == null)
         {
-            throw new Exception("El trámite que intenta eliminar no existe.");
+            throw new AplicationException("El trámite que intenta eliminar no existe.");
         }
 
         // 3. Ejecutar la baja en el repositorio
