@@ -1,21 +1,30 @@
 using System.Net.Cache;
 using SGE.Aplicacion.Tramites;
+using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
+using SGE.Aplicacion.Expedientes;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
 public class AgregarTramiteUseCase
 {
-    private ITramiteRepository _tramiteRepo;
+    private readonly ITramiteRepository _tramiteRepo;
+    private readonly IExpedienteRepository _expRepo;
 
-    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo)
+    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo, IExpedienteRepository expRepo)
     {
         _tramiteRepo = tramiteRepo;
+        _expRepo=expRepo;
     }
 
     public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req)
     {
+        if (req == null)
+        {
+            throw new Exception("La solicitud es nula.");
+        }
+
         // 1. Construimos los Value Objects necesarios
         Contenido contenido = new Contenido(req.Contenido);
         
@@ -31,11 +40,22 @@ public class AgregarTramiteUseCase
         // 3. Persistimos a través del repositorio
         _tramiteRepo.Agregar(tramite);
 
+        if (tramite.Etiqueta == EtiquetaEnum.PaseAlArchivo)
+        {
+            var exp = _expRepo.ObtenerPorId(req.ExpedienteId);
+            if (exp != null)
+            {
+                // Usamos el método que ya tienen en el dominio de Expediente
+                exp.CambiarEstado(EstadoEnum.Finalizado, req.IdUser);
+                _expRepo.Modificar(exp);
+            }
+        }
+
         // 4. Mapeamos el resultado al DTO de respuesta
         return new AgregarTramiteResponse(
             tramite.Id,
             tramite.ExpedienteId,
-            tramite.Etiqueta.ToString(),
+            tramite.Etiqueta,
             tramite.Contenido.Valor,
             tramite.FechaCreacion,
             tramite.FechaUltModificacion,
