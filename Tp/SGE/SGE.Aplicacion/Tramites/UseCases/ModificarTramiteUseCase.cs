@@ -2,6 +2,7 @@ using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Excepciones;
+using SGE.Aplicacion.Servicios;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
@@ -9,11 +10,13 @@ public class ModificarTramiteUseCase
 {
     private readonly ITramiteRepository _tramiteRepo;
     private readonly IAutorizacionService _autorizacion;
+    private readonly ActualizadorEstadoExpedienteService _actualizador;
 
-    public ModificarTramiteUseCase(ITramiteRepository tramiteRepo, IAutorizacionService autorizacion)
+    public ModificarTramiteUseCase(ITramiteRepository tramiteRepo, IAutorizacionService autorizacion, ActualizadorEstadoExpedienteService actualizador)
     {
         _tramiteRepo = tramiteRepo;
         _autorizacion = autorizacion;
+        _actualizador=actualizador;
     }
 
     public ModificarTramiteResponse Ejecutar(ModificarTramiteRequest req)
@@ -43,7 +46,10 @@ public class ModificarTramiteUseCase
         // 4. Persistencia
         _tramiteRepo.Modificar(tramite);
 
-        // 5. Respuesta
+        //5. Llamamos al serivicio orquesatdor
+        _actualizador.Ejecutar(tramite,req.IdUser);
+
+        // 6. Respuesta
         return new ModificarTramiteResponse(
             tramite.Id, 
             tramite.Contenido.Valor, 

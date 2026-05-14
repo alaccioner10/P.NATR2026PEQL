@@ -1,21 +1,20 @@
-using System.Net.Cache;
 using SGE.Aplicacion.Tramites;
 using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
-using SGE.Aplicacion.Expedientes;
+using SGE.Aplicacion.Servicios;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
 public class AgregarTramiteUseCase
 {
     private readonly ITramiteRepository _tramiteRepo;
-    private readonly IExpedienteRepository _expRepo;
+    private readonly ActualizadorEstadoExpedienteService _actualizador;
 
-    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo, IExpedienteRepository expRepo)
+    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador)
     {
         _tramiteRepo = tramiteRepo;
-        _expRepo=expRepo;
+        _actualizador = actualizador;
     }
 
     public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req)
@@ -40,16 +39,7 @@ public class AgregarTramiteUseCase
         // 3. Persistimos a través del repositorio
         _tramiteRepo.Agregar(tramite);
 
-        if (tramite.Etiqueta == EtiquetaEnum.PaseAlArchivo)
-        {
-            var exp = _expRepo.ObtenerPorId(req.ExpedienteId);
-            if (exp != null)
-            {
-                // Usamos el método que ya tienen en el dominio de Expediente
-                exp.CambiarEstado(EstadoEnum.Finalizado, req.IdUser);
-                _expRepo.Modificar(exp);
-            }
-        }
+        _actualizador.Ejecutar(tramite, req.IdUser);
 
         // 4. Mapeamos el resultado al DTO de respuesta
         return new AgregarTramiteResponse(
