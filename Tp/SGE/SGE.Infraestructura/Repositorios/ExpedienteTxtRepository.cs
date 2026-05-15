@@ -119,6 +119,6 @@ public void Modificar(Expediente expediente)
         Guid usuarioId = Guid.Parse(campos[5]);
 
         // Usamos el Factory Method con el orden que definiste en tu constructor privado
-        return Expediente.Expediente(id, fechaCreacion, fechaModificacion, usuarioId, caratula, estado);
+        return new Expediente(id, fechaCreacion, fechaModificacion, usuarioId, caratula, estado);
     }
 }
