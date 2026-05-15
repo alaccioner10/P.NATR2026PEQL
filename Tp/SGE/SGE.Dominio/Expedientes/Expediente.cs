@@ -84,4 +84,12 @@ public class Expediente
         Estado = nuevoEst;
         RegistrarModificacion(idUser);
     }
+
+
+    //Preguntar si esta bien hacer esto, estamos llamndo al constructor desde afuera para reconstruir el archivo txt. 
+    public static Expediente Reconstruir(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoEnum estado)
+    {
+        // Acá adentro sí podemos usar el constructor privado
+        return new Expediente(id, fechaCreacion, fechaUlt, usuarioUlt, caratula, estado);
+    }
 }
