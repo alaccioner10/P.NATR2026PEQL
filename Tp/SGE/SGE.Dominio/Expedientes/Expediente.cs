@@ -86,7 +86,7 @@ public class Expediente
     }
 
 
-    //Preguntar si esta bien hacer esto, estamos llamndo al constructor desde afuera para reconstruir el archivo txt. 
+    //Cambiar el constructor a publico tanto de Expediente como de Tramites 
     public static Expediente Reconstruir(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoEnum estado)
     {
         // Acá adentro sí podemos usar el constructor privado
