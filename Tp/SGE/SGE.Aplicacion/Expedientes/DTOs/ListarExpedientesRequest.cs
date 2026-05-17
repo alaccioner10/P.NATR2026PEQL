@@ -1,4 +1,3 @@
-using System;
 
 namespace SGE.Aplicacion.Expedientes.DTOs;
 

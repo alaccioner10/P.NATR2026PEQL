@@ -1,5 +1,3 @@
-using SGE.Aplicacion.Tramites;
-using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Servicios;

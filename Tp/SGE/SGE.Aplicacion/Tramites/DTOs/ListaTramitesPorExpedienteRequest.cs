@@ -1,4 +1,3 @@
-using System;
 using SGE.Dominio.Tramites;
 
 namespace SGE.Aplicacion.Tramites.DTOs;

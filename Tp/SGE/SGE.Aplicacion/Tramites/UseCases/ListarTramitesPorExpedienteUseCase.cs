@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using SGE.Aplicacion.Tramites.DTOs;
 
 namespace SGE.Aplicacion.Tramites.UseCases;

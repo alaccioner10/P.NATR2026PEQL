@@ -1,5 +1,4 @@
 using SGE.Aplicacion.Autorizacion;
-using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Excepciones;
 

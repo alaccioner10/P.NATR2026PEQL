@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites;
 

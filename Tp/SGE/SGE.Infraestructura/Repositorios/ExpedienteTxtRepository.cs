@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes;
-using SGE.Aplicacion.Expedientes.UseCases;
+
 
 namespace SGE.Infraestructura.Repositorios;
 
