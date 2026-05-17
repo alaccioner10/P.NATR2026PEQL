@@ -17,18 +17,59 @@ var autorizacionService = new AutorizacionProvisionalService();
 
 var actualizadorEstado = new ActualizadorEstadoExpedienteService(expedienteRepo);
 
+// Casos de Uso - Expedientes
 var agregarExpedienteUC = new AgregarExpedienteUseCase(expedienteRepo);
+var consultarExpedienteUC = new ConsultarExpedienteUseCase(expedienteRepo);
+var modificarCaratulaUC = new ModificarCaratulaUseCase(expedienteRepo, autorizacionService);
+var eliminarExpedienteUC = new EliminarExpedienteUseCase(expedienteRepo, tramiteRepo, autorizacionService);
+
+// Casos de Uso - Trámites
 var agregarTramiteUC = new AgregarTramiteUseCase(tramiteRepo, actualizadorEstado);
 var eliminarTramiteUC = new EliminarTramiteUseCase(tramiteRepo, autorizacionService, actualizadorEstado);
+var modificarTramiteUC = new ModificarTramiteUseCase(tramiteRepo, autorizacionService, actualizadorEstado);
+
 
 // ==========================================
-// 2. BUCLE PRINCIPAL 
+// 2. PANTALLA DE LOGIN OBLIGATORIA
+// ==========================================
+
+Console.Clear();
+Console.WriteLine("==================================================");
+Console.WriteLine("        SISTEMA DE GESTIÓN DE EXPEDIENTES         ");
+Console.WriteLine("==================================================");
+Console.ResetColor();
+
+Guid usuarioLogueado = Guid.Empty;
+bool logueado = false;
+
+while (!logueado)
+{
+    Console.Write("\nPor favor, ingrese su ID de Usuario para iniciar sesión: ");
+    string inputUser = Console.ReadLine() ?? "";
+
+    try
+    {
+        usuarioLogueado = Guid.Parse(inputUser);
+        logueado = true;
+        
+        Console.WriteLine("\n¡Sesión iniciada con éxito!");
+        Console.ResetColor();
+        Console.WriteLine("Presione cualquier tecla para ingresar al menú principal...");
+        Console.ReadKey();
+    }
+    catch (FormatException)
+    {
+        Console.WriteLine("ERROR: El formato no es válido. Debe ser un GUID (ej: 12345678-1234-1234-1234-123456789abc).");
+        Console.ResetColor();
+    }
+}
+
+
+// ==========================================
+// 3. BUCLE PRINCIPAL (Menú del Sistema)
 // ==========================================
 
 bool salir = false;
-
-// Arranca con un ID por defecto, pero ahora se puede cambiar desde el menú
-Guid usuarioLogueado = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
 while (!salir)
 {
@@ -39,9 +80,13 @@ while (!salir)
     Console.WriteLine("==================================================");
     Console.ResetColor();
     Console.WriteLine(" 1. Agregar un nuevo Expediente");
-    Console.WriteLine(" 2. Agregar un Trámite a un Expediente");
-    Console.WriteLine(" 3. Eliminar un Trámite");
-    Console.WriteLine(" 4. Iniciar Sesión / Cambiar de Usuario");
+    Console.WriteLine(" 2. Consultar Expediente");
+    Console.WriteLine(" 3. Modificar Carátula");
+    Console.WriteLine(" 4. Eliminar Expediente");
+    Console.WriteLine(" 5. Agregar un Trámite a un Expediente");
+    Console.WriteLine(" 6. Ver detalle de un Trámite");
+    Console.WriteLine(" 7. Modificar un Trámite");
+    Console.WriteLine(" 8. Eliminar un Trámite");
     Console.WriteLine(" 0. Salir del Sistema");
     Console.WriteLine("==================================================");
     Console.Write("Ingrese el número de la opción deseada: ");
@@ -66,6 +111,47 @@ while (!salir)
                 break;
 
             case "2":
+                Console.WriteLine("--- CONSULTAR EXPEDIENTE ---");
+                Console.Write("Ingrese el ID del Expediente a buscar: ");
+                Guid expIdConsultar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+
+                var requestConsultarExp = new ConsultarExpedienteRequest(expIdConsultar);
+                var responseConsultarExp = consultarExpedienteUC.Ejecutar(requestConsultarExp);
+
+                Console.WriteLine("\nDATOS DEL EXPEDIENTE:");
+                Console.WriteLine($"- ID: {responseConsultarExp.Id}");
+                Console.WriteLine($"- Carátula: {responseConsultarExp.Caratula}");
+                Console.WriteLine($"- Estado: {responseConsultarExp.Estado}");
+                Console.WriteLine($"- Fecha Creación: {responseConsultarExp.FechaCreacion}");
+                Console.WriteLine($"- Última Modificación: {responseConsultarExp.FechaModificacion}");
+                break;
+
+            case "3":
+                Console.WriteLine("--- MODIFICAR CARÁTULA ---");
+                Console.Write("Ingrese el ID del Expediente a modificar: ");
+                Guid expIdModificar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+                
+                Console.Write("Ingrese la nueva carátula: ");
+                string nuevaCaratula = Console.ReadLine() ?? "";
+
+                var requestModificarCaratula = new ModificarCaratulaRequest(expIdModificar, nuevaCaratula, usuarioLogueado, DateTime.Now);
+                modificarCaratulaUC.Ejecutar(requestModificarCaratula);
+
+                Console.WriteLine("\n¡Carátula modificada con éxito!");
+                break;
+
+            case "4":
+                Console.WriteLine("--- ELIMINAR EXPEDIENTE ---");
+                Console.Write("Ingrese el ID del Expediente a eliminar: ");
+                Guid expedienteIdEliminar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+
+                var requestEliminarExp = new EliminarExpedienteRequest(expedienteIdEliminar, usuarioLogueado);
+                eliminarExpedienteUC.Ejecutar(requestEliminarExp);
+
+                Console.WriteLine("\nEl expediente fue eliminado del sistema.");
+                break;
+
+            case "5":
                 Console.WriteLine("--- ALTA DE TRÁMITE ---");
                 Console.Write("Ingrese el ID del Expediente (ej. xxxxxxxx-xxxx-...): ");
                 Guid expId = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
@@ -74,38 +160,61 @@ while (!salir)
                 string contenido = Console.ReadLine() ?? "";
 
                 var requestTramite = new AgregarTramiteRequest(expId, EtiquetaEnum.Resolucion, contenido, usuarioLogueado);
-                
-                // Capturamos el retorno del caso de uso para obtener el ID del trámite creado
                 var responseTramite = agregarTramiteUC.Ejecutar(requestTramite);
 
                 Console.WriteLine($"\n¡Trámite agregado con éxito! ID: {responseTramite.Id}");
                 break;
 
-            case "3":
+            case "6":
+                Console.WriteLine("--- VER DETALLE DE TRÁMITE ---");
+                Console.Write("Ingrese el ID del Trámite que desea buscar: ");
+                Guid tramiteIdBuscar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+
+                var tramiteEncontrado = tramiteRepo.ObtenerPorId(tramiteIdBuscar);
+
+                if (tramiteEncontrado != null)
+                {
+                    Console.WriteLine("\nDATOS DEL TRÁMITE:");
+                    Console.WriteLine($"- ID Trámite: {tramiteEncontrado.Id}");
+                    Console.WriteLine($"- ID Expediente: {tramiteEncontrado.ExpedienteId}");
+                    Console.WriteLine($"- Etiqueta (Estado): {tramiteEncontrado.Etiqueta}");
+                    Console.WriteLine($"- Contenido: {tramiteEncontrado.Contenido.Valor}");
+                    Console.WriteLine($"- Fecha Creación: {tramiteEncontrado.FechaCreacion}");
+                }
+                else
+                {
+                    Console.WriteLine("\nNo se encontró ningún trámite con ese ID.");
+                }
+                break;
+
+            case "7":
+                Console.WriteLine("--- MODIFICAR TRÁMITE ---");
+                Console.Write("Ingrese el ID del Trámite a modificar: ");
+                Guid tramiteIdModificar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+                
+                Console.Write("Ingrese el nuevo contenido del trámite: ");
+                string nuevoContenido = Console.ReadLine() ?? "";
+
+                var requestModificar = new ModificarTramiteRequest(tramiteIdModificar, nuevoContenido, usuarioLogueado);
+                modificarTramiteUC.Ejecutar(requestModificar);
+
+                Console.WriteLine("\n¡Trámite modificado con éxito!");
+                break;
+
+            case "8":
                 Console.WriteLine("--- ELIMINAR TRÁMITE ---");
                 Console.Write("Ingrese el ID del Trámite a eliminar: ");
-                Guid tramiteId = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+                Guid tramiteIdEliminar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
 
-                var requestEliminar = new EliminarTramiteRequest(tramiteId, usuarioLogueado);
+                var requestEliminar = new EliminarTramiteRequest(tramiteIdEliminar, usuarioLogueado);
                 eliminarTramiteUC.Ejecutar(requestEliminar);
 
                 Console.WriteLine("\nEl trámite fue eliminado del sistema.");
                 break;
 
-            case "4":
-                Console.WriteLine("--- INICIAR SESIÓN / CAMBIAR USUARIO ---");
-                Console.Write("Ingrese el ID del Usuario (Formato xxxxxxxx-xxxx-...): ");
-                string inputUser = Console.ReadLine() ?? "";
-                
-                // Parseamos el nuevo GUID introducido por el usuario
-                usuarioLogueado = Guid.Parse(inputUser);
-                
-                Console.WriteLine($"\n¡Sesión iniciada con éxito! Bienvenido.");
-                break;
-
             case "0":
                 salir = true;
-                Console.WriteLine("Saliendo del sistema... ¡Éxitos con la entrega!");
+                Console.WriteLine("Saliendo del sistema...");
                 break;
 
             default:
@@ -124,7 +233,7 @@ while (!salir)
 
     if (!salir)
     {
-        Console.WriteLine("\nPresione cualquier tecla para volver al menú principal...");
-        Console.ReadKey(); // El freno que mantiene los mensajes en pantalla
+        Console.WriteLine("\nPresione cualquier tecla para volver al menú...");
+        Console.ReadKey();
     }
 }
