@@ -5,6 +5,7 @@ using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Tramites.UseCases;
 using SGE.Aplicacion.Tramites.DTOs; 
 using SGE.Aplicacion.Servicios;
+using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Tramites; 
 using SGE.Dominio.Expedientes; 
 
@@ -51,6 +52,14 @@ while (!logueado)
     try
     {
         usuarioLogueado = Guid.Parse(inputUser);
+
+        bool tienePermiso = autorizacionService.PoseeElPermiso(usuarioLogueado, Permiso.ExpedienteAlta);
+
+        if (!tienePermiso)
+        {
+            throw new UnauthorizedAccessException("El servicio de autorización denegó el acceso al sistema.");
+        }
+
         logueado = true;
         
         Console.WriteLine("\n¡Sesión iniciada con éxito!");
@@ -60,6 +69,10 @@ while (!logueado)
     catch (FormatException)
     {
         Console.WriteLine("ERROR: El formato no es válido. Debe ser un GUID (ej: 12345678-1234-1234-1234-123456789abc).");
+    }
+    catch (UnauthorizedAccessException ex)
+    {
+        Console.WriteLine($"\nACCESO DENEGADO: {ex.Message}");
     }
 }
 
