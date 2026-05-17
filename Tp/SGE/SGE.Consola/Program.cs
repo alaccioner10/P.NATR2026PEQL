@@ -33,7 +33,7 @@ var modificarTramiteUC = new ModificarTramiteUseCase(tramiteRepo, autorizacionSe
 
 
 // ==========================================
-// 2. PANTALLA DE LOGIN OBLIGATORIA
+// 2. PANTALLA DE LOGIN 
 // ==========================================
 
 Console.Clear();

@@ -4,20 +4,16 @@ using SGE.Aplicacion.Expedientes;
 
 namespace SGE.Infraestructura.Repositorios;
 
-// Le decimos a C# que esta clase implementa el contrato IExpedienteRepository
 public class ExpedienteTxtRepository : IExpedienteRepository
 {
 
-    // Definimos el nombre/ruta del archivo donde se va a guardar todo
     private readonly string _archivo= "expedientes.txt";
 
     public void Agregar (Expediente expediente)
     {
-        // 1. Armamos la cadena de texto separando las propiedades por un "|"
         string linea = $"{expediente.Id}|{expediente.Caratula.Valor}|{expediente.Estado}|{expediente.FechaCreacion}|{expediente.FechaUltimaModificacion}|{expediente.UsuarioUltimoCambio}";
 
-        // 2. Escribimos en el archivo. 
-        // El 'true' significa "Append": agrega la línea al final sin borrar lo que ya estaba.
+
         using (StreamWriter sw = new StreamWriter(_archivo, true))
         {
             sw.WriteLine(linea);
@@ -48,14 +44,13 @@ public IEnumerable<Expediente> ObtenerTodos()
         
         foreach (var linea in lineas)
         {
-            // Buscamos si la línea empieza con el ID que nos pasaron
             if (linea.StartsWith(id.ToString()))
             {
                 return MapearDesdeLinea(linea);
             }
         }
 
-        return null; // Si termina de leer todo y no lo encuentra, devuelve null
+        return null; 
     }
 
 public void Modificar(Expediente expediente)
@@ -69,18 +64,15 @@ public void Modificar(Expediente expediente)
         {
             if (linea.StartsWith(expediente.Id.ToString()))
             {
-                // Si es el expediente a modificar, armamos la nueva línea con los datos actualizados
                 string nuevaLinea = $"{expediente.Id}|{expediente.Caratula.Valor}|{expediente.Estado}|{expediente.FechaCreacion}|{expediente.FechaUltimaModificacion}|{expediente.UsuarioUltimoCambio}";
                 lineasActualizadas.Add(nuevaLinea);
             }
             else
             {
-                // Si es otro expediente, dejamos la línea como estaba
                 lineasActualizadas.Add(linea);
             }
         }
 
-        // Sobrescribimos el archivo completo con las líneas actualizadas
         File.WriteAllLines(_archivo, lineasActualizadas);
     }
 
@@ -93,14 +85,12 @@ public void Modificar(Expediente expediente)
 
         foreach (var linea in lineas)
         {
-            // Solo guardamos en la nueva lista las líneas que NO sean la del expediente a borrar
             if (!linea.StartsWith(id.ToString()))
             {
                 lineasActualizadas.Add(linea);
             }
         }
 
-        // Sobrescribimos el archivo (básicamente, guardamos todo menos el borrado)
         File.WriteAllLines(_archivo, lineasActualizadas);
     }
 
@@ -115,7 +105,6 @@ public void Modificar(Expediente expediente)
         DateTime fechaModificacion = DateTime.Parse(campos[4]);
         Guid usuarioId = Guid.Parse(campos[5]);
 
-        // Usamos el Factory Method con el orden que definiste en tu constructor privado
         return new Expediente(id, fechaCreacion, fechaModificacion, usuarioId, caratula, estado);
     }
 }

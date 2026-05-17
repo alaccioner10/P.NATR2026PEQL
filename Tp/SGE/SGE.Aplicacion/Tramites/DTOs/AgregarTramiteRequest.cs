@@ -2,7 +2,6 @@ using SGE.Dominio.Tramites;
 
 namespace SGE.Aplicacion.Tramites.DTOs;
 
-// Lo que recibimos de la UI/API
 public record AgregarTramiteRequest(
     Guid ExpedienteId, 
     EtiquetaEnum Etiqueta, 
@@ -10,7 +9,6 @@ public record AgregarTramiteRequest(
     Guid IdUser
 );
 
-// Lo que devolvemos
 public record AgregarTramiteResponse(
     Guid Id,
     Guid ExpedienteId,

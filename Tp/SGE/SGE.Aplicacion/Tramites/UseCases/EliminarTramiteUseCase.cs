@@ -20,26 +20,22 @@ public class EliminarTramiteUseCase
 
     public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest req)
     {
-        // 1. Validación de Seguridad
         
         if (!_autorizacion.PoseeElPermiso(req.IdUsuario, Permiso.TramiteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar trámites.");
         }
 
-        // 2. Verificar existencia 
         var tramite = _tramiteRepo.ObtenerPorId(req.TramiteId);
         if (tramite == null)
         {
             throw new AplicationException("El trámite que intenta eliminar no existe.");
         }
 
-        // 3. Ejecutar la baja en el repositorio
         _tramiteRepo.Eliminar(req.TramiteId);
 
         _actualizador.Ejecutar(tramite, req.IdUsuario);
 
-        // 4. Devolver respuesta
         return new EliminarTramiteResponse(req.TramiteId, "Trámite eliminado con éxito.");
     }
 }

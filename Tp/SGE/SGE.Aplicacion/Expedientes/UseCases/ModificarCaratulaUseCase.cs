@@ -19,7 +19,6 @@ public class ModificarCaratulaUseCase
     public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest req)
     {
        
-       // 1. Validamos que el request no venga vacío apenas entramos (¡esto faltaba!)
         if (req == null)
         {
             throw new AplicationException("La solicitud no puede estar vacía."); 

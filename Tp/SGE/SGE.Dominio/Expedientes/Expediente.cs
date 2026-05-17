@@ -15,17 +15,12 @@ public class Expediente
     public Caratula Caratula{get; private set;}
     public EstadoEnum Estado {get; private set;}
 
-    /*
-        Constructor de expediente NUEVO, solo recibe cosas que no puede generar por su cuenta.
-    */
+
     public Expediente(Caratula caratula, Guid user) : this(Guid.NewGuid(), DateTime.Now, DateTime.Now, user, caratula, EstadoEnum.RecienIniciado)
     {
     }
 
-    /*
-        Constructor de expendiente cuando es RECUPERADO u OBTENIDO de otro lado con todos sus datos,
-        aca no genera nada por su cuenta.
-    */
+
     public Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoEnum estado)
     {
         if(id == Guid.Empty)
