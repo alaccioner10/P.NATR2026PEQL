@@ -6,6 +6,7 @@ using SGE.Aplicacion.Tramites.UseCases;
 using SGE.Aplicacion.Tramites.DTOs; 
 using SGE.Aplicacion.Servicios;
 using SGE.Dominio.Tramites; 
+using SGE.Dominio.Expedientes; 
 
 // ==========================================
 // 1. INYECCIÓN DE DEPENDENCIAS 
@@ -21,6 +22,7 @@ var actualizadorEstado = new ActualizadorEstadoExpedienteService(expedienteRepo)
 var agregarExpedienteUC = new AgregarExpedienteUseCase(expedienteRepo);
 var consultarExpedienteUC = new ConsultarExpedienteUseCase(expedienteRepo);
 var modificarCaratulaUC = new ModificarCaratulaUseCase(expedienteRepo, autorizacionService);
+var cambiarEstadoExpUC = new CambiarEstadoExpediente(expedienteRepo, autorizacionService);
 var eliminarExpedienteUC = new EliminarExpedienteUseCase(expedienteRepo, tramiteRepo, autorizacionService);
 
 // Casos de Uso - Trámites
@@ -37,7 +39,6 @@ Console.Clear();
 Console.WriteLine("==================================================");
 Console.WriteLine("        SISTEMA DE GESTIÓN DE EXPEDIENTES         ");
 Console.WriteLine("==================================================");
-Console.ResetColor();
 
 Guid usuarioLogueado = Guid.Empty;
 bool logueado = false;
@@ -53,14 +54,12 @@ while (!logueado)
         logueado = true;
         
         Console.WriteLine("\n¡Sesión iniciada con éxito!");
-        Console.ResetColor();
         Console.WriteLine("Presione cualquier tecla para ingresar al menú principal...");
         Console.ReadKey();
     }
     catch (FormatException)
     {
         Console.WriteLine("ERROR: El formato no es válido. Debe ser un GUID (ej: 12345678-1234-1234-1234-123456789abc).");
-        Console.ResetColor();
     }
 }
 
@@ -78,15 +77,17 @@ while (!salir)
     Console.WriteLine("        SISTEMA DE GESTIÓN DE EXPEDIENTES         ");
     Console.WriteLine($"        Usuario actual: {usuarioLogueado}");
     Console.WriteLine("==================================================");
-    Console.ResetColor();
     Console.WriteLine(" 1. Agregar un nuevo Expediente");
     Console.WriteLine(" 2. Consultar Expediente");
     Console.WriteLine(" 3. Modificar Carátula");
-    Console.WriteLine(" 4. Eliminar Expediente");
-    Console.WriteLine(" 5. Agregar un Trámite a un Expediente");
-    Console.WriteLine(" 6. Ver detalle de un Trámite");
-    Console.WriteLine(" 7. Modificar un Trámite");
-    Console.WriteLine(" 8. Eliminar un Trámite");
+    Console.WriteLine(" 4. Modificar Estado de Expediente");
+    Console.WriteLine(" 5. Eliminar Expediente");
+    Console.WriteLine("--------------------------------------------------");
+    Console.WriteLine(" 6. Agregar un Trámite a un Expediente");
+    Console.WriteLine(" 7. Ver detalle de un Trámite");
+    Console.WriteLine(" 8. Modificar un Trámite");
+    Console.WriteLine(" 9. Eliminar un Trámite");
+    Console.WriteLine("--------------------------------------------------");
     Console.WriteLine(" 0. Salir del Sistema");
     Console.WriteLine("==================================================");
     Console.Write("Ingrese el número de la opción deseada: ");
@@ -141,6 +142,27 @@ while (!salir)
                 break;
 
             case "4":
+                Console.WriteLine("--- MODIFICAR ESTADO DE EXPEDIENTE ---");
+                Console.Write("Ingrese el ID del Expediente a modificar: ");
+                Guid expIdEstado = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
+                
+                Console.Write("Ingrese el nuevo estado (ej. Iniciado, Resolucion, etc.): ");
+                string estadoInput = Console.ReadLine() ?? "";
+
+                if (Enum.TryParse<EstadoEnum>(estadoInput, true, out EstadoEnum nuevoEstado))
+                {
+                    var requestEstado = new CambiarEstadoExpRequest(expIdEstado, usuarioLogueado, nuevoEstado);
+                    cambiarEstadoExpUC.Ejecutar(requestEstado);
+
+                    Console.WriteLine("\n¡Estado del expediente modificado con éxito!");
+                }
+                else
+                {
+                    Console.WriteLine("\nERROR: El estado ingresado no coincide con ningún estado válido del sistema.");
+                }
+                break;
+
+            case "5":
                 Console.WriteLine("--- ELIMINAR EXPEDIENTE ---");
                 Console.Write("Ingrese el ID del Expediente a eliminar: ");
                 Guid expedienteIdEliminar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
@@ -151,7 +173,7 @@ while (!salir)
                 Console.WriteLine("\nEl expediente fue eliminado del sistema.");
                 break;
 
-            case "5":
+            case "6":
                 Console.WriteLine("--- ALTA DE TRÁMITE ---");
                 Console.Write("Ingrese el ID del Expediente (ej. xxxxxxxx-xxxx-...): ");
                 Guid expId = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
@@ -165,7 +187,7 @@ while (!salir)
                 Console.WriteLine($"\n¡Trámite agregado con éxito! ID: {responseTramite.Id}");
                 break;
 
-            case "6":
+            case "7":
                 Console.WriteLine("--- VER DETALLE DE TRÁMITE ---");
                 Console.Write("Ingrese el ID del Trámite que desea buscar: ");
                 Guid tramiteIdBuscar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
@@ -187,7 +209,7 @@ while (!salir)
                 }
                 break;
 
-            case "7":
+            case "8":
                 Console.WriteLine("--- MODIFICAR TRÁMITE ---");
                 Console.Write("Ingrese el ID del Trámite a modificar: ");
                 Guid tramiteIdModificar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
@@ -201,7 +223,7 @@ while (!salir)
                 Console.WriteLine("\n¡Trámite modificado con éxito!");
                 break;
 
-            case "8":
+            case "9":
                 Console.WriteLine("--- ELIMINAR TRÁMITE ---");
                 Console.Write("Ingrese el ID del Trámite a eliminar: ");
                 Guid tramiteIdEliminar = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
