@@ -40,7 +40,7 @@ public class EliminarExpedienteUseCase
             throw new AplicationException("No se encontró el expediente solicitado");
         }
 
-        var tramites = _iTramRepo.ObtenerPorExpedienteId(req.ExpedienteId);
+        var tramites = _iTramRepo.ObtenerPorExpedienteId(req.ExpedienteId).ToList();
         foreach (var t in tramites)
         {
             _iTramRepo.Eliminar(t.Id);

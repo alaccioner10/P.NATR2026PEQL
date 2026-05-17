@@ -8,13 +8,15 @@ using SGE.Aplicacion.Servicios;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Tramites; 
 using SGE.Dominio.Expedientes; 
+using SGE.Aplicacion.Expedientes;
+using SGE.Aplicacion.Tramites;
 
 // ==========================================
 // 1. INYECCIÓN DE DEPENDENCIAS 
 // ==========================================
 
-var expedienteRepo = new ExpedienteTxtRepository();
-var tramiteRepo = new TramiteTxtRepository();
+IExpedienteRepository expedienteRepo = new ExpedienteMemoriaRepository();
+ITramiteRepository tramiteRepo = new TramiteMemoriaRepository();
 var autorizacionService = new AutorizacionProvisionalService(); 
 
 var actualizadorEstado = new ActualizadorEstadoExpedienteService(expedienteRepo);
