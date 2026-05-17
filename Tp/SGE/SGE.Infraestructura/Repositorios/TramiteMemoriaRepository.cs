@@ -11,7 +11,6 @@ public class TramiteMemoriaRepository : ITramiteRepository
     
     public Tramite? ObtenerPorId(Guid id) => _tramites.FirstOrDefault(t => t.Id == id);
     
-    // Si tuvieran un método para traer los trámites de un expediente específico:
     public IEnumerable<Tramite> ObtenerPorExpedienteId(Guid expedienteId) 
         => _tramites.Where(t => t.ExpedienteId == expedienteId);
 

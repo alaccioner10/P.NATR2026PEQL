@@ -49,6 +49,6 @@ public class EliminarExpedienteUseCase
         _iExpRepo.Eliminar(req.ExpedienteId);
 
 
-        return new EliminarExpedienteResponse(req.ExpedienteId, "Expediente y sus trámites eliminados con éxito.");
+        return new EliminarExpedienteResponse(req.ExpedienteId);
     }
 }
