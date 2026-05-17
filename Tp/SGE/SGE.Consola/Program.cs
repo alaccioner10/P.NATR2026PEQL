@@ -142,23 +142,49 @@ while (!salir)
                 break;
 
             case "4":
-                Console.WriteLine("--- MODIFICAR ESTADO DE EXPEDIENTE ---");
+Console.WriteLine("--- MODIFICAR ESTADO DE EXPEDIENTE ---");
                 Console.Write("Ingrese el ID del Expediente a modificar: ");
                 Guid expIdEstado = Guid.Parse(Console.ReadLine() ?? Guid.Empty.ToString());
                 
-                Console.Write("Ingrese el nuevo estado (ej. Iniciado, Resolucion, etc.): ");
-                string estadoInput = Console.ReadLine() ?? "";
+                Console.WriteLine("\nSeleccione el nuevo estado:");
+                Console.WriteLine(" 1. Recien Iniciado");
+                Console.WriteLine(" 2. Para Resolver");
+                Console.WriteLine(" 3. Con Resolucion");
+                Console.WriteLine(" 4. En Notificacion");
+                Console.WriteLine(" 5. Finalizado");
+                Console.Write("\nIngrese el número de la opción: ");
+                
+                var subOpcion = Console.ReadLine();
+                EstadoEnum? nuevoEstado = null;
 
-                if (Enum.TryParse<EstadoEnum>(estadoInput, true, out EstadoEnum nuevoEstado))
+                switch (subOpcion)
                 {
-                    var requestEstado = new CambiarEstadoExpRequest(expIdEstado, usuarioLogueado, nuevoEstado);
+                    case "1":
+                        nuevoEstado = EstadoEnum.RecienIniciado;
+                        break;
+                    case "2":
+                        nuevoEstado = EstadoEnum.ParaResolver;
+                        break;
+                    case "3":
+                        nuevoEstado = EstadoEnum.ConResolucion;
+                        break;
+                    case "4":
+                        nuevoEstado = EstadoEnum.EnNotificacion;
+                        break;
+                    case "5":
+                        nuevoEstado = EstadoEnum.Finalizado;
+                        break;
+                    default:
+                        Console.WriteLine("\nERROR: Opción de estado no válida.");
+                        break;
+                }
+
+                if (nuevoEstado != null)
+                {
+                    var requestEstado = new CambiarEstadoExpRequest(expIdEstado, usuarioLogueado, nuevoEstado.Value);
                     cambiarEstadoExpUC.Ejecutar(requestEstado);
 
-                    Console.WriteLine("\n¡Estado del expediente modificado con éxito!");
-                }
-                else
-                {
-                    Console.WriteLine("\nERROR: El estado ingresado no coincide con ningún estado válido del sistema.");
+                    Console.WriteLine($"\n¡Estado modificado a '{nuevoEstado}' con éxito!");
                 }
                 break;
 
