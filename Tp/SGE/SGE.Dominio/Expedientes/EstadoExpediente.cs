@@ -1,6 +1,6 @@
 namespace SGE.Dominio.Expedientes;
 
-public enum EstadoEnum
+public enum EstadoExpediente
 {
     RecienIniciado,
     ParaResolver,

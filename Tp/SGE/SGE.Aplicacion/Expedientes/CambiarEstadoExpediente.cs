@@ -1,6 +1,7 @@
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Excepciones;
+using SGE.Dominio.Tramites;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
@@ -33,7 +34,7 @@ public class CambiarEstadoExpediente
             throw new AplicationException("El expediente solicitado no existe");
         }
 
-        exp.CambiarEstado(req.Estado, req.IdUser);
+        exp.ActualizarEstado((EtiquetaTramite?)req.Estado, req.IdUser);
 
         _iExpRepo.Modificar(exp);
 

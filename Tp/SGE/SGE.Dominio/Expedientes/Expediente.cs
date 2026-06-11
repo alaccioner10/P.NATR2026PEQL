@@ -13,15 +13,15 @@ public class Expediente
     public DateTime FechaUltimaModificacion {get; private set;}
     public Guid UsuarioUltimoCambio {get; private set;}
     public Caratula Caratula{get; private set;}
-    public EstadoEnum Estado {get; private set;}
+    public EstadoExpediente Estado {get; private set;}
 
 
-    public Expediente(Caratula caratula, Guid user) : this(Guid.NewGuid(), DateTime.Now, DateTime.Now, user, caratula, EstadoEnum.RecienIniciado)
+    public Expediente(Caratula caratula, Guid user) : this(Guid.NewGuid(), DateTime.Now, DateTime.Now, user, caratula, EstadoExpediente.RecienIniciado)
     {
     }
 
 
-    public Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoEnum estado)
+    public Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoExpediente estado)
     {
         if(id == Guid.Empty)
         {
@@ -52,34 +52,25 @@ public class Expediente
         RegistrarModificacion(idUser);
     }
 
-    public bool ActualizarEstado(EtiquetaEnum? ultEtiqueta, Guid idUser)
+    public bool ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)
     {
-        EstadoEnum estadoAntes = Estado;
+        EstadoExpediente estadoAntes = Estado;
         switch (ultEtiqueta)
         {
             case null:
-                Estado = EstadoEnum.RecienIniciado;
+                Estado = EstadoExpediente.RecienIniciado;
                 break;
-            case EtiquetaEnum.Resolucion:
-                Estado = EstadoEnum.ConResolucion;
+            case EtiquetaTramite.Resolucion:
+                Estado = EstadoExpediente.ConResolucion;
                 break;
-            case EtiquetaEnum.PaseAEstudio:
-                Estado= EstadoEnum.ParaResolver;
+            case EtiquetaTramite.PaseAEstudio:
+                Estado= EstadoExpediente.ParaResolver;
                 break;
-            case EtiquetaEnum.PaseAlArchivo:
-                Estado = EstadoEnum.Finalizado;
+            case EtiquetaTramite.PaseAlArchivo:
+                Estado = EstadoExpediente.Finalizado;
                 break;
         }
         RegistrarModificacion(idUser);
-        return estadoAntes == Estado;
+        return estadoAntes != Estado;
     }
-
-    public void CambiarEstado(EstadoEnum nuevoEst, Guid idUser)
-    {
-        Estado = nuevoEst;
-        RegistrarModificacion(idUser);
-    }
-
-
-
 }

@@ -4,7 +4,7 @@ namespace SGE.Aplicacion.Tramites.DTOs;
 
 public record AgregarTramiteRequest(
     Guid ExpedienteId, 
-    EtiquetaEnum Etiqueta, 
+    EtiquetaTramite Etiqueta, 
     string Contenido, 
     Guid IdUser
 );
@@ -12,7 +12,7 @@ public record AgregarTramiteRequest(
 public record AgregarTramiteResponse(
     Guid Id,
     Guid ExpedienteId,
-    EtiquetaEnum Etiqueta,
+    EtiquetaTramite Etiqueta,
     string Contenido,
     DateTime FechaCreacion,
     DateTime FechaUltModificacion,

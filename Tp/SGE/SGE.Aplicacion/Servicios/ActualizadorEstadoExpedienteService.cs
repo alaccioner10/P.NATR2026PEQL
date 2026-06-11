@@ -15,13 +15,13 @@ public class ActualizadorEstadoExpedienteService
 
     public void Ejecutar(Tramite tramite, Guid usuarioId)
     {
-        if (tramite.Etiqueta == EtiquetaEnum.PaseAlArchivo)
+        if (tramite.Etiqueta == EtiquetaTramite.PaseAlArchivo)
         {
             var exp=_expRepo.ObtenerPorId(tramite.ExpedienteId);
 
             if (exp != null)
             {
-                exp.CambiarEstado(EstadoEnum.Finalizado, usuarioId);
+                exp.ActualizarEstado((EtiquetaTramite?)EstadoExpediente.Finalizado, usuarioId);
                 _expRepo.Modificar(exp);
             }
         }

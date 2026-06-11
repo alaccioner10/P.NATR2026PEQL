@@ -1,5 +1,4 @@
-﻿using SGE.Infraestructura.Repositorios;
-using SGE.Infraestructura.Servicios; 
+﻿using SGE.Infraestructura.Repositorios; 
 using SGE.Aplicacion.Expedientes.UseCases;
 using SGE.Aplicacion.Expedientes.DTOs; 
 using SGE.Aplicacion.Tramites.UseCases;
@@ -22,14 +21,14 @@ var autorizacionService = new AutorizacionProvisionalService();
 var actualizadorEstado = new ActualizadorEstadoExpedienteService(expedienteRepo);
 
 // Casos de Uso - Expedientes
-var agregarExpedienteUC = new AgregarExpedienteUseCase(expedienteRepo);
+var agregarExpedienteUC = new AgregarExpedienteUseCase(expedienteRepo,autorizacionService);
 var consultarExpedienteUC = new ConsultarExpedienteUseCase(expedienteRepo);
 var modificarCaratulaUC = new ModificarCaratulaUseCase(expedienteRepo, autorizacionService);
 var cambiarEstadoExpUC = new CambiarEstadoExpediente(expedienteRepo, autorizacionService);
 var eliminarExpedienteUC = new EliminarExpedienteUseCase(expedienteRepo, tramiteRepo, autorizacionService);
 
 // Casos de Uso - Trámites
-var agregarTramiteUC = new AgregarTramiteUseCase(tramiteRepo, actualizadorEstado);
+var agregarTramiteUC = new AgregarTramiteUseCase(tramiteRepo, actualizadorEstado,autorizacionService);
 var eliminarTramiteUC = new EliminarTramiteUseCase(tramiteRepo, autorizacionService, actualizadorEstado);
 var modificarTramiteUC = new ModificarTramiteUseCase(tramiteRepo, autorizacionService, actualizadorEstado);
 
@@ -170,24 +169,24 @@ Console.WriteLine("--- MODIFICAR ESTADO DE EXPEDIENTE ---");
                 Console.Write("\nIngrese el número de la opción: ");
                 
                 var subOpcion = Console.ReadLine();
-                EstadoEnum? nuevoEstado = null;
+                EstadoExpediente? nuevoEstado = null;
 
                 switch (subOpcion)
                 {
                     case "1":
-                        nuevoEstado = EstadoEnum.RecienIniciado;
+                        nuevoEstado = EstadoExpediente.RecienIniciado;
                         break;
                     case "2":
-                        nuevoEstado = EstadoEnum.ParaResolver;
+                        nuevoEstado = EstadoExpediente.ParaResolver;
                         break;
                     case "3":
-                        nuevoEstado = EstadoEnum.ConResolucion;
+                        nuevoEstado = EstadoExpediente.ConResolucion;
                         break;
                     case "4":
-                        nuevoEstado = EstadoEnum.EnNotificacion;
+                        nuevoEstado = EstadoExpediente.EnNotificacion;
                         break;
                     case "5":
-                        nuevoEstado = EstadoEnum.Finalizado;
+                        nuevoEstado = EstadoExpediente.Finalizado;
                         break;
                     default:
                         Console.WriteLine("\nERROR: Opción de estado no válida.");
@@ -222,7 +221,7 @@ Console.WriteLine("--- MODIFICAR ESTADO DE EXPEDIENTE ---");
                 Console.Write("Ingrese el contenido del trámite: ");
                 string contenido = Console.ReadLine() ?? "";
 
-                var requestTramite = new AgregarTramiteRequest(expId, EtiquetaEnum.Resolucion, contenido, usuarioLogueado);
+                var requestTramite = new AgregarTramiteRequest(expId, EtiquetaTramite.Resolucion, contenido, usuarioLogueado);
                 var responseTramite = agregarTramiteUC.Ejecutar(requestTramite);
 
                 Console.WriteLine($"\n¡Trámite agregado con éxito! ID: {responseTramite.Id}");

@@ -7,17 +7,17 @@ public class Tramite
 {
     public Guid Id{get; private set;}
     public Guid ExpedienteId {get; private set;}
-    public EtiquetaEnum Etiqueta {get; private set;}
+    public EtiquetaTramite Etiqueta {get; private set;}
     public Contenido Contenido {get; private set;}
     public DateTime FechaCreacion {get; private set;}
     public DateTime FechaUltModificacion {get; private set;}
     public Guid UsuarioUltCambio {get; private set;}
 
-    public Tramite(Guid expediente, EtiquetaEnum etiqueta, Contenido contenido, Guid user) : this(Guid.NewGuid(),expediente,etiqueta,contenido,DateTime.Now,DateTime.Now,user)
+    public Tramite(Guid expediente, EtiquetaTramite etiqueta, Contenido contenido, Guid user) : this(Guid.NewGuid(),expediente,etiqueta,contenido,DateTime.Now,DateTime.Now,user)
     {
     }
 
-    public Tramite(Guid id, Guid exp, EtiquetaEnum etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
+    public Tramite(Guid id, Guid exp, EtiquetaTramite etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
     {
         if(id == Guid.Empty)
         {

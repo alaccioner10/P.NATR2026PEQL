@@ -1,6 +1,7 @@
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Servicios;
+using SGE.Aplicacion.Autorizacion;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
@@ -8,25 +9,27 @@ public class AgregarTramiteUseCase
 {
     private readonly ITramiteRepository _tramiteRepo;
     private readonly ActualizadorEstadoExpedienteService _actualizador;
+    private IAutorizacionService _autorizacion;
 
-    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador)
+    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador,IAutorizacionService autorizacion)
     {
         _tramiteRepo = tramiteRepo;
         _actualizador = actualizador;
+        _autorizacion = autorizacion;
     }
 
     public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req)
     {
-        if (req == null)
+        if (!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.TramiteAlta))
         {
-            throw new Exception("La solicitud es nula.");
+            throw new AutorizacionException("El usuario no tiene permisos para agregar trámites");
         }
 
         Contenido contenido = new Contenido(req.Contenido);
         
         Tramite tramite = new Tramite(
             req.ExpedienteId,
-            (EtiquetaEnum)req.Etiqueta,
+            (EtiquetaTramite)req.Etiqueta,
             contenido,
             req.IdUser
         );
