@@ -12,6 +12,6 @@ public record RegistrarUsuarioResponse(
     Guid Id,
     string Nombre,
     string Email,
-    string EsAdmin,
+    bool EsAdmin,
     IEnumerable<Permiso> Permisos
 );
