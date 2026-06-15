@@ -2,6 +2,7 @@ using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Excepciones;
+using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
