@@ -1,3 +1,5 @@
+using SGE.Aplicacion;
+
 public class UnidadDeTrabajo : IUnidadDeTrabajo
 {
 private readonly SGEContext _context;

@@ -1,11 +1,13 @@
 namespace SGE.Dominio.Usuarios;
+
+using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Excepciones;
 public class Usuario
 {
     public Guid Id{get; private set;}
-    public string Nombre{get; private set;}
-    public string Email{get; private set;}
-    public string ContrasenaHash{get;private set;}
+    public string Nombre{get; set;}
+    public string Email{get;set;}
+    public string ContrasenaHash{get; set;}
     public bool EsAdmin{get;private set;}
     public IEnumerable<Permiso> Permisos{get;private set;}
 
