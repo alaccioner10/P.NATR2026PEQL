@@ -1,81 +1,59 @@
-using System.Data.Common;
 using SGE.Aplicacion.Tramites;
 using SGE.Dominio.Tramites;
 using SGE.Infraestructura.Excepciones;
 
 namespace SGE.Infraestructura.Repositorios;
 
-public class TramiteMemoriaRepository : ITramiteRepository
+public class TramiteRepository : ITramiteRepository
 {
+    private SGEContext _context;
+    public TramiteRepository(SGEContext context)
+    {
+        _context = context;
+    }
     public void Agregar(Tramite tramite)
     {
         SGESqlite.Inicializar();
-        using(var db=new SGEContext())
-        {
-            db.Tramites.Add(tramite);
-            db.SaveChanges();
-        }
+        _context.Tramites.Add(tramite);
     }
     
     public Tramite? ObtenerPorId(Guid id)
     {
-        Tramite? tramite;
         SGESqlite.Inicializar();
-        using(var db=new SGEContext())
-        {
-            tramite=db.Tramites.FirstOrDefault(t => t.Id == id);
-        }
-        return tramite;
+        return _context.Tramites.FirstOrDefault(t => t.Id == id);
     }
     public IEnumerable<Tramite> ObtenerTodos()
     {
         SGESqlite.Inicializar();
-        IEnumerable<Tramite> tramites = [];
-        using(var db=new SGEContext())
-        {
-           tramites = db.Tramites.ToList();
-        }
-        return tramites;
+        return _context.Tramites.ToList();
     }
 
     public void Modificar(Tramite tramite)
     {
         SGESqlite.Inicializar();
-        using(var db=new SGEContext())
+        Tramite? tra = _context.Tramites.FirstOrDefault(e => e.Id.Equals(tramite.Id));
+        if(tra == null)
         {
-            Tramite? tra = db.Tramites.FirstOrDefault(e => e.Id.Equals(tramite.Id));
-            if(tra == null)
-            {
-                throw new RepositoryException("No existe el expediente")
-            }
-            db.Tramites.Update(tramite);
-            db.SaveChanges();
+            throw new RepositoryException("No existe el expediente");
+        }
+        _context.Tramites.Update(tramite);
         }
     }
 
     public void Eliminar(Guid id)
     {
         SGESqlite.Inicializar();
-        using(var db=new SGEContext())
+        Tramite? tr = _context.Tramites.FirstOrDefault(e => e.Id.Equals(id));
+        if(tr == null)
         {
-            Tramite? tr = db.Tramites.FirstOrDefault(e => e.Id.Equals(id));
-            if(tr == null)
-            {
-                throw new RepositoryException("No existe el expediente")
-            }
-            db.Tramites.Remove(tr);
-            db.SaveChanges();
+            throw new RepositoryException("No existe el expediente");
         }
+        _context.Tramites.Remove(tr);
     }
 
     public IEnumerable<Tramite> ObtenerPorExpedienteId(Guid expedienteId)
     {
-        IEnumerable<Tramite> tramite;
         SGESqlite.Inicializar();
-        using(var db=new SGEContext())
-        {
-            tramite=db.Tramites.Where(t => t.ExpedienteId == expedienteId);
-        }
-        return tramite;
+        return _context.Tramites.Where(t => t.ExpedienteId == expedienteId);
     }
 }
