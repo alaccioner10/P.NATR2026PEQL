@@ -6,17 +6,8 @@ using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
-public class ModificarCaratulaUseCase
+public class ModificarCaratulaUseCase(IUnidadDeTrabajo UOW,IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
 {
-    private  IExpedienteRepository _iExpRepo;
-    private  IAutorizacionService _autorizacion;
-
-    public ModificarCaratulaUseCase (IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
-    {
-        _iExpRepo=iExpRepo;
-        _autorizacion=autorizacion;
-    }
-
     public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest req)
     {
        
@@ -25,12 +16,12 @@ public class ModificarCaratulaUseCase
             throw new AplicationException("La solicitud no puede estar vacía."); 
         }
 
-        if(!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.ExpedienteModificacion))
+        if(!autorizacion.PoseeElPermiso(req.IdUser, Permiso.ExpedienteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar expedientes");
         }
 
-        var exp=_iExpRepo.ObtenerPorId(req.Id);
+        var exp=iExpRepo.ObtenerPorId(req.Id);
         if (exp == null)
         {
             throw new AplicationException("El expediente solicitado no existe");
@@ -40,7 +31,7 @@ public class ModificarCaratulaUseCase
 
         exp.ModificarCaratula(car,req.IdUser);
 
-        _iExpRepo.Modificar(exp);
+        UOW.Guardar();
 
         return new ModificarCaratulaResponse(exp.Id, req.NuevaCaratula, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }

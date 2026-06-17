@@ -33,7 +33,6 @@ public class ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo 
         {
             user.ContrasenaHash = ContrasenaUtil.Convertir(req.NuevaClave);
         }
-        repo.Modificar(user);
         UOW.Guardar();
 
         return new ModificarMisDatosResponse(user.Id,user.Nombre,user.Email);

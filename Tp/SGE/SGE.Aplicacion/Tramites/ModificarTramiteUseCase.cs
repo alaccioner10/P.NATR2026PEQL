@@ -6,27 +6,17 @@ using SGE.Aplicacion.Servicios;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
-public class ModificarTramiteUseCase
+public class ModificarTramiteUseCase(IUnidadDeTrabajo UOW, ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador, IAutorizacionService autorizacion)
 {
-    private readonly ITramiteRepository _tramiteRepo;
-    private readonly IAutorizacionService _autorizacion;
-    private readonly ActualizadorEstadoExpedienteService _actualizador;
-
-    public ModificarTramiteUseCase(ITramiteRepository tramiteRepo, IAutorizacionService autorizacion, ActualizadorEstadoExpedienteService actualizador)
-    {
-        _tramiteRepo = tramiteRepo;
-        _autorizacion = autorizacion;
-        _actualizador=actualizador;
-    }
 
     public ModificarTramiteResponse Ejecutar(ModificarTramiteRequest req)
     {
-        if (!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.TramiteModificacion))
+        if (!autorizacion.PoseeElPermiso(req.IdUser, Permiso.TramiteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar trámites");
         }
 
-        var tramite = _tramiteRepo.ObtenerPorId(req.TramiteId);
+        var tramite = tramiteRepo.ObtenerPorId(req.TramiteId);
         if (tramite == null)
         {
             throw new AplicationException("El trámite solicitado no existe");
@@ -36,9 +26,9 @@ public class ModificarTramiteUseCase
 
         tramite.ModificarContenido(nuevoContenido, req.IdUser);
 
-        _tramiteRepo.Modificar(tramite);
+        UOW.Guardar();
 
-        _actualizador.Ejecutar(tramite,req.IdUser);
+        actualizador.Ejecutar(tramite,req.IdUser);
 
         return new ModificarTramiteResponse(
             tramite.Id, 

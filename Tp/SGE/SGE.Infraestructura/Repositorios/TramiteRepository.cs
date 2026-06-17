@@ -28,18 +28,6 @@ public class TramiteRepository : ITramiteRepository
         return _context.Tramites.ToList();
     }
 
-    public void Modificar(Tramite tramite)
-    {
-        SGESqlite.Inicializar();
-        Tramite? tra = _context.Tramites.FirstOrDefault(e => e.Id.Equals(tramite.Id));
-        if(tra == null)
-        {
-            throw new RepositoryException("No existe el tramite");
-        }
-        _context.Tramites.Update(tramite);
-        }
-    }
-
     public void Eliminar(Guid id)
     {
         SGESqlite.Inicializar();

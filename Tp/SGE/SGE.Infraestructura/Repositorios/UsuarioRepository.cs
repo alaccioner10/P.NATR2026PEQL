@@ -22,16 +22,6 @@ public class UsuarioRepository : IUsuarioRepository
         SGESqlite.Inicializar();
         return _context.Usuarios.FirstOrDefault(e => e.Id == id);
     }
-    public void Modificar(Usuario user)
-    {
-        SGESqlite.Inicializar();
-        Usuario? id = _context.Usuarios.FirstOrDefault(e => e.Id.Equals(user.Id));
-        if(id == null)
-        {
-            throw new RepositoryException("No existe el usuario");
-        }
-        _context.Usuarios.Update(user);
-    }
     public void Eliminar(Guid id)
     {
         SGESqlite.Inicializar();
