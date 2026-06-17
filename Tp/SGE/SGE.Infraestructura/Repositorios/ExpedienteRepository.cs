@@ -1,8 +1,6 @@
-using System.Data.Common;
 using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Expedientes;
 using SGE.Infraestructura.Excepciones;
-using SQLitePCL;
 
 namespace SGE.Infraestructura.Repositorios;
 

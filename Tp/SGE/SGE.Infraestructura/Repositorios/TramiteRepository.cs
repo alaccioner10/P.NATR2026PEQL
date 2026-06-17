@@ -34,7 +34,7 @@ public class TramiteRepository : ITramiteRepository
         Tramite? tra = _context.Tramites.FirstOrDefault(e => e.Id.Equals(tramite.Id));
         if(tra == null)
         {
-            throw new RepositoryException("No existe el expediente");
+            throw new RepositoryException("No existe el tramite");
         }
         _context.Tramites.Update(tramite);
         }
@@ -46,7 +46,7 @@ public class TramiteRepository : ITramiteRepository
         Tramite? tr = _context.Tramites.FirstOrDefault(e => e.Id.Equals(id));
         if(tr == null)
         {
-            throw new RepositoryException("No existe el expediente");
+            throw new RepositoryException("No existe el tramite");
         }
         _context.Tramites.Remove(tr);
     }
