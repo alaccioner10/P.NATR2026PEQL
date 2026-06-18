@@ -15,7 +15,7 @@ public class Usuario
     {
     }
 
-    public Usuario(Guid id,string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
+    private Usuario(Guid id,string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
     {
         if(id == Guid.Empty)
         {
@@ -27,5 +27,10 @@ public class Usuario
         ContrasenaHash=contrasenaHash;
         EsAdmin=esAdmin;
         Permisos=permisos;
+    }
+
+    public static Usuario Reconstruir(Guid id,string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
+    {
+        return new Usuario(id,nombre,email,contrasenaHash,esAdmin,permisos);
     }
 }

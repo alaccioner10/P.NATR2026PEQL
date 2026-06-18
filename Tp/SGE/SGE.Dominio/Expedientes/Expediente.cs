@@ -21,7 +21,7 @@ public class Expediente
     }
 
 
-    public Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoExpediente estado)
+    private Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoExpediente estado)
     {
         if(id == Guid.Empty)
         {
@@ -39,6 +39,11 @@ public class Expediente
         UsuarioUltimoCambio = usuarioUlt;
         Caratula = caratula;
         Estado = estado;
+    }
+
+    public static Expediente Reconstruir(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoExpediente estado)
+    {
+        return new Expediente(id,fechaCreacion,fechaUlt,usuarioUlt,caratula,estado);
     }
     private void RegistrarModificacion(Guid idUser)
     {

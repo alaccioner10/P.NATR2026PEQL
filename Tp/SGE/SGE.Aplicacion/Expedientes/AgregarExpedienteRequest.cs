@@ -1,5 +1,4 @@
 namespace SGE.Aplicacion.Expedientes.DTOs;
-using SGE.Dominio.Expedientes;
 
 public record class AgregarExpedienteRequest(string Caratula, Guid IdUser);
 

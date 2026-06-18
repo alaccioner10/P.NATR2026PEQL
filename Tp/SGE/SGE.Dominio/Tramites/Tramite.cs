@@ -17,7 +17,7 @@ public class Tramite
     {
     }
 
-    public Tramite(Guid id, Guid exp, EtiquetaTramite etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
+    private Tramite(Guid id, Guid exp, EtiquetaTramite etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
     {
         if(id == Guid.Empty)
         {
@@ -34,6 +34,11 @@ public class Tramite
         FechaCreacion = fechaCreacion;
         FechaUltModificacion = ultModificacion;
         UsuarioUltCambio = user;
+    }
+
+    public static Tramite Reconstruir(Guid id, Guid exp, EtiquetaTramite etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
+    {
+        return new Tramite(id,exp,etiqueta,contenido,fechaCreacion,ultModificacion,user);
     }
 
     public void ModificarContenido(Contenido nuevoContenido, Guid usuarioId)
