@@ -1,3 +1,4 @@
+using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Expedientes.DTOs;
@@ -8,15 +9,18 @@ namespace SGE.Aplicacion.Expedientes.UseCases;
 
 public class EliminarExpedienteUseCase
 {
+    private readonly IUnidadDeTrabajo _uow;
     private  IExpedienteRepository _iExpRepo;
     private  ITramiteRepository _iTramRepo;
     private  IAutorizacionService _autorizacion;
 
     public EliminarExpedienteUseCase(
+        IUnidadDeTrabajo uow,
         IExpedienteRepository iExpRepo, 
         ITramiteRepository iTramRepo, 
         IAutorizacionService autorizacion)
     {
+        _uow = uow;
         _iExpRepo = iExpRepo;
         _iTramRepo = iTramRepo;
         _autorizacion = autorizacion;
@@ -48,7 +52,7 @@ public class EliminarExpedienteUseCase
         }
 
         _iExpRepo.Eliminar(req.ExpedienteId);
-
+        _uow.Guardar();
 
         return new EliminarExpedienteResponse(req.ExpedienteId);
     }

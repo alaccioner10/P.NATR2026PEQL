@@ -1,3 +1,4 @@
+using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Dominio.Expedientes;
@@ -6,10 +7,12 @@ namespace SGE.Aplicacion.Expedientes.UseCases;
 
 public class AgregarExpedienteUseCase
 {
+    private readonly IUnidadDeTrabajo _uow;
     private IExpedienteRepository _iExpRepo;
     private IAutorizacionService _autorizacion;
-    public AgregarExpedienteUseCase(IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+    public AgregarExpedienteUseCase(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
     {
+        _uow = uow;
         _iExpRepo = iExpRepo;
         _autorizacion = autorizacion;
     }
@@ -24,6 +27,7 @@ public class AgregarExpedienteUseCase
         Expediente exp = new Expediente(car, req.IdUser);
 
         _iExpRepo.Agregar(exp);
+        _uow.Guardar();
 
         return new AgregarExpedienteResponse(
             exp.Id,

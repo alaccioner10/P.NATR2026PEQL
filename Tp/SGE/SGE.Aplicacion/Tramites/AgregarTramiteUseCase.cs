@@ -1,3 +1,4 @@
+using SGE.Aplicacion;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Servicios;
@@ -7,12 +8,14 @@ namespace SGE.Aplicacion.Tramites.UseCases;
 
 public class AgregarTramiteUseCase
 {
+    private readonly IUnidadDeTrabajo _uow;
     private readonly ITramiteRepository _tramiteRepo;
     private readonly ActualizadorEstadoExpedienteService _actualizador;
     private IAutorizacionService _autorizacion;
 
-    public AgregarTramiteUseCase(ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador,IAutorizacionService autorizacion)
+    public AgregarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador, IAutorizacionService autorizacion)
     {
+        _uow = uow;
         _tramiteRepo = tramiteRepo;
         _actualizador = actualizador;
         _autorizacion = autorizacion;
@@ -37,6 +40,7 @@ public class AgregarTramiteUseCase
         _tramiteRepo.Agregar(tramite);
 
         _actualizador.Ejecutar(tramite, req.IdUser);
+        _uow.Guardar();
 
         return new AgregarTramiteResponse(
             tramite.Id,

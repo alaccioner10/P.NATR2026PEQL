@@ -1,3 +1,4 @@
+using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Excepciones;
@@ -7,12 +8,14 @@ namespace SGE.Aplicacion.Tramites.UseCases;
 
 public class EliminarTramiteUseCase
 {
+    private readonly IUnidadDeTrabajo _uow;
     private  ITramiteRepository _tramiteRepo;
     private  IAutorizacionService _autorizacion;
     private ActualizadorEstadoExpedienteService _actualizador;
 
-    public EliminarTramiteUseCase(ITramiteRepository tramiteRepo, IAutorizacionService autorizacion, ActualizadorEstadoExpedienteService actualizador)
+    public EliminarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, IAutorizacionService autorizacion, ActualizadorEstadoExpedienteService actualizador)
     {
+        _uow = uow;
         _tramiteRepo = tramiteRepo;
         _autorizacion = autorizacion;
         _actualizador = actualizador;
@@ -35,6 +38,7 @@ public class EliminarTramiteUseCase
         _tramiteRepo.Eliminar(req.TramiteId);
 
         _actualizador.Ejecutar(tramite, req.IdUsuario);
+        _uow.Guardar();
 
         return new EliminarTramiteResponse(req.TramiteId, "Trámite eliminado con éxito.");
     }

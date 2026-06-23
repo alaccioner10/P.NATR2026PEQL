@@ -8,11 +8,13 @@ namespace SGE.Aplicacion.Expedientes.UseCases;
 
 public class CambiarEstadoExpediente
 {
+    private readonly IUnidadDeTrabajo _uow;
     private  IExpedienteRepository _iExpRepo;
     private  IAutorizacionService _autorizacion;
 
-    public CambiarEstadoExpediente (IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+    public CambiarEstadoExpediente (IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
     {
+        _uow = uow;
         _iExpRepo=iExpRepo;
         _autorizacion=autorizacion;
     }
@@ -38,6 +40,7 @@ public class CambiarEstadoExpediente
         exp.ActualizarEstado((EtiquetaTramite?)req.Estado, req.IdUser);
 
         _iExpRepo.Modificar(exp);
+        _uow.Guardar();
 
         return new CambiarEstadoExpResponse(exp.Id,exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
