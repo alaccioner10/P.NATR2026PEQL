@@ -15,6 +15,8 @@ public class Usuario
     {
     }
 
+    //Tenemos que preguntar si tenemos que hacer un constructor Protected vacio para el EF.
+
     private Usuario(Guid id,string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
     {
         if(id == Guid.Empty)
