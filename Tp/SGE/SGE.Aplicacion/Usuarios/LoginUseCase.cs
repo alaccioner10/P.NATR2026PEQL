@@ -7,12 +7,12 @@ public class LoginUseCase(IUsuarioRepository repo, ITokenProvider tokenProvider)
     public LoginResponse Ejecutar(LoginRequest req)
     {
         Usuario? user=repo.ObtenerPorEmail(req.Email);
-        if(user == null || ContrasenaUtil.Comparar(req.Contrasena,user.ContrasenaHash))
+        if (user == null || !ContrasenaUtil.Comparar(req.Contrasena, user.ContrasenaHash))
         {
-            throw new AutorizacionException("El mail o la contraseña son incorectos.");
+            throw new AutorizacionException("El mail o la contraseña son incorrectos.");
         }
 
-        var token= tokenProvider.GenerarToken(user);
-        return new LoginResponse(token)
+        var token = tokenProvider.GenerarToken(user);
+        return new LoginResponse(token);
     }
 }

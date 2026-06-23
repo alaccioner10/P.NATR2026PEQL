@@ -1,4 +1,9 @@
 
+using SGE.Aplicacion.Autorizacion;
+using SGE.Aplicacion.Expedientes.DTOs;
+using SGE.Aplicacion.Excepciones;
+using SGE.Dominio.Expedientes;
+
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
 public class ModificarCaratulaUseCase(IUnidadDeTrabajo UOW,IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)

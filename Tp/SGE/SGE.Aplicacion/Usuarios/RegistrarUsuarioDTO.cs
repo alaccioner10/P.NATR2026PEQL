@@ -1,3 +1,4 @@
+using SGE.Aplicacion.Autorizacion;
 using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Usuarios.DTOs;

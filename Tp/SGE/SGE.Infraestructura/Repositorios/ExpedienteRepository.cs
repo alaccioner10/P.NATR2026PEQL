@@ -28,6 +28,12 @@ public class ExpedienteRepository : IExpedienteRepository
         return _context.Expedientes.ToList();
     }
 
+    public void Modificar(Expediente expediente)
+    {
+        SGESqlite.Inicializar();
+        _context.Expedientes.Update(expediente);
+    }
+
     public void Eliminar(Guid id)
     {
         SGESqlite.Inicializar();
