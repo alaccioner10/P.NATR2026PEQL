@@ -6,20 +6,12 @@ using SGE.Aplicacion.Servicios;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
-public class EliminarTramiteUseCase
+public class EliminarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, IAutorizacionService autorizacion, ActualizadorEstadoExpedienteService actualizador)
 {
-    private readonly IUnidadDeTrabajo _uow;
-    private  ITramiteRepository _tramiteRepo;
-    private  IAutorizacionService _autorizacion;
-    private ActualizadorEstadoExpedienteService _actualizador;
-
-    public EliminarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, IAutorizacionService autorizacion, ActualizadorEstadoExpedienteService actualizador)
-    {
-        _uow = uow;
-        _tramiteRepo = tramiteRepo;
-        _autorizacion = autorizacion;
-        _actualizador = actualizador;
-    }
+    private readonly IUnidadDeTrabajo _uow = uow;
+    private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
+    private readonly IAutorizacionService _autorizacion = autorizacion;
+    private readonly ActualizadorEstadoExpedienteService _actualizador = actualizador;
 
     public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest req)
     {

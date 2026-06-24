@@ -13,24 +13,20 @@ public class TramiteRepository : ITramiteRepository
     }
     public void Agregar(Tramite tramite)
     {
-        SGESqlite.Inicializar();
         _context.Tramites.Add(tramite);
     }
     
     public Tramite? ObtenerPorId(Guid id)
     {
-        SGESqlite.Inicializar();
         return _context.Tramites.FirstOrDefault(t => t.Id == id);
     }
     public IEnumerable<Tramite> ObtenerTodos()
     {
-        SGESqlite.Inicializar();
         return _context.Tramites.ToList();
     }
 
     public void Eliminar(Guid id)
     {
-        SGESqlite.Inicializar();
         Tramite? tr = _context.Tramites.FirstOrDefault(e => e.Id.Equals(id));
         if(tr == null)
         {
@@ -41,7 +37,6 @@ public class TramiteRepository : ITramiteRepository
 
     public IEnumerable<Tramite> ObtenerPorExpedienteId(Guid expedienteId)
     {
-        SGESqlite.Inicializar();
         return _context.Tramites.Where(t => t.ExpedienteId == expedienteId);
     }
 }

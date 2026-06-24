@@ -6,20 +6,12 @@ using SGE.Aplicacion.Autorizacion;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
-public class AgregarTramiteUseCase
+public class AgregarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador, IAutorizacionService autorizacion)
 {
-    private readonly IUnidadDeTrabajo _uow;
-    private readonly ITramiteRepository _tramiteRepo;
-    private readonly ActualizadorEstadoExpedienteService _actualizador;
-    private IAutorizacionService _autorizacion;
-
-    public AgregarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador, IAutorizacionService autorizacion)
-    {
-        _uow = uow;
-        _tramiteRepo = tramiteRepo;
-        _actualizador = actualizador;
-        _autorizacion = autorizacion;
-    }
+    private readonly IUnidadDeTrabajo _uow = uow;
+    private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
+    private readonly ActualizadorEstadoExpedienteService _actualizador = actualizador;
+    private readonly IAutorizacionService _autorizacion = autorizacion;
 
     public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req)
     {

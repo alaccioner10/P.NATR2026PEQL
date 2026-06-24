@@ -8,43 +8,48 @@ namespace SGE.Dominio.Expedientes;
 
 public class Expediente
 {
-    public Guid Id {get; private set;}
-    public DateTime FechaCreacion {get; private set;}
-    public DateTime FechaUltimaModificacion {get; private set;}
-    public Guid UsuarioUltimoCambio {get; private set;}
-    public Caratula Caratula{get; private set;}
-    public EstadoExpediente Estado {get; private set;}
+    public Guid Id { get; private set; }
+    public DateTime FechaCreacion { get; private set; }
+    public DateTime FechaUltimaModificacion { get; private set; }
+    public Guid UsuarioUltimoCambio { get; private set; }
+    public Caratula Caratula { get; private set; }
+    public EstadoExpediente Estado { get; private set; }
 
+    private Expediente()
+    {
+        Caratula = null!;
+    }
 
-    public Expediente(Caratula caratula, Guid user) : this(Guid.NewGuid(), DateTime.Now, DateTime.Now, user, caratula, EstadoExpediente.RecienIniciado)
+    public Expediente(Caratula caratula, Guid user)
+        : this(Guid.NewGuid(), DateTime.Now, DateTime.Now, user, caratula, EstadoExpediente.RecienIniciado)
     {
     }
 
-
-    private Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoExpediente estado)
+    private Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUltimaModificacion, Guid usuarioUltimoCambio, Caratula caratula, EstadoExpediente estado)
     {
-        if(id == Guid.Empty)
+        if (id == Guid.Empty)
         {
             throw new DomainException("El Id no puede ser vacío.");
         }
 
-        if(fechaUlt.CompareTo(fechaCreacion) < 0)
+        if (fechaUltimaModificacion.CompareTo(fechaCreacion) < 0)
         {
             throw new DomainException("La fecha de modificación no puede ser previa a la de creación.");
         }
 
-        Id=id;
+        Id = id;
         FechaCreacion = fechaCreacion;
-        FechaUltimaModificacion = fechaUlt;
-        UsuarioUltimoCambio = usuarioUlt;
+        FechaUltimaModificacion = fechaUltimaModificacion;
+        UsuarioUltimoCambio = usuarioUltimoCambio;
         Caratula = caratula;
         Estado = estado;
     }
 
-    public static Expediente Reconstruir(Guid id, DateTime fechaCreacion, DateTime fechaUlt, Guid usuarioUlt, Caratula caratula, EstadoExpediente estado)
+    public static Expediente Reconstruir(Guid id, DateTime fechaCreacion, DateTime fechaUltimaModificacion, Guid usuarioUltimoCambio, Caratula caratula, EstadoExpediente estado)
     {
-        return new Expediente(id,fechaCreacion,fechaUlt,usuarioUlt,caratula,estado);
+        return new Expediente(id, fechaCreacion, fechaUltimaModificacion, usuarioUltimoCambio, caratula, estado);
     }
+
     private void RegistrarModificacion(Guid idUser)
     {
         UsuarioUltimoCambio = idUser;
@@ -69,12 +74,13 @@ public class Expediente
                 Estado = EstadoExpediente.ConResolucion;
                 break;
             case EtiquetaTramite.PaseAEstudio:
-                Estado= EstadoExpediente.ParaResolver;
+                Estado = EstadoExpediente.ParaResolver;
                 break;
             case EtiquetaTramite.PaseAlArchivo:
                 Estado = EstadoExpediente.Finalizado;
                 break;
         }
+
         RegistrarModificacion(idUser);
         return estadoAntes != Estado;
     }

@@ -7,24 +7,12 @@ using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
-public class EliminarExpedienteUseCase
+public class EliminarExpedienteUseCase(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, ITramiteRepository iTramRepo, IAutorizacionService autorizacion)
 {
-    private readonly IUnidadDeTrabajo _uow;
-    private  IExpedienteRepository _iExpRepo;
-    private  ITramiteRepository _iTramRepo;
-    private  IAutorizacionService _autorizacion;
-
-    public EliminarExpedienteUseCase(
-        IUnidadDeTrabajo uow,
-        IExpedienteRepository iExpRepo, 
-        ITramiteRepository iTramRepo, 
-        IAutorizacionService autorizacion)
-    {
-        _uow = uow;
-        _iExpRepo = iExpRepo;
-        _iTramRepo = iTramRepo;
-        _autorizacion = autorizacion;
-    }
+    private readonly IUnidadDeTrabajo _uow = uow;
+    private readonly IExpedienteRepository _iExpRepo = iExpRepo;
+    private readonly ITramiteRepository _iTramRepo = iTramRepo;
+    private readonly IAutorizacionService _autorizacion = autorizacion;
 
     public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest req)
     {

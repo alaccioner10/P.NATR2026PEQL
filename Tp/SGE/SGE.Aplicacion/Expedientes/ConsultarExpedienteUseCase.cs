@@ -3,14 +3,9 @@ using SGE.Aplicacion.Expedientes.DTOs;
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
 
-public class ConsultarExpedienteUseCase
+public class ConsultarExpedienteUseCase(IExpedienteRepository iExpRepo)
 {
-    private readonly IExpedienteRepository _iExpRepo;
-
-    public ConsultarExpedienteUseCase(IExpedienteRepository iExpRepo)
-    {
-        _iExpRepo=iExpRepo;
-    }
+    private readonly IExpedienteRepository _iExpRepo = iExpRepo;
 
     public ConsultarExpedienteResponse Ejecutar (ConsultarExpedienteRequest req)
     {

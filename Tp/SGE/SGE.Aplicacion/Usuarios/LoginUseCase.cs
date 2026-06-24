@@ -2,6 +2,8 @@ using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Usuarios;
 using SGE.Dominio.Usuarios;
 
+namespace SGE.Aplicacion.Usuarios.UseCases;
+
 public class LoginUseCase(IUsuarioRepository repo, ITokenProvider tokenProvider)
 {
     public LoginResponse Ejecutar(LoginRequest req)

@@ -5,16 +5,12 @@ using SGE.Aplicacion.Usuarios;
 using SGE.Aplicacion.Usuarios.DTOs;
 using SGE.Dominio.Usuarios;
 
-public class RegistrarUsuarioUseCase
-{
-    private IUnidadDeTrabajo _uow;
-    private IUsuarioRepository _userRepo;
+namespace SGE.Aplicacion.Usuarios.UseCases;
 
-    public RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo)
-    {
-        _uow = uow;
-        _userRepo = userRepo;    
-    }
+public class RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo)
+{
+    private readonly IUnidadDeTrabajo _uow = uow;
+    private readonly IUsuarioRepository _userRepo = userRepo;
 
     public RegistrarUsuarioResponse Ejecutar(RegistrarUsuarioRequest req)
     {
