@@ -3,6 +3,7 @@ using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Expedientes;
 using SGE.Aplicacion.Expedientes.UseCases;
+using SGE.Aplicacion.Servicios;
 using SGE.Aplicacion.Tramites;
 using SGE.Aplicacion.Tramites.UseCases;
 using SGE.Aplicacion.Usuarios;
@@ -27,8 +28,9 @@ builder.Services.AddScoped<ITramiteRepository, TramiteRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
-// Servicio de autorización provisional
+// Servicio de autorización y token provisionales
 builder.Services.AddSingleton<IAutorizacionService, AutorizacionProvisionalService>();
+builder.Services.AddSingleton<ITokenProvider, TokenProvisionalService>();
 
 // Casos de uso - Expedientes
 builder.Services.AddScoped<AgregarExpedienteUseCase>();
@@ -47,6 +49,10 @@ builder.Services.AddScoped<ListarTramitesPorExpedienteUseCase>();
 // Casos de uso - Usuarios
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<RegistrarUsuarioUseCase>();
+builder.Services.AddScoped<ModificarMisDatosUseCase>();
+
+// Servicios de dominio/aplicación internos
+builder.Services.AddScoped<ActualizadorEstadoExpedienteService>();
 
 var app = builder.Build();
 
@@ -65,7 +71,7 @@ app.UseSwaggerUI(); // Levanta la interfaz clásica azul/blanca de Swagger
 app.MapGet("/SGE", () => Results.Redirect("/swagger/index.html"));
 
 // --- 3. MAPEAR CONTROLADORES ---
-app.MapControllers(); 
+app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok("SGE WebApi está arriba"));
 

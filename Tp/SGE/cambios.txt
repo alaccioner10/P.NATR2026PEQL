@@ -1,0 +1,14 @@
+Registro de Cambios - SGE (Fase 2)
+==================================
+
+1. ModificarTramiteUseCase.cs:
+   - Se corrigió el orden de las operaciones. La llamada al actualizador de estado del expediente (`actualizador.Ejecutar(tramite, req.IdUser)`) se movió para que ocurra ANTES del guardado en la Unidad de Trabajo (`UOW.Guardar()`). Esto garantiza que los cambios propagados al expediente (como cambiar su estado a "Finalizado" al ingresar un trámite "PaseAlArchivo") se guarden correctamente en la base de datos.
+
+2. ModificarCaratulaUseCase.cs:
+   - Se añadió la llamada explícita al repositorio `iExpRepo.Modificar(exp)` antes de persistir los cambios mediante `UOW.Guardar()`. Esto aporta coherencia de diseño respecto a otros casos de uso de modificación y reduce el acoplamiento implícito a la base de datos o el change tracking automático del ORM.
+
+3. Refactorización de constructores primarios:
+   - Se modificaron los Casos de Uso (`AgregarExpedienteUseCase`, `ModificarCaratulaUseCase`, `EliminarExpedienteUseCase`, `AgregarTramiteUseCase`, `EliminarTramiteUseCase`, `ModificarTramiteUseCase`, `RegistrarUsuarioUseCase` y `ModificarMisDatosUseCase`) para utilizar la sintaxis clásica de inyección por constructor y declarar campos de clase privados explícitos con el modificador `readonly`. Esto asegura la inmutabilidad de las dependencias inyectadas y mejora la compatibilidad y legibilidad del código.
+
+4. Registro de dependencias en WebApi/Program.cs:
+   - Se registró en el contenedor de dependencias el servicio `ActualizadorEstadoExpedienteService` (Scoped) y se importó su espacio de nombres `SGE.Aplicacion.Servicios`. Esto soluciona la falta de registro requerida por los Casos de Uso de trámites.

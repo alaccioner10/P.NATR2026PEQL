@@ -5,11 +5,18 @@ using SGE.Dominio.Expedientes;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
-public class AgregarExpedienteUseCase(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+public class AgregarExpedienteUseCase
 {
-    private readonly IUnidadDeTrabajo _uow = uow;
-    private readonly IExpedienteRepository _iExpRepo = iExpRepo;
-    private readonly IAutorizacionService _autorizacion = autorizacion;
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly IExpedienteRepository _iExpRepo;
+    private readonly IAutorizacionService _autorizacion;
+
+    public AgregarExpedienteUseCase(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+    {
+        _uow = uow;
+        _iExpRepo = iExpRepo;
+        _autorizacion = autorizacion;
+    }
 
     public AgregarExpedienteResponse Ejecutar(AgregarExpedienteRequest req)
     {

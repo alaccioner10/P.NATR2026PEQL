@@ -6,8 +6,17 @@ using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Usuarios.UseCases;
 
-public class ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo UOW)
+public class ModificarMisDatosUseCase
 {
+    private readonly IUsuarioRepository _repo;
+    private readonly IUnidadDeTrabajo _uow;
+
+    public ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo uow)
+    {
+        _repo = repo;
+        _uow = uow;
+    }
+
     public ModificarMisDatosResponse Ejecutar(ModificarMisDatosRequest req, Guid id)
     {
         if(req.id != id)
@@ -15,7 +24,7 @@ public class ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo 
             throw new AutorizacionException("No puedes editar los datos de otro usuario");
         }
 
-        Usuario? user = repo.ObtenerPorId(id);
+        Usuario? user = _repo.ObtenerPorId(id);
        
         if(user == null)
         {
@@ -27,8 +36,8 @@ public class ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo 
         user.Email = !string.IsNullOrWhiteSpace(req.NuevoEmail) ? req.NuevoEmail : user.Email;
         user.ContrasenaHash = !string.IsNullOrWhiteSpace(req.NuevaClave) ? ContrasenaUtil.Convertir(req.NuevaClave) : user.ContrasenaHash;
 
-        repo.Modificar(user);
-        UOW.Guardar();
+        _repo.Modificar(user);
+        _uow.Guardar();
 
         return new ModificarMisDatosResponse(user.Id, user.Nombre, user.Email);
     }

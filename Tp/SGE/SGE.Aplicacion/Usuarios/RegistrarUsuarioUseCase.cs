@@ -7,10 +7,16 @@ using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Usuarios.UseCases;
 
-public class RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo)
+public class RegistrarUsuarioUseCase
 {
-    private readonly IUnidadDeTrabajo _uow = uow;
-    private readonly IUsuarioRepository _userRepo = userRepo;
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly IUsuarioRepository _userRepo;
+
+    public RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo)
+    {
+        _uow = uow;
+        _userRepo = userRepo;
+    }
 
     public RegistrarUsuarioResponse Ejecutar(RegistrarUsuarioRequest req)
     {
