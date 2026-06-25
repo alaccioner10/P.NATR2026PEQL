@@ -10,12 +10,12 @@ Registro de Cambios - SGE (Fase 2)
 3. Refactorización de constructores primarios:
    - Se modificaron los Casos de Uso (`AgregarExpedienteUseCase`, `ModificarCaratulaUseCase`, `EliminarExpedienteUseCase`, `AgregarTramiteUseCase`, `EliminarTramiteUseCase`, `ModificarTramiteUseCase`, `RegistrarUsuarioUseCase` y `ModificarMisDatosUseCase`) para utilizar la sintaxis clásica de inyección por constructor y declarar campos de clase privados explícitos con el modificador `readonly`. Esto asegura la inmutabilidad de las dependencias inyectadas y mejora la compatibilidad y legibilidad del código.
 
-4. Registro de dependencias en WebApi/Program.cs:
+4. Registro de dependencias en SGE.WebApi/Program.cs:
    - Se registró en el contenedor de dependencias el servicio `ActualizadorEstadoExpedienteService` (Scoped) y se importó su espacio de nombres `SGE.Aplicacion.Servicios`. Esto soluciona la falta de registro requerida por los Casos de Uso de trámites.
    - Se registraron los servicios `ITokenProvider` (vinculado a `ProveedorTokenJwt`) y `IAutorizacionService` (vinculado a `AutorizacionService`), resolviendo problemas de resolución de dependencias en tiempo de ejecución.
    - Se registró `ModificarMisDatosUseCase` (Scoped).
 
-5. Corrección de referencias y dependencias NuGet en SGE.Infraestructura y WebApi:
+5. Corrección de referencias y dependencias NuGet en SGE.Infraestructura y SGE.WebApi:
    - Se añadió la referencia al paquete NuGet `System.IdentityModel.Tokens.Jwt` (v8.0.1) y `Microsoft.IdentityModel.Tokens` (v8.0.1) en `SGE.Infraestructura.csproj` y `SGE.WebApi.csproj`. Esto resuelve los errores de compilación del manejador de tokens JWT y sus dependencias en ambos proyectos.
    - Se renombró el parámetro `usuario` a `user` en `ProveedorTokenJwt.cs` para cumplir exactamente con la firma de la interfaz `ITokenProvider`.
    - Se añadió `<OutputType>Exe</OutputType>` en `SGE.WebApi.csproj` para solucionar el problema de detección de ejecutable en extensiones de VS Code (C# Dev Kit).
