@@ -18,6 +18,7 @@ Registro de Cambios - SGE (Fase 2)
 5. Corrección de referencias y dependencias NuGet en SGE.Infraestructura y WebApi:
    - Se añadió la referencia al paquete NuGet `System.IdentityModel.Tokens.Jwt` (v8.0.1) y `Microsoft.IdentityModel.Tokens` (v8.0.1) en `SGE.Infraestructura.csproj` y `SGE.WebApi.csproj`. Esto resuelve los errores de compilación del manejador de tokens JWT y sus dependencias en ambos proyectos.
    - Se renombró el parámetro `usuario` a `user` en `ProveedorTokenJwt.cs` para cumplir exactamente con la firma de la interfaz `ITokenProvider`.
+   - Se añadió `<OutputType>Exe</OutputType>` en `SGE.WebApi.csproj` para solucionar el problema de detección de ejecutable en extensiones de VS Code (C# Dev Kit).
 
 6. Corrección en Cambio de Estado de Expedientes:
    - Se agregó una sobrecarga de `ActualizarEstado(EstadoExpediente, Guid)` en `Expediente.cs` para permitir modificaciones directas del estado.
