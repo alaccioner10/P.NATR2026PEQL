@@ -3,7 +3,6 @@ using SGE.Dominio.Usuarios;
 namespace SGE.Aplicacion.Usuarios;
 public record class ModificarMisDatosRequest
 (
-    Guid id,
     string? NuevoNombre,
     string? NuevoEmail,
     string? NuevaClave

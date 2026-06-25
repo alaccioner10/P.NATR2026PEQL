@@ -19,11 +19,6 @@ public class ModificarMisDatosUseCase
 
     public ModificarMisDatosResponse Ejecutar(ModificarMisDatosRequest req, Guid id)
     {
-        if(req.id != id)
-        {
-            throw new AutorizacionException("No puedes editar los datos de otro usuario");
-        }
-
         Usuario? user = _repo.ObtenerPorId(id);
        
         if(user == null)

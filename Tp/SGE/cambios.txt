@@ -26,3 +26,7 @@ Registro de Cambios - SGE (Fase 2)
 
 7. AutorizacionException.cs:
    - Se implementaron los constructores estándar tradicionales para compatibilidad del compilador y remover advertencias de tipo nullable.
+
+8. Ajustes de Simplificación y Organización:
+   - Se removió el campo `id` del DTO `ModificarMisDatosRequest` en `ModificarMisDatosDTO.cs` y su validación asociada en `ModificarMisDatosUseCase.cs`. Ahora la modificación se realiza utilizando únicamente el `id` proveniente de la ruta (URL), haciendo más limpio el cuerpo de la petición.
+   - Se reorganizaron los bloques de registros de inyección de dependencias en `Program.cs` agrupándolos lógicamente por módulos (Usuarios, Expedientes, Trámites y SGE.WebApi).

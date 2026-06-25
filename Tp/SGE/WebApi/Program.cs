@@ -19,21 +19,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); // El generador clásico de Swagger
 
-// Configuración de EF Core y SQLite
-builder.Services.AddDbContext<SGEContext>(options =>
-    options.UseSqlite("Data Source=SGE.db"));
-
-// Repositorios y Unidad de Trabajo
-builder.Services.AddScoped<IExpedienteRepository, ExpedienteRepository>();
-builder.Services.AddScoped<ITramiteRepository, TramiteRepository>();
+// ==================== 1. USUARIOS ====================
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+builder.Services.AddScoped<LoginUseCase>();
+builder.Services.AddScoped<RegistrarUsuarioUseCase>();
+builder.Services.AddScoped<ModificarMisDatosUseCase>();
 
-//Token y Autorización
-builder.Services.AddSingleton<ITokenProvider>(new ProveedorTokenJwt("ClaveSuperSecretaDeDesarrolloDeAlMenos32BytesDeLargo!"));
-builder.Services.AddScoped<IAutorizacionService, AutorizacionService>();
-
-// Casos de uso - Expedientes
+// ==================== 2. EXPEDIENTES ====================
+builder.Services.AddScoped<IExpedienteRepository, ExpedienteRepository>();
 builder.Services.AddScoped<AgregarExpedienteUseCase>();
 builder.Services.AddScoped<ConsultarExpedienteUseCase>();
 builder.Services.AddScoped<ListaExpedientesUseCase>();
@@ -41,18 +34,19 @@ builder.Services.AddScoped<ModificarCaratulaUseCase>();
 builder.Services.AddScoped<CambiarEstadoExpediente>();
 builder.Services.AddScoped<EliminarExpedienteUseCase>();
 
-// Casos de uso - Trámites
+// ==================== 3. TRAMITES ====================
+builder.Services.AddScoped<ITramiteRepository, TramiteRepository>();
 builder.Services.AddScoped<AgregarTramiteUseCase>();
 builder.Services.AddScoped<EliminarTramiteUseCase>();
 builder.Services.AddScoped<ModificarTramiteUseCase>();
 builder.Services.AddScoped<ListarTramitesPorExpedienteUseCase>();
 
-// Casos de uso - Usuarios
-builder.Services.AddScoped<LoginUseCase>();
-builder.Services.AddScoped<RegistrarUsuarioUseCase>();
-builder.Services.AddScoped<ModificarMisDatosUseCase>();
-
-// Registrar el servicio actualizador de estado
+// ==================== 4. SGE.WEBAPI (Compartidos / Infraestructura) ====================
+builder.Services.AddDbContext<SGEContext>(options =>
+    options.UseSqlite("Data Source=SGE.db"));
+builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
+builder.Services.AddSingleton<ITokenProvider>(new ProveedorTokenJwt("ClaveSuperSecretaDeDesarrolloDeAlMenos32BytesDeLargo!"));
+builder.Services.AddScoped<IAutorizacionService, AutorizacionService>();
 builder.Services.AddScoped<ActualizadorEstadoExpedienteService>();
 
 var app = builder.Build();
