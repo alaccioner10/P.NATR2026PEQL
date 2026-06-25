@@ -84,4 +84,12 @@ public class Expediente
         RegistrarModificacion(idUser);
         return estadoAntes != Estado;
     }
+
+    public bool ActualizarEstado(EstadoExpediente nuevoEstado, Guid idUser)
+    {
+        EstadoExpediente estadoAntes = Estado;
+        Estado = nuevoEstado;
+        RegistrarModificacion(idUser);
+        return estadoAntes != Estado;
+    }
 }

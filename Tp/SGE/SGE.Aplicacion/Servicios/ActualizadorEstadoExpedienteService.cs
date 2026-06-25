@@ -21,7 +21,7 @@ public class ActualizadorEstadoExpedienteService
 
             if (exp != null)
             {
-                exp.ActualizarEstado((EtiquetaTramite?)EstadoExpediente.Finalizado, usuarioId);
+                exp.ActualizarEstado(tramite.Etiqueta, usuarioId);
                 _expRepo.Modificar(exp);
             }
         }

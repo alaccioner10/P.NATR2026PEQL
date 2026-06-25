@@ -9,14 +9,14 @@ namespace SGE.Aplicacion.Expedientes.UseCases;
 public class CambiarEstadoExpediente
 {
     private readonly IUnidadDeTrabajo _uow;
-    private  IExpedienteRepository _iExpRepo;
-    private  IAutorizacionService _autorizacion;
+    private readonly IExpedienteRepository _iExpRepo;
+    private readonly IAutorizacionService _autorizacion;
 
-    public CambiarEstadoExpediente (IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+    public CambiarEstadoExpediente(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
     {
         _uow = uow;
-        _iExpRepo=iExpRepo;
-        _autorizacion=autorizacion;
+        _iExpRepo = iExpRepo;
+        _autorizacion = autorizacion;
     }
 
     public CambiarEstadoExpResponse Ejecutar(CambiarEstadoExpRequest req)
@@ -37,12 +37,11 @@ public class CambiarEstadoExpediente
             throw new AplicationException("El expediente solicitado no existe");
         }
 
-        exp.ActualizarEstado((EtiquetaTramite?)req.Estado, req.IdUser);
+        exp.ActualizarEstado(req.Estado, req.IdUser);
 
         _iExpRepo.Modificar(exp);
         _uow.Guardar();
 
         return new CambiarEstadoExpResponse(exp.Id,exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
-
 }

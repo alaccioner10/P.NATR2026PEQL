@@ -12,3 +12,16 @@ Registro de Cambios - SGE (Fase 2)
 
 4. Registro de dependencias en WebApi/Program.cs:
    - Se registró en el contenedor de dependencias el servicio `ActualizadorEstadoExpedienteService` (Scoped) y se importó su espacio de nombres `SGE.Aplicacion.Servicios`. Esto soluciona la falta de registro requerida por los Casos de Uso de trámites.
+   - Se registraron los servicios `ITokenProvider` (vinculado a `ProveedorTokenJwt`) y `IAutorizacionService` (vinculado a `AutorizacionService`), resolviendo problemas de resolución de dependencias en tiempo de ejecución.
+   - Se registró `ModificarMisDatosUseCase` (Scoped).
+
+5. Corrección de referencias y dependencias NuGet en SGE.Infraestructura y WebApi:
+   - Se añadió la referencia al paquete NuGet `System.IdentityModel.Tokens.Jwt` (v8.0.1) y `Microsoft.IdentityModel.Tokens` (v8.0.1) en `SGE.Infraestructura.csproj` y `SGE.WebApi.csproj`. Esto resuelve los errores de compilación del manejador de tokens JWT y sus dependencias en ambos proyectos.
+   - Se renombró el parámetro `usuario` a `user` en `ProveedorTokenJwt.cs` para cumplir exactamente con la firma de la interfaz `ITokenProvider`.
+
+6. Corrección en Cambio de Estado de Expedientes:
+   - Se agregó una sobrecarga de `ActualizarEstado(EstadoExpediente, Guid)` en `Expediente.cs` para permitir modificaciones directas del estado.
+   - Se corrigieron los errores lógicos en `CambiarEstadoExpediente.cs` y `ActualizadorEstadoExpedienteService.cs` reemplazando los casteos incorrectos de `EstadoExpediente` a `EtiquetaTramite?` por invocaciones adecuadas de `ActualizarEstado`.
+
+7. AutorizacionException.cs:
+   - Se implementaron los constructores estándar tradicionales para compatibilidad del compilador y remover advertencias de tipo nullable.

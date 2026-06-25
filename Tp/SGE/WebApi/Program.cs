@@ -10,6 +10,7 @@ using SGE.Aplicacion.Usuarios;
 using SGE.Aplicacion.Usuarios.UseCases;
 using SGE.Infraestructura;
 using SGE.Infraestructura.Repositorios;
+using SGE.Infraestructura.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,9 @@ builder.Services.AddScoped<ITramiteRepository, TramiteRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
 
-
+//Token y Autorización
+builder.Services.AddSingleton<ITokenProvider>(new ProveedorTokenJwt("ClaveSuperSecretaDeDesarrolloDeAlMenos32BytesDeLargo!"));
+builder.Services.AddScoped<IAutorizacionService, AutorizacionService>();
 
 // Casos de uso - Expedientes
 builder.Services.AddScoped<AgregarExpedienteUseCase>();
@@ -47,6 +50,7 @@ builder.Services.AddScoped<ListarTramitesPorExpedienteUseCase>();
 // Casos de uso - Usuarios
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<RegistrarUsuarioUseCase>();
+builder.Services.AddScoped<ModificarMisDatosUseCase>();
 
 // Registrar el servicio actualizador de estado
 builder.Services.AddScoped<ActualizadorEstadoExpedienteService>();
