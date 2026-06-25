@@ -74,6 +74,4 @@ app.MapGet("/SGE", () => Results.Redirect("/swagger/index.html"));
 // --- 3. MAPEAR CONTROLADORES ---
 app.MapControllers();
 
-app.MapGet("/health", () => Results.Ok("SGE WebApi está arriba"));
-
 app.Run();
