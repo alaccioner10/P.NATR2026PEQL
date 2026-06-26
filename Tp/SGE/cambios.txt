@@ -54,3 +54,9 @@ Registro de Cambios - SGE (Fase 2)
          * `Tp/SGE/SGE.Aplicacion/Excepciones/AplicationException.cs` (Constructor de excepción público).
        - Capa Infraestructura:
          * `Tp/SGE/SGE.Infraestructura/Excepciones/RepositoryException.cs` (Constructor de excepción público).
+
+10. Parametrización de Configuración (appsettings.json):
+    - Se crearon los archivos de configuración `appsettings.json` y `appsettings.Development.json` en el proyecto `SGE.WebApi`.
+    - Se extrajeron la cadena de conexión SQLite ("DefaultConnection") y la clave secreta JWT ("JwtSettings:Secret") a dichos archivos de configuración.
+    - Se modificó `Program.cs` para obtener estos valores dinámicamente utilizando `builder.Configuration`.
+

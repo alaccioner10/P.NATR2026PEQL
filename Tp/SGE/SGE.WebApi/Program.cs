@@ -38,9 +38,14 @@ builder.Services.AddScoped<ModificarTramiteUseCase>();
 builder.Services.AddScoped<ListarTramitesPorExpedienteUseCase>();
 
 builder.Services.AddDbContext<SGEContext>(options =>
-    options.UseSqlite("Data Source=SGE.db"));
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlite(connectionString);
+});
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
-builder.Services.AddSingleton<ITokenProvider>(new ProveedorTokenJwt("ClaveSuperSecretaDeDesarrolloDeAlMenos32BytesDeLargo!"));
+
+var jwtSecret = builder.Configuration["JwtSettings:Secret"] ?? throw new InvalidOperationException("JWT Secret is not configured.");
+builder.Services.AddSingleton<ITokenProvider>(new ProveedorTokenJwt(jwtSecret));
 builder.Services.AddScoped<IAutorizacionService, AutorizacionService>();
 builder.Services.AddScoped<ActualizadorEstadoExpedienteService>();
 
