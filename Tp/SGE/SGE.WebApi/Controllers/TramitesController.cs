@@ -27,7 +27,6 @@ namespace SGE.WebApi.Controllers
             _listarTramitesUseCase = listarTramitesUseCase;
         }
 
-        // POST: api/tramites
         [HttpPost]
         public IActionResult Agregar([FromBody] AgregarTramiteRequest request)
         {
@@ -50,7 +49,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // PUT: api/tramites
         [HttpPut]
         public IActionResult Modificar([FromBody] ModificarTramiteRequest request)
         {
@@ -73,7 +71,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // DELETE: api/tramites
         [HttpDelete]
         public IActionResult Eliminar([FromBody] EliminarTramiteRequest request)
         {
@@ -96,7 +93,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // GET: api/tramites
         [HttpGet]
         public IActionResult Listar([FromQuery] ListaTramitesPorExpedienteRequest request)
         {

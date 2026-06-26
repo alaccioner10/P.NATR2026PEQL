@@ -17,7 +17,6 @@ namespace SGE.WebApi.Controllers
         private readonly CambiarEstadoExpediente _cambiarEstadoExpediente;
         private readonly EliminarExpedienteUseCase _eliminarExpedienteUseCase;
 
-        // Constructor tradicional arreglado (sin la palabra 'class' colgada)
         public ExpedientesController(
             AgregarExpedienteUseCase agregarExpedienteUseCase,
             ListaExpedientesUseCase listaExpedientesUseCase,
@@ -34,7 +33,6 @@ namespace SGE.WebApi.Controllers
             _eliminarExpedienteUseCase = eliminarExpedienteUseCase;
         }
 
-        // POST: api/expedientes
         [HttpPost]
         public IActionResult Agregar([FromBody] AgregarExpedienteRequest request)
         {
@@ -57,7 +55,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // GET: api/expedientes
         [HttpGet]
         public IActionResult Listar([FromQuery] ListarExpedientesRequest request)
         {
@@ -72,7 +69,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // GET: api/expedientes/consultar
         [HttpGet("consultar")]
         public IActionResult Consultar([FromQuery] ConsultarExpedienteRequest request)
         {
@@ -87,7 +83,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // PUT: api/expedientes/caratula
         [HttpPut("caratula")]
         public IActionResult ModificarCaratula([FromBody] ModificarCaratulaRequest request)
         {
@@ -110,7 +105,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // PUT: api/expedientes/estado
         [HttpPut("estado")]
         public IActionResult CambiarEstado([FromBody] CambiarEstadoExpRequest request)
         {
@@ -133,7 +127,6 @@ namespace SGE.WebApi.Controllers
             }
         }
 
-        // DELETE: api/expedientes
         [HttpDelete]
         public IActionResult Eliminar([FromBody] EliminarExpedienteRequest request)
         {

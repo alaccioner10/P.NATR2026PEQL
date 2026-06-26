@@ -14,18 +14,15 @@ using SGE.Infraestructura.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. CONFIGURACIÓN DE SWAGGER TRADICIONAL ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // El generador clásico de Swagger
+builder.Services.AddSwaggerGen();
 
-// ==================== 1. USUARIOS ====================
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<LoginUseCase>();
 builder.Services.AddScoped<RegistrarUsuarioUseCase>();
 builder.Services.AddScoped<ModificarMisDatosUseCase>();
 
-// ==================== 2. EXPEDIENTES ====================
 builder.Services.AddScoped<IExpedienteRepository, ExpedienteRepository>();
 builder.Services.AddScoped<AgregarExpedienteUseCase>();
 builder.Services.AddScoped<ConsultarExpedienteUseCase>();
@@ -34,14 +31,12 @@ builder.Services.AddScoped<ModificarCaratulaUseCase>();
 builder.Services.AddScoped<CambiarEstadoExpediente>();
 builder.Services.AddScoped<EliminarExpedienteUseCase>();
 
-// ==================== 3. TRAMITES ====================
 builder.Services.AddScoped<ITramiteRepository, TramiteRepository>();
 builder.Services.AddScoped<AgregarTramiteUseCase>();
 builder.Services.AddScoped<EliminarTramiteUseCase>();
 builder.Services.AddScoped<ModificarTramiteUseCase>();
 builder.Services.AddScoped<ListarTramitesPorExpedienteUseCase>();
 
-// ==================== 4. SGE.WEBAPI (Compartidos / Infraestructura) ====================
 builder.Services.AddDbContext<SGEContext>(options =>
     options.UseSqlite("Data Source=SGE.db"));
 builder.Services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
@@ -51,21 +46,17 @@ builder.Services.AddScoped<ActualizadorEstadoExpedienteService>();
 
 var app = builder.Build();
 
-// Inicializar la base de datos al arrancar
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<SGEContext>();
     context.Database.EnsureCreated();
 }
 
-// --- 2. ACTIVAR SWAGGER SIEMPRE (Forzado para tu entorno Linux) ---
 app.UseSwagger();
-app.UseSwaggerUI(); // Levanta la interfaz clásica azul/blanca de Swagger
+app.UseSwaggerUI();
 
-// Tu atajo: si entrás a /SGE, te manda directo al Swagger tradicional
 app.MapGet("/SGE", () => Results.Redirect("/swagger/index.html"));
 
-// --- 3. MAPEAR CONTROLADORES ---
 app.MapControllers();
 
 app.Run();

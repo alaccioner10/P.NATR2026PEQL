@@ -30,3 +30,27 @@ Registro de Cambios - SGE (Fase 2)
 8. Ajustes de Simplificación y Organización:
    - Se removió el campo `id` del DTO `ModificarMisDatosRequest` en `ModificarMisDatosDTO.cs` y su validación asociada en `ModificarMisDatosUseCase.cs`. Ahora la modificación se realiza utilizando únicamente el `id` proveniente de la ruta (URL), haciendo más limpio el cuerpo de la petición.
    - Se reorganizaron los bloques de registros de inyección de dependencias en `Program.cs` agrupándolos lógicamente por módulos (Usuarios, Expedientes, Trámites y SGE.WebApi).
+
+9. Eliminación de Comentarios y Anotaciones Especiales:
+   - Se eliminaron todos los comentarios de código en los siguientes archivos del proyecto:
+     * Tp/SGE/SGE.Aplicacion/Usuarios/ModificarMisDatosUseCase.cs
+     * Tp/SGE/SGE.Aplicacion/Autorizacion/AutorizacionService.cs
+     * Tp/SGE/SGE.Dominio/Usuarios/Usuario.cs
+     * Tp/SGE/SGE.Infraestructura/Servicios/ProveedorTokenJwt.cs
+     * Tp/SGE/SGE.WebApi/Controllers/UsuariosController.cs
+     * Tp/SGE/SGE.WebApi/Controllers/TramitesController.cs
+     * Tp/SGE/SGE.WebApi/Controllers/ExpedientesController.cs
+     * Tp/SGE/SGE.WebApi/Program.cs
+   - Anotacion:
+     * El inicializador para SQL (`Inicializar()`) se encuentra en:
+       - `Tp/SGE/SGE.Infraestructura/SGESqlite.cs` (Clase `SGESqlite`, método `Inicializar(SGEContext context)`).
+       - La inicialización automática al arrancar se ejecuta en `Tp/SGE/SGE.WebApi/Program.cs` usando `EnsureCreated()`.
+     * Los constructores parameterless (sin parámetros) explícitos están en:
+       - Capa Dominio:
+         * `Tp/SGE/SGE.Dominio/Excepciones/DomainException.cs` (Constructor de excepción público).
+         * `Tp/SGE/SGE.Dominio/Expedientes/Expediente.cs` (Constructor privado para EF Core).
+         * `Tp/SGE/SGE.Dominio/Tramites/Tramite.cs` (Constructor privado para EF Core).
+       - Capa Aplicación:
+         * `Tp/SGE/SGE.Aplicacion/Excepciones/AplicationException.cs` (Constructor de excepción público).
+       - Capa Infraestructura:
+         * `Tp/SGE/SGE.Infraestructura/Excepciones/RepositoryException.cs` (Constructor de excepción público).

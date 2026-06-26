@@ -26,7 +26,6 @@ public class ModificarMisDatosUseCase
             throw new AplicationException("Usuario no encontrado");
         }
 
-        // Actualizar todos los campos: si no hay nuevo valor, usar el actual
         user.Nombre = !string.IsNullOrWhiteSpace(req.NuevoNombre) ? req.NuevoNombre : user.Nombre;
         user.Email = !string.IsNullOrWhiteSpace(req.NuevoEmail) ? req.NuevoEmail : user.Email;
         user.ContrasenaHash = !string.IsNullOrWhiteSpace(req.NuevaClave) ? ContrasenaUtil.Convertir(req.NuevaClave) : user.ContrasenaHash;

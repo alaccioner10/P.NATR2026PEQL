@@ -20,7 +20,6 @@ public class AutorizacionService : IAutorizacionService
             return false;
         }
 
-        // Un administrador posee todos los permisos implícitamente
         return usuario.EsAdmin || usuario.Permisos.Contains(permiso);
     }
 }

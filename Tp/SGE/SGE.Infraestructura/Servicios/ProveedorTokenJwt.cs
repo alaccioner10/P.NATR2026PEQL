@@ -22,7 +22,6 @@ public class ProveedorTokenJwt : ITokenProvider
         var manejadorToken = new JwtSecurityTokenHandler();
         var claveEnBytes = Encoding.UTF8.GetBytes(_claveSecreta);
 
-        // Reclamos: Información pública del usuario que viaja en el token
         var reclamos = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -31,7 +30,6 @@ public class ProveedorTokenJwt : ITokenProvider
             new Claim("esAdmin", user.EsAdmin.ToString().ToLower())
         };
 
-        // Si no es admin, añadimos sus permisos
         if (!user.EsAdmin)
         {
             foreach (var permiso in user.Permisos)
@@ -43,7 +41,6 @@ public class ProveedorTokenJwt : ITokenProvider
         var descriptorToken = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(reclamos),
-            // Al omitir 'Expires', el token no tiene fecha de vencimiento y no expira
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(claveEnBytes),
                 SecurityAlgorithms.HmacSha256Signature
