@@ -15,17 +15,20 @@ namespace SGE.WebApi.Controllers
         private readonly ModificarTramiteUseCase _modificarTramiteUseCase;
         private readonly EliminarTramiteUseCase _eliminarTramiteUseCase;
         private readonly ListarTramitesPorExpedienteUseCase _listarTramitesUseCase;
+        private readonly ConsultarTramiteUseCase _consultarTramiteUseCase;
 
         public TramitesController(
             AgregarTramiteUseCase agregarTramiteUseCase,
             ModificarTramiteUseCase modificarTramiteUseCase,
             EliminarTramiteUseCase eliminarTramiteUseCase,
-            ListarTramitesPorExpedienteUseCase listarTramitesUseCase)
+            ListarTramitesPorExpedienteUseCase listarTramitesUseCase,
+            ConsultarTramiteUseCase consultarTramiteUseCase)
         {
             _agregarTramiteUseCase = agregarTramiteUseCase;
             _modificarTramiteUseCase = modificarTramiteUseCase;
             _eliminarTramiteUseCase = eliminarTramiteUseCase;
             _listarTramitesUseCase = listarTramitesUseCase;
+            _consultarTramiteUseCase = consultarTramiteUseCase;
         }
 
         private Guid ObtenerIdUsuarioDelToken()
@@ -67,6 +70,14 @@ namespace SGE.WebApi.Controllers
         public IActionResult Listar([FromQuery] ListaTramitesPorExpedienteRequest request)
         {
             var response = _listarTramitesUseCase.Ejecutar(request);
+            return Ok(response);
+        }
+
+        [HttpGet("{id:guid}")]
+        [AllowAnonymous]
+        public IActionResult Consultar([FromRoute] Guid id)
+        {
+            var response = _consultarTramiteUseCase.Ejecutar(new ConsultarTramiteRequest(id));
             return Ok(response);
         }
     }

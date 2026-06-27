@@ -51,6 +51,9 @@ public sealed class ManejadorGlobalExcepcionesMiddleware
 		{
 			AutorizacionException => ((int)HttpStatusCode.Forbidden, "Error de autorización"),
 			UnauthorizedAccessException => ((int)HttpStatusCode.Unauthorized, "No autorizado"),
+			AplicationException when ex.Message.Contains("no existe", StringComparison.OrdinalIgnoreCase) || 
+			                         ex.Message.Contains("no encontrado", StringComparison.OrdinalIgnoreCase)
+				=> ((int)HttpStatusCode.NotFound, "Recurso no encontrado"),
 			AplicationException => ((int)HttpStatusCode.BadRequest, "Error de aplicación"),
 			DomainException => ((int)HttpStatusCode.BadRequest, "Error de dominio"),
 			RepositoryException => ((int)HttpStatusCode.NotFound, "Recurso no encontrado"),

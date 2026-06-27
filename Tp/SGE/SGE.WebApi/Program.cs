@@ -55,6 +55,7 @@ builder.Services.AddScoped<AgregarTramiteUseCase>();
 builder.Services.AddScoped<EliminarTramiteUseCase>();
 builder.Services.AddScoped<ModificarTramiteUseCase>();
 builder.Services.AddScoped<ListarTramitesPorExpedienteUseCase>();
+builder.Services.AddScoped<ConsultarTramiteUseCase>();
 
 builder.Services.AddDbContext<SGEContext>(options =>
 {

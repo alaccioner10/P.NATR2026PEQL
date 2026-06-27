@@ -11,7 +11,7 @@ public class LoginUseCase(IUsuarioRepository repo, ITokenProvider tokenProvider)
         Usuario? user=repo.ObtenerPorEmail(req.Email);
         if (user == null || !ContrasenaUtil.Comparar(req.Contrasena, user.ContrasenaHash))
         {
-            throw new AutorizacionException("El mail o la contraseña son incorrectos.");
+            throw new UnauthorizedAccessException("El mail o la contraseña son incorrectos.");
         }
 
         var token = tokenProvider.GenerarToken(user);
