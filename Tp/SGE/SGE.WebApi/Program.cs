@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Expedientes;
@@ -14,12 +15,24 @@ using SGE.Aplicacion.Usuarios.UseCases;
 using SGE.Infraestructura;
 using SGE.Infraestructura.Repositorios;
 using SGE.Infraestructura.Servicios;
+using SGE.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.DocumentFilter<FiltroAutorizacion>();
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = "Pegar el JWT completo o solo el token. Se enviará como Authorization."
+    });
+});
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<LoginUseCase>();
@@ -66,6 +79,26 @@ builder.Services.AddAuthentication(opciones =>
 {
     opciones.RequireHttpsMetadata = false;
     opciones.SaveToken = true;
+    opciones.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var authorizationHeader = context.Request.Headers.Authorization.ToString();
+
+            if (string.IsNullOrWhiteSpace(authorizationHeader))
+            {
+                return Task.CompletedTask;
+            }
+
+            const string bearerPrefix = "Bearer ";
+
+            context.Token = authorizationHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
+                ? authorizationHeader[bearerPrefix.Length..].Trim()
+                : authorizationHeader.Trim();
+
+            return Task.CompletedTask;
+        }
+    };
     opciones.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
@@ -87,7 +120,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    options.ConfigObject.PersistAuthorization = true;
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -96,4 +132,4 @@ app.MapGet("/SGE", () => Results.Redirect("/swagger/index.html"));
 
 app.MapControllers();
 
-app.Run();
+app.Run();
