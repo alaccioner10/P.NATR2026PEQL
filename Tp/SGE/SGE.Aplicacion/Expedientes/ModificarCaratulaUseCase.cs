@@ -19,7 +19,7 @@ public class ModificarCaratulaUseCase
         _autorizacion = autorizacion;
     }
 
-    public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest req)
+    public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest req, Guid idUsuario)
     {
        
         if (req == null)
@@ -27,7 +27,7 @@ public class ModificarCaratulaUseCase
             throw new AplicationException("La solicitud no puede estar vacía."); 
         }
 
-        if(!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.ExpedienteModificacion))
+        if(!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar expedientes");
         }
@@ -40,7 +40,7 @@ public class ModificarCaratulaUseCase
 
         Caratula car= new Caratula(req.NuevaCaratula);
 
-        exp.ModificarCaratula(car,req.IdUser);
+        exp.ModificarCaratula(car,idUsuario);
 
         _iExpRepo.Modificar(exp);
 

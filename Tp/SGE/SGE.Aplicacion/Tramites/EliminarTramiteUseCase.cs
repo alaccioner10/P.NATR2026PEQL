@@ -21,10 +21,10 @@ public class EliminarTramiteUseCase
         _actualizador = actualizador;
     }
 
-    public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest req)
+    public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest req, Guid idUsuario)
     {
         
-        if (!_autorizacion.PoseeElPermiso(req.IdUsuario, Permiso.TramiteBaja))
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar trámites.");
         }
@@ -37,7 +37,7 @@ public class EliminarTramiteUseCase
 
         _tramiteRepo.Eliminar(req.TramiteId);
 
-        _actualizador.Ejecutar(tramite, req.IdUsuario);
+        _actualizador.Ejecutar(tramite, idUsuario);
         _uow.Guardar();
 
         return new EliminarTramiteResponse(req.TramiteId, "Trámite eliminado con éxito.");

@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Excepciones;
@@ -8,6 +10,7 @@ namespace SGE.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TramitesController : ControllerBase
     {
         private readonly AgregarTramiteUseCase _agregarTramiteUseCase;
@@ -27,12 +30,23 @@ namespace SGE.WebApi.Controllers
             _listarTramitesUseCase = listarTramitesUseCase;
         }
 
+        private Guid ObtenerIdUsuarioDelToken()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+            {
+                throw new UnauthorizedAccessException("No se pudo obtener el ID del usuario del token.");
+            }
+            return Guid.Parse(claim.Value);
+        }
+
         [HttpPost]
         public IActionResult Agregar([FromBody] AgregarTramiteRequest request)
         {
             try
             {
-                var response = _agregarTramiteUseCase.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _agregarTramiteUseCase.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)
@@ -54,7 +68,8 @@ namespace SGE.WebApi.Controllers
         {
             try
             {
-                var response = _modificarTramiteUseCase.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _modificarTramiteUseCase.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)
@@ -76,7 +91,8 @@ namespace SGE.WebApi.Controllers
         {
             try
             {
-                var response = _eliminarTramiteUseCase.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _eliminarTramiteUseCase.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)
@@ -94,6 +110,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Listar([FromQuery] ListaTramitesPorExpedienteRequest request)
         {
             try

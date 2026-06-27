@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Aplicacion.Expedientes.UseCases;
 using SGE.Aplicacion.Expedientes.DTOs;
@@ -8,6 +10,7 @@ namespace SGE.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ExpedientesController : ControllerBase
     {
         private readonly AgregarExpedienteUseCase _agregarExpedienteUseCase;
@@ -33,12 +36,23 @@ namespace SGE.WebApi.Controllers
             _eliminarExpedienteUseCase = eliminarExpedienteUseCase;
         }
 
+        private Guid ObtenerIdUsuarioDelToken()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+            {
+                throw new UnauthorizedAccessException("No se pudo obtener el ID del usuario del token.");
+            }
+            return Guid.Parse(claim.Value);
+        }
+
         [HttpPost]
         public IActionResult Agregar([FromBody] AgregarExpedienteRequest request)
         {
             try
             {
-                var response = _agregarExpedienteUseCase.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _agregarExpedienteUseCase.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)
@@ -56,6 +70,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Listar([FromQuery] ListarExpedientesRequest request)
         {
             try
@@ -70,6 +85,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpGet("consultar")]
+        [AllowAnonymous]
         public IActionResult Consultar([FromQuery] ConsultarExpedienteRequest request)
         {
             try
@@ -88,7 +104,8 @@ namespace SGE.WebApi.Controllers
         {
             try
             {
-                var response = _modificarCaratulaUseCase.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _modificarCaratulaUseCase.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)
@@ -110,7 +127,8 @@ namespace SGE.WebApi.Controllers
         {
             try
             {
-                var response = _cambiarEstadoExpediente.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _cambiarEstadoExpediente.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)
@@ -132,7 +150,8 @@ namespace SGE.WebApi.Controllers
         {
             try
             {
-                var response = _eliminarExpedienteUseCase.Ejecutar(request);
+                var idUsuario = ObtenerIdUsuarioDelToken();
+                var response = _eliminarExpedienteUseCase.Ejecutar(request, idUsuario);
                 return Ok(response);
             }
             catch (AutorizacionException ex)

@@ -2,8 +2,7 @@ namespace SGE.Aplicacion.Tramites.DTOs;
 
 public record ModificarTramiteRequest(
     Guid TramiteId, 
-    string NuevoContenido, 
-    Guid IdUser
+    string NuevoContenido
 );
 
 public record ModificarTramiteResponse(

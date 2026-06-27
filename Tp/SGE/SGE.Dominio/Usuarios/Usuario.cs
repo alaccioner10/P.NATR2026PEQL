@@ -33,4 +33,9 @@ public class Usuario
     {
         return new Usuario(id,nombre,email,contrasenaHash,esAdmin,permisos);
     }
+
+    public void CambiarPermisos(IEnumerable<Permiso> nuevosPermisos)
+    {
+        Permisos = nuevosPermisos;
+    }
 }

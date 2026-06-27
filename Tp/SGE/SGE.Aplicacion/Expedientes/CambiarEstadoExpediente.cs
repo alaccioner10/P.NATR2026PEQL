@@ -19,14 +19,14 @@ public class CambiarEstadoExpediente
         _autorizacion = autorizacion;
     }
 
-    public CambiarEstadoExpResponse Ejecutar(CambiarEstadoExpRequest req)
+    public CambiarEstadoExpResponse Ejecutar(CambiarEstadoExpRequest req, Guid idUsuario)
     {
         if (req == null)
         {
             throw new AplicationException("La solicitud no puede estar vacia");
         }
         
-        if(!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.ExpedienteModificacion))
+        if(!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar el estado");
         }
@@ -37,7 +37,7 @@ public class CambiarEstadoExpediente
             throw new AplicationException("El expediente solicitado no existe");
         }
 
-        exp.ActualizarEstado(req.Estado, req.IdUser);
+        exp.ActualizarEstado(req.Estado, idUsuario);
 
         _iExpRepo.Modificar(exp);
         _uow.Guardar();

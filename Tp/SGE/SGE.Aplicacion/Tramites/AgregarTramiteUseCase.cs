@@ -21,9 +21,9 @@ public class AgregarTramiteUseCase
         _autorizacion = autorizacion;
     }
 
-    public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req)
+    public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req, Guid idUsuario)
     {
-        if (!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.TramiteAlta))
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteAlta))
         {
             throw new AutorizacionException("El usuario no tiene permisos para agregar trámites");
         }
@@ -34,12 +34,12 @@ public class AgregarTramiteUseCase
             req.ExpedienteId,
             (EtiquetaTramite)req.Etiqueta,
             contenido,
-            req.IdUser
+            idUsuario
         );
 
         _tramiteRepo.Agregar(tramite);
 
-        _actualizador.Ejecutar(tramite, req.IdUser);
+        _actualizador.Ejecutar(tramite, idUsuario);
         _uow.Guardar();
 
         return new AgregarTramiteResponse(

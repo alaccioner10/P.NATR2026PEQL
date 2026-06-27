@@ -21,9 +21,9 @@ public class ModificarTramiteUseCase
         _autorizacion = autorizacion;
     }
 
-    public ModificarTramiteResponse Ejecutar(ModificarTramiteRequest req)
+    public ModificarTramiteResponse Ejecutar(ModificarTramiteRequest req, Guid idUsuario)
     {
-        if (!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.TramiteModificacion))
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar trámites");
         }
@@ -36,9 +36,9 @@ public class ModificarTramiteUseCase
 
         Contenido nuevoContenido = new Contenido(req.NuevoContenido);
 
-        tramite.ModificarContenido(nuevoContenido, req.IdUser);
+        tramite.ModificarContenido(nuevoContenido, idUsuario);
 
-        _actualizador.Ejecutar(tramite,req.IdUser);
+        _actualizador.Ejecutar(tramite,idUsuario);
 
         _uow.Guardar();
 

@@ -22,7 +22,7 @@ public class EliminarExpedienteUseCase
         _autorizacion = autorizacion;
     }
 
-    public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest req)
+    public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest req, Guid idUsuario)
     {
 
         if(req == null)
@@ -30,7 +30,7 @@ public class EliminarExpedienteUseCase
             throw new AplicationException ("La solicitud no puede estar vacía."); 
         }
 
-        if (!_autorizacion.PoseeElPermiso(req.IdUsuario, Permiso.ExpedienteBaja))
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar este expediente.");
         }

@@ -18,14 +18,14 @@ public class AgregarExpedienteUseCase
         _autorizacion = autorizacion;
     }
 
-    public AgregarExpedienteResponse Ejecutar(AgregarExpedienteRequest req)
+    public AgregarExpedienteResponse Ejecutar(AgregarExpedienteRequest req, Guid idUsuario)
     {
-        if (!_autorizacion.PoseeElPermiso(req.IdUser, Permiso.ExpedienteAlta))
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteAlta))
         {
             throw new AutorizacionException("El usuario no tiene permisos para agregar expedientes");
         }
         Caratula car = new Caratula(req.Caratula);
-        Expediente exp = new Expediente(car, req.IdUser);
+        Expediente exp = new Expediente(car, idUsuario);
 
         _iExpRepo.Agregar(exp);
         _uow.Guardar();

@@ -5,8 +5,7 @@ namespace SGE.Aplicacion.Tramites.DTOs;
 public record AgregarTramiteRequest(
     Guid ExpedienteId, 
     EtiquetaTramite Etiqueta, 
-    string Contenido, 
-    Guid IdUser
+    string Contenido
 );
 
 public record AgregarTramiteResponse(
