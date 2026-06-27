@@ -125,6 +125,7 @@ app.UseSwaggerUI(options =>
     options.ConfigObject.PersistAuthorization = true;
 });
 
+app.UseMiddleware<ManejadorGlobalExcepcionesMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 

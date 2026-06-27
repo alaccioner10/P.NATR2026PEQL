@@ -1,8 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SGE.Aplicacion.Autorizacion;
-using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Tramites.UseCases;
 
@@ -43,85 +41,33 @@ namespace SGE.WebApi.Controllers
         [HttpPost]
         public IActionResult Agregar([FromBody] AgregarTramiteRequest request)
         {
-            try
-            {
-                var idUsuario = ObtenerIdUsuarioDelToken();
-                var response = _agregarTramiteUseCase.Ejecutar(request, idUsuario);
-                return Ok(response);
-            }
-            catch (AutorizacionException ex)
-            {
-                return StatusCode(403, new { error = ex.Message });
-            }
-            catch (AplicationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Error inesperado al agregar el trámite", detalle = ex.Message });
-            }
+            var idUsuario = ObtenerIdUsuarioDelToken();
+            var response = _agregarTramiteUseCase.Ejecutar(request, idUsuario);
+            return Ok(response);
         }
 
         [HttpPut]
         public IActionResult Modificar([FromBody] ModificarTramiteRequest request)
         {
-            try
-            {
-                var idUsuario = ObtenerIdUsuarioDelToken();
-                var response = _modificarTramiteUseCase.Ejecutar(request, idUsuario);
-                return Ok(response);
-            }
-            catch (AutorizacionException ex)
-            {
-                return StatusCode(403, new { error = ex.Message });
-            }
-            catch (AplicationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Error inesperado al modificar el trámite", detalle = ex.Message });
-            }
+            var idUsuario = ObtenerIdUsuarioDelToken();
+            var response = _modificarTramiteUseCase.Ejecutar(request, idUsuario);
+            return Ok(response);
         }
 
         [HttpDelete]
         public IActionResult Eliminar([FromBody] EliminarTramiteRequest request)
         {
-            try
-            {
-                var idUsuario = ObtenerIdUsuarioDelToken();
-                var response = _eliminarTramiteUseCase.Ejecutar(request, idUsuario);
-                return Ok(response);
-            }
-            catch (AutorizacionException ex)
-            {
-                return StatusCode(403, new { error = ex.Message });
-            }
-            catch (AplicationException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Error inesperado al eliminar el trámite", detalle = ex.Message });
-            }
+            var idUsuario = ObtenerIdUsuarioDelToken();
+            var response = _eliminarTramiteUseCase.Ejecutar(request, idUsuario);
+            return Ok(response);
         }
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Listar([FromQuery] ListaTramitesPorExpedienteRequest request)
         {
-            try
-            {
-                var response = _listarTramitesUseCase.Ejecutar(request);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Error al listar los trámites del expediente", detalle = ex.Message });
-            }
+            var response = _listarTramitesUseCase.Ejecutar(request);
+            return Ok(response);
         }
     }
 }

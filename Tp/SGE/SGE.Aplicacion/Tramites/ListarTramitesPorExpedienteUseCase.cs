@@ -1,3 +1,4 @@
+using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Tramites.DTOs;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
@@ -10,7 +11,7 @@ public class ListarTramitesPorExpedienteUseCase(ITramiteRepository tramiteRepo)
     {
         if (req == null)
         {
-            throw new Exception("La solicitud no puede estar vacía");
+            throw new AplicationException("La solicitud no puede estar vacía");
         }
 
         var tramites= _tramiteRepo.ObtenerPorExpedienteId(req.ExpedienteID);
