@@ -1,0 +1,2461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual Técnico Exhaustivo - Sistema de Gestión de Expedientes (SGE)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+        :root {
+            --primary: #38bdf8;
+            --primary-light: #7dd3fc;
+            --secondary: #f8fafc;
+            --accent: #34d399;
+            --text-main: #cbd5e1;
+            --text-muted: #64748b;
+            --bg-main: #0b0f19;
+            --bg-card: #131b2e;
+            --border: #1e293b;
+            --code-bg: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-main);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Estilos de Portada */
+        .cover {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            padding: 40px;
+            background: linear-gradient(135deg, #090d16 0%, #17223b 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .cover h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+        }
+
+        .cover h2 {
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+            color: var(--primary-light);
+        }
+
+        .cover .meta-info {
+            margin-top: 40px;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            width: 80%;
+        }
+
+        .cover .meta-info p {
+            margin: 8px 0;
+        }
+
+        .cover .integrantes {
+            font-weight: 500;
+            color: white;
+            margin-top: 10px;
+        }
+
+        /* Índice */
+        .index-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .index-card h3 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .index-column h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border-left: 3px solid var(--primary-light);
+            padding-left: 8px;
+            margin-top: 15px;
+        }
+
+        .index-column ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .index-column li {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+
+        .index-column a {
+            color: var(--text-main);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .index-column a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+
+        /* Secciones */
+        section {
+            margin-bottom: 60px;
+            background-color: var(--bg-card);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h2.section-title {
+            font-size: 2.2rem;
+            color: var(--secondary);
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary-light);
+            padding-bottom: 8px;
+        }
+
+        h3.subsection-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-top: 40px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+
+        .class-header {
+            background-color: #1e293b;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 30px;
+            border-left: 5px solid var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--secondary);
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-main);
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-bottom: 20px;
+            margin-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0 30px 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #1e293b;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #182235;
+        }
+
+        /* Diagramas */
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #090d16;
+            padding: 30px;
+            border-radius: 8px;
+            color: white;
+            margin: 30px auto;
+            font-size: 0.9rem;
+        }
+
+        .architecture-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .arch-layer {
+            border: 2px solid;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .layer-webapi { border-color: #f43f5e; background-color: rgba(244, 63, 94, 0.15); }
+        .layer-infra { border-color: #3b82f6; background-color: rgba(59, 130, 246, 0.15); }
+        .layer-app { border-color: #eab308; background-color: rgba(234, 179, 8, 0.15); }
+        .layer-domain { border-color: #10b981; background-color: rgba(16, 185, 129, 0.15); }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #64748b;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--primary-light);
+        }
+
+        pre {
+            background-color: #090d16;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            font-family: 'Fira Code', monospace;
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        .callout {
+            background-color: #0f172a;
+            border-left: 4px solid var(--primary-light);
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+        }
+
+        .callout-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .callout-design {
+            background-color: #062f22;
+            border-left-color: var(--accent);
+        }
+
+        .callout-design .callout-title {
+            color: #34d399;
+        }
+
+        /* Explicación de Código */
+        .explanation-block {
+            background-color: #17223b;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0 35px 0;
+        }
+
+        .explanation-block h5 {
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 5px;
+        }
+
+        .explanation-block ul {
+            margin-bottom: 0;
+        }
+
+        /* Estilos de Impresión */
+        @media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+                font-size: 11pt;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .cover {
+                min-height: 95vh;
+                background: white !important;
+                color: black !important;
+                border: 2px solid #000;
+                border-radius: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+
+            .cover h1, .cover h2, .cover .meta-info, .cover .integrantes {
+                color: black !important;
+                border-color: black;
+            }
+
+            section {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                margin-bottom: 40px;
+                background: white;
+                page-break-after: always;
+            }
+
+            h2.section-title {
+                border-bottom: 2px solid #000000;
+                color: black;
+                page-break-after: avoid;
+            }
+
+            h3.subsection-title {
+                color: black;
+                page-break-after: avoid;
+            }
+
+            .class-header {
+                background-color: #e2e8f0;
+                border-left: 4px solid black;
+                page-break-inside: avoid;
+            }
+
+            pre {
+                background-color: #f8fafc;
+                color: #000000;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+                white-space: pre-wrap;
+            }
+
+            .explanation-block {
+                background-color: white;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+
+            .diagram-container {
+                background-color: white !important;
+                color: black !important;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+
+            .arch-layer {
+                color: black !important;
+                background-color: white !important;
+                border: 2px solid black !important;
+            }
+
+            .callout {
+                background-color: #f8fafc;
+                border-left: 3px solid black;
+                page-break-inside: avoid;
+            }
+
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- PORTADA -->
+    <div class="cover">
+        <h1>MANUAL TÉCNICO EXHAUSTIVO Y GUÍA COMPLETA DE CLASES</h1>
+        <h2>Documentación Detallada de cada Clase, Flujo y Decisión de Diseño del SGE</h2>
+        <div style="flex-grow: 1;"></div>
+        <div class="meta-info">
+            <p><strong>Proyecto:</strong> Sistema de Gestión de Expedientes (SGE)</p>
+            <p><strong>Materia:</strong> Seminario de Lenguajes (.NET) - UNLP</p>
+            <p><strong>Fecha de Emisión:</strong> Julio de 2026</p>
+            <p><strong>Autores:</strong></p>
+            <p class="integrantes">Chiappa Del Rio Santiago (22430/2)</p>
+            <p class="integrantes">Cejas Juan Pablo (20814/6)</p>
+            <p class="integrantes">Macias Ludmila Shulamit (27510/3)</p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 0: INDICE DE ARCHIVOS COMPLETO -->
+    <div class="index-card" id="sec-indice-archivos">
+        <h3>Estructura Completa de Archivos del Sistema</h3>
+        <p>
+            Para garantizar que ningún componente quede fuera, a continuación se desglosa el inventario total de los archivos del proyecto SGE por capas.
+        </p>
+        <div class="index-grid">
+            <div class="index-column">
+                <h4>SGE.Dominio</h4>
+                <ul>
+                    <li>📄 <code>Expedientes/Expediente.cs</code> (Entidad Raíz)</li>
+                    <li>📄 <code>Expedientes/Caratula.cs</code> (Value Object)</li>
+                    <li>📄 <code>Expedientes/EstadoExpediente.cs</code> (Enum)</li>
+                    <li>📄 <code>Tramites/Tramite.cs</code> (Entidad)</li>
+                    <li>📄 <code>Tramites/Contenido.cs</code> (Value Object)</li>
+                    <li>📄 <code>Tramites/EtiquetaTramite.cs</code> (Enum)</li>
+                    <li>📄 <code>Usuarios/Usuario.cs</code> (Entidad)</li>
+                    <li>📄 <code>Usuarios/Permiso.cs</code> (Enum de permisos)</li>
+                    <li>📄 <code>Excepciones/DomainException.cs</code> (Exception)</li>
+                </ul>
+
+                <h4>SGE.Aplicacion (General)</h4>
+                <ul>
+                    <li>📄 <code>IUnidadDeTrabajo.cs</code> (UoW Interface)</li>
+                    <li>📄 <code>Excepciones/AplicationException.cs</code> (Exception)</li>
+                    <li>📄 <code>Autorizacion/IAutorizacionService.cs</code> (Interface)</li>
+                    <li>📄 <code>Autorizacion/AutorizacionService.cs</code> (Implementación)</li>
+                    <li>📄 <code>Autorizacion/AutorizacionException.cs</code> (Exception)</li>
+                    <li>📄 <code>Servicios/ActualizadorEstadoExpedienteService.cs</code></li>
+                </ul>
+            </div>
+
+            <div class="index-column">
+                <h4>SGE.Aplicacion (Por Módulo)</h4>
+                <ul>
+                    <li><strong>Expedientes:</strong></li>
+                    <li>📄 <code>IExpedienteRepository.cs</code></li>
+                    <li>📄 <code>UseCases/AgregarExpedienteUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ConsultarExpedienteUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ListaExpedientesUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ModificarCaratulaUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/CambiarEstadoExpediente.cs</code></li>
+                    <li>📄 <code>UseCases/EliminarExpedienteUseCase.cs</code></li>
+                    <li>📄 <code>DTOs/AgregarExpedienteRequest.cs</code> (Request/Response)</li>
+                    <li>📄 <code>DTOs/ConsultarExpedienteRequest.cs</code> (Request/Response)</li>
+                    <li>📄 <code>DTOs/ListarExpedientesRequest.cs</code> (Request)</li>
+                    <li>📄 <code>DTOs/ModificarCaratulaRequest.cs</code> (Request/Response)</li>
+                    <li>📄 <code>DTOs/CambiarEstado.cs</code> (Request/Response)</li>
+                    <li>📄 <code>DTOs/EliminarExpedienteRequest.cs</code> (Request/Response)</li>
+                    <li><strong>Trámites:</strong></li>
+                    <li>📄 <code>ITramiteRepository.cs</code></li>
+                    <li>📄 <code>UseCases/AgregarTramiteUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ModificarTramiteUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/EliminarTramiteUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ListarTramitesPorExpedienteUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ConsultarTramiteUseCase.cs</code></li>
+                    <li>📄 <code>DTOs/AgregarTramiteRequest.cs</code></li>
+                    <li>📄 <code>DTOs/ConsultarTramiteRequest.cs</code></li>
+                    <li>📄 <code>DTOs/ListaTramitesPorExpedienteRequest.cs</code></li>
+                    <li>📄 <code>DTOs/ModificarTramiteDTO.cs</code></li>
+                    <li>📄 <code>DTOs/EliminarTramiteDTO.cs</code></li>
+                </ul>
+            </div>
+
+            <div class="index-column">
+                <h4>SGE.Aplicacion (Usuarios)</h4>
+                <ul>
+                    <li>📄 <code>IUsuarioRepository.cs</code></li>
+                    <li>📄 <code>ITokenProvider.cs</code> (Interface JWT)</li>
+                    <li>📄 <code>ContrasenaUtil.cs</code> (Hash SHA256)</li>
+                    <li>📄 <code>UseCases/RegistrarUsuarioUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/LoginUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ModificarMisDatosUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/CambiarPermisosUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/ConsultarUsuarioUseCase.cs</code></li>
+                    <li>📄 <code>UseCases/EliminarUsuarioUseCase.cs</code></li>
+                    <li>📄 <code>DTOs/RegistrarUsuarioDTO.cs</code></li>
+                    <li>📄 <code>DTOs/LoginDTO.cs</code></li>
+                    <li>📄 <code>DTOs/ModificarMisDatosDTO.cs</code></li>
+                    <li>📄 <code>DTOs/CambiarPermisosDTO.cs</code></li>
+                    <li>📄 <code>DTOs/ConsultarUsuarioDTO.cs</code></li>
+                    <li>📄 <code>DTOs/EliminarUsuarioDTO.cs</code></li>
+                </ul>
+
+                <h4>SGE.Infraestructura / SGE.WebApi</h4>
+                <ul>
+                    <li>📄 <code>SGEContext.cs</code> (DbContext de EF)</li>
+                    <li>📄 <code>SGESqlite.cs</code> (Db Initialization)</li>
+                    <li>📄 <code>UnidadDeTrabajo.cs</code> (UoW)</li>
+                    <li>📄 <code>Servicios/ProveedorTokenJwt.cs</code> (JWT)</li>
+                    <li>📄 <code>Excepciones/RepositoryException.cs</code></li>
+                    <li>📄 <code>Repositorios/ExpedienteRepository.cs</code></li>
+                    <li>📄 <code>Repositorios/TramiteRepository.cs</code></li>
+                    <li>📄 <code>Repositorios/UsuarioRepository.cs</code></li>
+                    <li>📄 <code>Program.cs</code> (API Bootstrap)</li>
+                    <li>📄 <code>FiltroAutorizacion.cs</code> (Swagger)</li>
+                    <li>📄 <code>ManejadorGlobalExcepcionesMiddleware.cs</code></li>
+                    <li>📄 <code>Controllers/ExpedientesController.cs</code></li>
+                    <li>📄 <code>Controllers/TramitesController.cs</code></li>
+                    <li>📄 <code>Controllers/UsuariosController.cs</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: FLUJO GENERAL -->
+    <section id="sec-flujo">
+        <h2 class="section-title">1. Flujo General de Ejecución del Sistema</h2>
+        <p>
+            El sistema funciona bajo el principio de <strong>arquitectura por capas desacoplada</strong>. Una petición viaja de la siguiente manera:
+        </p>
+
+        <div class="diagram-container">
+            <h4 style="margin-bottom: 15px; color: var(--primary-light);">Diagramas de Secuencia y Flujos de Datos</h4>
+            <p style="text-align: center; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Para facilitar el seguimiento del flujo de la información, a continuación se detallan los diagramas de secuencia interactivos de las operaciones críticas del sistema, ilustrando cómo se comunican las distintas capas (Presentación, Aplicación, Dominio e Infraestructura) a medida que viajan los datos.
+            </p>
+
+            <!-- FLUJO 1: REGISTRO DE USUARIO -->
+            <div style="width: 100%; margin-bottom: 50px;">
+                <h5 style="color: var(--primary-light); margin-bottom: 10px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Flujo 1: Registro de un Nuevo Usuario</h5>
+                <p style="font-size: 0.9rem; margin-bottom: 15px; text-align: left;">
+                    Muestra el camino de los datos cuando un administrador crea un nuevo usuario en el sistema. Los datos pasan del controlador al caso de uso, se hashea la contraseña de forma unidireccional y se persiste en SQLite.
+                </p>
+                <svg viewBox="0 0 800 320" style="width: 100%; max-width: 850px; height: auto; display: block; margin: 0 auto; background-color: #070a13; border-radius: 8px; border: 1px solid var(--border);">
+                  <defs>
+                    <marker id="arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                    </marker>
+                    <marker id="arrow-left" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+                    </marker>
+                  </defs>
+
+                  <!-- Lifelines -->
+                  <line x1="80" y1="40" x2="80" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="240" y1="40" x2="240" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="400" y1="40" x2="400" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="560" y1="40" x2="560" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="720" y1="40" x2="720" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+
+                  <!-- Headers -->
+                  <rect x="25" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#94a3b8" stroke-width="1.5" />
+                  <text x="80" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Cliente</text>
+
+                  <rect x="185" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#f43f5e" stroke-width="1.5" />
+                  <text x="240" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Web API</text>
+
+                  <rect x="345" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#eab308" stroke-width="1.5" />
+                  <text x="400" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Aplicación</text>
+
+                  <rect x="505" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#10b981" stroke-width="1.5" />
+                  <text x="560" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Dominio</text>
+
+                  <rect x="665" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#3b82f6" stroke-width="1.5" />
+                  <text x="720" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Infraestructura</text>
+
+                  <!-- Activation Bars -->
+                  <rect x="236" y="60" width="8" height="220" rx="2" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+                  <rect x="396" y="90" width="8" height="170" rx="2" fill="#1e293b" stroke="#eab308" stroke-width="1" />
+                  <rect x="716" y="195" width="8" height="40" rx="2" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+
+                  <!-- Message 1: POST request -->
+                  <line x1="80" y1="70" x2="236" y2="70" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="158" y="63" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">POST /api/usuarios/registrar</text>
+
+                  <!-- Message 2: Call UseCase -->
+                  <line x1="244" y1="100" x2="396" y2="100" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="320" y="93" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">RegistrarUsuario(dto)</text>
+
+                  <!-- Message 3: Hash Password (Self reference loop) -->
+                  <path d="M 404,115 C 430,115 430,135 404,135" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="435" y="129" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="start">Hash SHA256</text>
+
+                  <!-- Message 4: Create Domain Entity -->
+                  <line x1="404" y1="160" x2="554" y2="160" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="479" y="153" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">new Usuario()</text>
+                  <!-- Entity self validation -->
+                  <circle cx="560" cy="160" r="4" fill="#10b981" />
+                  <text x="570" y="163" fill="#cbd5e1" font-size="8" font-family="Outfit" text-anchor="start">Autovalidación</text>
+
+                  <!-- Message 5: Repository and UoW Save -->
+                  <line x1="404" y1="205" x2="716" y2="205" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="560" y="198" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Agregar() + SaveChanges()</text>
+
+                  <!-- Message 6: DB Return -->
+                  <line x1="716" y1="230" x2="404" y2="230" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="560" y="225" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Transacción SQLite OK</text>
+
+                  <!-- Message 7: UseCase Return -->
+                  <line x1="396" y1="250" x2="244" y2="250" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="320" y="245" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">ResponseDTO</text>
+
+                  <!-- Message 8: Controller HTTP Response -->
+                  <line x1="236" y1="275" x2="80" y2="275" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="158" y="270" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">200 OK</text>
+                </svg>
+            </div>
+
+            <!-- FLUJO 2: INICIO DE SESIÓN -->
+            <div style="width: 100%; margin-bottom: 50px;">
+                <h5 style="color: var(--primary-light); margin-bottom: 10px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Flujo 2: Inicio de Sesión (Login)</h5>
+                <p style="font-size: 0.9rem; margin-bottom: 15px; text-align: left;">
+                    Muestra el flujo de credenciales para obtener un token JWT firmado. La API valida contra SQLite la existencia del usuario, verifica el hash de la contraseña y genera el JWT.
+                </p>
+                <svg viewBox="0 0 800 320" style="width: 100%; max-width: 850px; height: auto; display: block; margin: 0 auto; background-color: #070a13; border-radius: 8px; border: 1px solid var(--border);">
+                  <defs>
+                    <marker id="arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                    </marker>
+                    <marker id="arrow-left" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+                    </marker>
+                  </defs>
+
+                  <!-- Lifelines -->
+                  <line x1="80" y1="40" x2="80" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="240" y1="40" x2="240" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="400" y1="40" x2="400" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="560" y1="40" x2="560" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="720" y1="40" x2="720" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+
+                  <!-- Headers -->
+                  <rect x="25" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#94a3b8" stroke-width="1.5" />
+                  <text x="80" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Cliente</text>
+
+                  <rect x="185" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#f43f5e" stroke-width="1.5" />
+                  <text x="240" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Web API</text>
+
+                  <rect x="345" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#eab308" stroke-width="1.5" />
+                  <text x="400" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Aplicación</text>
+
+                  <rect x="505" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#10b981" stroke-width="1.5" />
+                  <text x="560" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Dominio</text>
+
+                  <rect x="665" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#3b82f6" stroke-width="1.5" />
+                  <text x="720" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Infraestructura</text>
+
+                  <!-- Activation Bars -->
+                  <rect x="236" y="60" width="8" height="220" rx="2" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+                  <rect x="396" y="90" width="8" height="170" rx="2" fill="#1e293b" stroke="#eab308" stroke-width="1" />
+                  <rect x="716" y="120" width="8" height="45" rx="2" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+                  <rect x="716" y="200" width="8" height="40" rx="2" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+
+                  <!-- Message 1: POST Login -->
+                  <line x1="80" y1="70" x2="236" y2="70" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="158" y="63" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">POST /api/usuarios/login</text>
+
+                  <!-- Message 2: Call UseCase -->
+                  <line x1="244" y1="100" x2="396" y2="100" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="320" y="93" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Login(dto)</text>
+
+                  <!-- Message 3: Fetch User -->
+                  <line x1="404" y1="125" x2="716" y2="125" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="560" y="118" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">ObtenerPorEmail()</text>
+
+                  <!-- Message 4: Return User -->
+                  <line x1="716" y1="150" x2="404" y2="150" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="560" y="145" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Usuario Entidad</text>
+
+                  <!-- Message 5: Verify password -->
+                  <path d="M 404,165 C 430,165 430,185 404,185" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="435" y="179" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="start">VerificarHash()</text>
+
+                  <!-- Message 6: Token Generation request -->
+                  <line x1="404" y1="210" x2="716" y2="210" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="560" y="203" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">GenerarToken(usuario)</text>
+
+                  <!-- Message 7: Return Token String -->
+                  <line x1="716" y1="230" x2="404" y2="230" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="560" y="225" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Token String (JWT)</text>
+
+                  <!-- Message 8: UseCase Response -->
+                  <line x1="396" y1="250" x2="244" y2="250" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="320" y="245" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">LoginResponseDTO</text>
+
+                  <!-- Message 9: HTTP Response with JWT -->
+                  <line x1="236" y1="275" x2="80" y2="275" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="158" y="270" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">200 OK + JWT JSON</text>
+                </svg>
+            </div>
+
+            <!-- FLUJO 3: CREAR EXPEDIENTE -->
+            <div style="width: 100%; margin-bottom: 50px;">
+                <h5 style="color: var(--primary-light); margin-bottom: 10px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Flujo 3: Creación de un Expediente</h5>
+                <p style="font-size: 0.9rem; margin-bottom: 15px; text-align: left;">
+                    Muestra el flujo al dar de alta un expediente. Requiere cabecera JWT válida. El caso de uso evalúa permisos, crea la raíz de agregado y lo guarda de forma segura.
+                </p>
+                <svg viewBox="0 0 800 320" style="width: 100%; max-width: 850px; height: auto; display: block; margin: 0 auto; background-color: #070a13; border-radius: 8px; border: 1px solid var(--border);">
+                  <defs>
+                    <marker id="arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                    </marker>
+                    <marker id="arrow-left" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+                    </marker>
+                  </defs>
+
+                  <!-- Lifelines -->
+                  <line x1="80" y1="40" x2="80" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="240" y1="40" x2="240" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="400" y1="40" x2="400" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="560" y1="40" x2="560" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="720" y1="40" x2="720" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+
+                  <!-- Headers -->
+                  <rect x="25" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#94a3b8" stroke-width="1.5" />
+                  <text x="80" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Cliente</text>
+
+                  <rect x="185" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#f43f5e" stroke-width="1.5" />
+                  <text x="240" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Web API</text>
+
+                  <rect x="345" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#eab308" stroke-width="1.5" />
+                  <text x="400" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Aplicación</text>
+
+                  <rect x="505" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#10b981" stroke-width="1.5" />
+                  <text x="560" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Dominio</text>
+
+                  <rect x="665" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#3b82f6" stroke-width="1.5" />
+                  <text x="720" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Infraestructura</text>
+
+                  <!-- Activation Bars -->
+                  <rect x="236" y="60" width="8" height="220" rx="2" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+                  <rect x="396" y="105" width="8" height="150" rx="2" fill="#1e293b" stroke="#eab308" stroke-width="1" />
+                  <rect x="716" y="200" width="8" height="40" rx="2" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+
+                  <!-- Message 1: POST request -->
+                  <line x1="80" y1="70" x2="236" y2="70" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="158" y="63" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">POST /api/expedientes</text>
+                  <!-- Token Validate -->
+                  <circle cx="240" cy="85" r="4" fill="#f43f5e" />
+                  <text x="250" y="89" fill="#cbd5e1" font-size="8" font-family="Outfit" text-anchor="start">Valida JWT</text>
+
+                  <!-- Message 2: Call UseCase -->
+                  <line x1="244" y1="110" x2="396" y2="110" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="320" y="103" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Ejecutar(req, userId)</text>
+
+                  <!-- Message 3: Verify permissions -->
+                  <path d="M 404,120 C 430,120 430,140 404,140" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="435" y="134" fill="#cbd5e1" font-size="8" font-family="Fira Code" text-anchor="start">PoseePermiso(ExpedienteAlta)</text>
+
+                  <!-- Message 4: Create Domain Aggregate -->
+                  <line x1="404" y1="165" x2="554" y2="165" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="479" y="158" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">new Expediente(Caratula)</text>
+                  <!-- self validation -->
+                  <circle cx="560" cy="165" r="4" fill="#10b981" />
+                  <text x="570" y="168" fill="#cbd5e1" font-size="8" font-family="Outfit" text-anchor="start">Valida Invariantes</text>
+
+                  <!-- Message 5: Repository Save -->
+                  <line x1="404" y1="210" x2="716" y2="210" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="560" y="203" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Agregar() + SaveChanges()</text>
+
+                  <!-- Message 6: DB Commit -->
+                  <line x1="716" y1="230" x2="404" y2="230" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="560" y="225" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">SQLite Commit OK</text>
+
+                  <!-- Message 7: UseCase Return -->
+                  <line x1="396" y1="250" x2="244" y2="250" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="320" y="245" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">AgregarExpedienteResponse</text>
+
+                  <!-- Message 8: HTTP Response -->
+                  <line x1="236" y1="275" x2="80" y2="275" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="158" y="270" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">200 OK</text>
+                </svg>
+            </div>
+
+            <!-- FLUJO 4: CONSULTAR EXPEDIENTE -->
+            <div style="width: 100%; margin-bottom: 50px;">
+                <h5 style="color: var(--primary-light); margin-bottom: 10px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Flujo 4: Consulta de un Expediente y sus Trámites</h5>
+                <p style="font-size: 0.9rem; margin-bottom: 15px; text-align: left;">
+                    Muestra el flujo de lectura de datos. EF Core lee la base de datos relacional, convierte los Value Objects primitivos a objetos ricos y retorna un DTO seguro estructurado.
+                </p>
+                <svg viewBox="0 0 800 320" style="width: 100%; max-width: 850px; height: auto; display: block; margin: 0 auto; background-color: #070a13; border-radius: 8px; border: 1px solid var(--border);">
+                  <defs>
+                    <marker id="arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                    </marker>
+                    <marker id="arrow-left" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+                    </marker>
+                  </defs>
+
+                  <!-- Lifelines -->
+                  <line x1="80" y1="40" x2="80" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="240" y1="40" x2="240" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="400" y1="40" x2="400" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="560" y1="40" x2="560" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="720" y1="40" x2="720" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+
+                  <!-- Headers -->
+                  <rect x="25" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#94a3b8" stroke-width="1.5" />
+                  <text x="80" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Cliente</text>
+
+                  <rect x="185" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#f43f5e" stroke-width="1.5" />
+                  <text x="240" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Web API</text>
+
+                  <rect x="345" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#eab308" stroke-width="1.5" />
+                  <text x="400" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Aplicación</text>
+
+                  <rect x="505" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#10b981" stroke-width="1.5" />
+                  <text x="560" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Dominio</text>
+
+                  <rect x="665" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#3b82f6" stroke-width="1.5" />
+                  <text x="720" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Infraestructura</text>
+
+                  <!-- Activation Bars -->
+                  <rect x="236" y="60" width="8" height="220" rx="2" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+                  <rect x="396" y="105" width="8" height="150" rx="2" fill="#1e293b" stroke="#eab308" stroke-width="1" />
+                  <rect x="716" y="165" width="8" height="65" rx="2" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+
+                  <!-- Message 1: GET request -->
+                  <line x1="80" y1="70" x2="236" y2="70" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="158" y="63" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">GET /api/expedientes/{id}</text>
+                  <!-- Validate token -->
+                  <circle cx="240" cy="85" r="4" fill="#f43f5e" />
+                  <text x="250" y="89" fill="#cbd5e1" font-size="8" font-family="Outfit" text-anchor="start">Valida JWT</text>
+
+                  <!-- Message 2: Call UseCase -->
+                  <line x1="244" y1="110" x2="396" y2="110" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="320" y="103" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">ConsultarExpediente(id)</text>
+
+                  <!-- Message 3: Verify permissions -->
+                  <path d="M 404,120 C 430,120 430,140 404,140" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="435" y="134" fill="#cbd5e1" font-size="8" font-family="Fira Code" text-anchor="start">PoseePermiso(ExpedienteConsulta)</text>
+
+                  <!-- Message 4: Fetch Entity -->
+                  <line x1="404" y1="175" x2="716" y2="175" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="560" y="168" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">ObtenerPorId(id)</text>
+
+                  <!-- Message 5: EF Hydrates Entity (Rebuild) -->
+                  <path d="M 724,185 C 750,185 750,205 724,205" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="755" y="199" fill="#cbd5e1" font-size="8" font-family="Fira Code" text-anchor="start">EF: Reconstruir()</text>
+
+                  <!-- Message 6: Return Entity -->
+                  <line x1="716" y1="225" x2="404" y2="225" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="560" y="220" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Expediente Entidad</text>
+
+                  <!-- Message 7: UseCase Return (Maps to DTO) -->
+                  <line x1="396" y1="250" x2="244" y2="250" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="320" y="245" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">ConsultarExpedienteResponse</text>
+
+                  <!-- Message 8: HTTP Response -->
+                  <line x1="236" y1="275" x2="80" y2="275" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="158" y="270" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">200 OK + JSON</text>
+                </svg>
+            </div>
+
+            <!-- FLUJO 5: ANEXAR UN TRÁMITE -->
+            <div style="width: 100%; margin-bottom: 20px;">
+                <h5 style="color: var(--primary-light); margin-bottom: 10px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Flujo 5: Anexar un Trámite a un Expediente</h5>
+                <p style="font-size: 0.9rem; margin-bottom: 15px; text-align: left;">
+                    Muestra el flujo completo cuando se agrega un trámite. Involucra la máquina de estados del Expediente (para cambiar a Finalizado si es PaseAlArchivo) y la persistencia atómica coordinada por la Unidad de Trabajo.
+                </p>
+                <svg viewBox="0 0 800 320" style="width: 100%; max-width: 850px; height: auto; display: block; margin: 0 auto; background-color: #070a13; border-radius: 8px; border: 1px solid var(--border);">
+                  <defs>
+                    <marker id="arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                    </marker>
+                    <marker id="arrow-left" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+                    </marker>
+                  </defs>
+
+                  <!-- Lifelines -->
+                  <line x1="80" y1="40" x2="80" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="240" y1="40" x2="240" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="400" y1="40" x2="400" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="560" y1="40" x2="560" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+                  <line x1="720" y1="40" x2="720" y2="290" stroke="#1e293b" stroke-dasharray="4 4" />
+
+                  <!-- Headers -->
+                  <rect x="25" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#94a3b8" stroke-width="1.5" />
+                  <text x="80" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Cliente</text>
+
+                  <rect x="185" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#f43f5e" stroke-width="1.5" />
+                  <text x="240" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Web API</text>
+
+                  <rect x="345" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#eab308" stroke-width="1.5" />
+                  <text x="400" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Aplicación</text>
+
+                  <rect x="505" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#10b981" stroke-width="1.5" />
+                  <text x="560" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Dominio</text>
+
+                  <rect x="665" y="10" width="110" height="25" rx="5" fill="#131b2e" stroke="#3b82f6" stroke-width="1.5" />
+                  <text x="720" y="27" fill="#ffffff" font-size="11" font-family="Outfit" text-anchor="middle">Infraestructura</text>
+
+                  <!-- Activation Bars -->
+                  <rect x="236" y="60" width="8" height="220" rx="2" fill="#1e293b" stroke="#f43f5e" stroke-width="1" />
+                  <rect x="396" y="100" width="8" height="155" rx="2" fill="#1e293b" stroke="#eab308" stroke-width="1" />
+                  <rect x="716" y="210" width="8" height="35" rx="2" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+
+                  <!-- Message 1: POST /api/tramites -->
+                  <line x1="80" y1="70" x2="236" y2="70" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="158" y="63" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">POST /api/tramites</text>
+
+                  <!-- Message 2: Call UseCase -->
+                  <line x1="244" y1="105" x2="396" y2="105" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="320" y="98" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">AgregarTramite(req)</text>
+
+                  <!-- Message 3: Create Tramite VO & Entity -->
+                  <line x1="404" y1="130" x2="554" y2="130" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="479" y="123" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">new Tramite()</text>
+
+                  <!-- Message 4: Update Expediente State -->
+                  <line x1="404" y1="160" x2="554" y2="160" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="479" y="153" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">ActualizarEstado(etiqueta)</text>
+                  <!-- State Transition validation -->
+                  <circle cx="560" cy="160" r="4" fill="#10b981" />
+                  <text x="570" y="163" fill="#cbd5e1" font-size="8" font-family="Outfit" text-anchor="start">Cambio de Estado</text>
+
+                  <!-- Message 5: Persist atomic changes via UoW -->
+                  <line x1="404" y1="215" x2="716" y2="215" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow-right)" />
+                  <text x="560" y="208" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">uow.SaveChanges()</text>
+
+                  <!-- Message 6: DB Commit -->
+                  <line x1="716" y1="235" x2="404" y2="235" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="560" y="230" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">Guardado SQLite OK</text>
+
+                  <!-- Message 7: UseCase Return -->
+                  <line x1="396" y1="250" x2="244" y2="250" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="320" y="245" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">AgregarTramiteResponse</text>
+
+                  <!-- Message 8: HTTP Response -->
+                  <line x1="236" y1="275" x2="80" y2="275" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrow-left)" />
+                  <text x="158" y="270" fill="#cbd5e1" font-size="9" font-family="Fira Code" text-anchor="middle">200 OK</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: CAPA DE DOMINIO -->
+    <section id="sec-dominio">
+        <h2 class="section-title">2. Detalle de Clases: Capa de Dominio (SGE.Dominio)</h2>
+        <p>
+            Representa el núcleo puro del negocio. Contiene las entidades principales, que encapsulan estado y reglas de negocio, y los Value Objects (Objetos de Valor).
+        </p>
+
+        <div class="callout callout-design">
+            <div class="callout-title">Fundamentos Teóricos del Diseño Guiado por el Dominio (DDD)</div>
+            <p>
+                La capa de <strong>Dominio</strong> es el corazón de la aplicación. Representa los conceptos, las reglas del negocio y los casos de lógica pura que definen el comportamiento de nuestro sistema. De acuerdo con los principios del <em>Domain-Driven Design (DDD)</em>, esta capa no tiene dependencias de ningún elemento externo (como bases de datos, APIs o frameworks), lo que garantiza su portabilidad y estabilidad ante cambios técnicos. Sus componentes clave se dividen en:
+            </p>
+            <p>
+                <strong>1. Entidades y Raíces de Agregación (Aggregate Roots):</strong> Una <em>Entidad</em> es un objeto que posee una identidad única que trasciende el tiempo y los cambios de estado (representada por un ID único de tipo <code>Guid</code>). El <strong>Agregado</strong> es un conjunto de entidades y objetos de valor que se tratan como una única transacción lógica. La raíz del agregado (<em>Aggregate Root</em>), como la clase <code>Expediente</code>, es el único punto de contacto con el exterior del agregado. Cualquier cambio en sus partes internas (como añadir un <code>Tramite</code> o modificar una fecha de actualización) debe realizarse obligatoriamente a través de métodos expuestos en la raíz. Esto previene que los objetos queden en estados corruptos o inconsistentes.
+            </p>
+            <p>
+                <strong>2. Objetos de Valor (Value Objects):</strong> A diferencia de las entidades, los <em>Value Objects</em> carecen de una identidad conceptual propia. Se definen únicamente por sus propiedades (como <code>Caratula</code> o <code>Contenido</code>) y son inmutables: si un objeto de valor cambia, se reemplaza por uno completamente nuevo en lugar de mutar sus propiedades en memoria. La comparación entre dos objetos de valor se hace por igualdad estructural (sus valores internos son idénticos) y no por referencia de puntero, lo que simplifica enormemente la lógica de control.
+            </p>
+            <p>
+                <strong>3. Preservación de Invariantes y Excepciones:</strong> Una invariante es una regla de negocio que debe cumplirse en todo momento (por ejemplo, "un expediente finalizado no puede volver a cambiar de estado"). En DDD, las entidades y objetos de valor son responsables de auto-validarse. El constructor y los métodos de negocio evalúan las invariantes preventivamente y lanzan excepciones especializadas (<code>DomainException</code>) si se detecta una anomalía. De este modo, se garantiza que el dominio actúe como un escudo protector, imposibilitando que datos corruptos viajen hacia las bases de datos.
+            </p>
+        </div>
+
+        <!-- Expediente -->
+        <div class="class-header" id="dom-expediente">Clase: Expediente.cs</div>
+        <p>
+            Esta entidad representa un expediente administrativo en el sistema. Es la raíz de agregación y gestiona la coherencia y estados lógicos del expediente.
+        </p>
+        <pre><code class="language-csharp">namespace SGE.Dominio.Expedientes;
+
+public class Expediente
+{
+    public Guid Id { get; private set; }
+    public DateTime FechaCreacion { get; private set; }
+    public DateTime FechaUltimaModificacion { get; private set; }
+    public Guid UsuarioUltimoCambio { get; private set; }
+    public Caratula Caratula { get; private set; }
+    public EstadoExpediente Estado { get; private set; }
+
+    private Expediente()
+    {
+        Caratula = null!;
+    }
+
+    public Expediente(Caratula caratula, Guid user)
+        : this(Guid.NewGuid(), DateTime.Now, DateTime.Now, user, caratula, EstadoExpediente.RecienIniciado)
+    {
+    }
+
+    private Expediente(Guid id, DateTime fechaCreacion, DateTime fechaUltimaModificacion, Guid usuarioUltimoCambio, Caratula caratula, EstadoExpediente estado)
+    {
+        if (id == Guid.Empty)
+        {
+            throw new DomainException("El Id no puede ser vacío.");
+        }
+
+        if (fechaUltimaModificacion.CompareTo(fechaCreacion) < 0)
+        {
+            throw new DomainException("La fecha de modificación no puede ser previa a la de creación.");
+        }
+
+        Id = id;
+        FechaCreacion = fechaCreacion;
+        FechaUltimaModificacion = fechaUltimaModificacion;
+        UsuarioUltimoCambio = usuarioUltimoCambio;
+        Caratula = caratula;
+        Estado = estado;
+    }
+
+    public static Expediente Reconstruir(Guid id, DateTime fechaCreacion, DateTime fechaUltimaModificacion, Guid usuarioUltimoCambio, Caratula caratula, EstadoExpediente estado)
+    {
+        return new Expediente(id, fechaCreacion, fechaUltimaModificacion, usuarioUltimoCambio, caratula, estado);
+    }
+
+    private void RegistrarModificacion(Guid idUser)
+    {
+        UsuarioUltimoCambio = idUser;
+        FechaUltimaModificacion = DateTime.Now;
+    }
+
+    public void ModificarCaratula(Caratula nuevaC, Guid idUser)
+    {
+        Caratula = nuevaC;
+        RegistrarModificacion(idUser);
+    }
+
+    public bool ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)
+    {
+        EstadoExpediente estadoAntes = Estado;
+        switch (ultEtiqueta)
+        {
+            case null:
+                Estado = EstadoExpediente.RecienIniciado;
+                break;
+            case EtiquetaTramite.Resolucion:
+                Estado = EstadoExpediente.ConResolucion;
+                break;
+            case EtiquetaTramite.PaseAEstudio:
+                Estado = EstadoExpediente.ParaResolver;
+                break;
+            case EtiquetaTramite.PaseAlArchivo:
+                Estado = EstadoExpediente.Finalizado;
+                break;
+        }
+
+        RegistrarModificacion(idUser);
+        return estadoAntes != Estado;
+    }
+
+    public bool ActualizarEstado(EstadoExpediente nuevoEstado, Guid idUser)
+    {
+        EstadoExpediente estadoAntes = Estado;
+        Estado = nuevoEstado;
+        RegistrarModificacion(idUser);
+        return estadoAntes != Estado;
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Patrones de Diseño y DDD):</h5>
+            <ul>
+                <li><strong>El Expediente como Aggregate Root (Raíz de Agregado):</strong> En el diseño dirigido por el dominio (DDD), un Agregado es un grupo de objetos asociados que se tratan como una unidad transaccional de datos. El <code>Expediente</code> actúa como la Raíz del Agregado (Aggregate Root). Esto significa que es la única puerta de entrada para modificar cualquier dato del expediente o de sus elementos subordinados (como los trámites asociados). Al encapsular las modificaciones a través del expediente, se asegura que las invariantes de negocio (las reglas de consistencia interna) se validen y cumplan en todo momento.</li>
+                <li><strong>Encapsulamiento de Propiedades y Modificadores <code>private set</code>:</strong> Al declarar los setters de las propiedades (como <code>Estado</code> y <code>Caratula</code>) con el modificador <code>private set</code>, prohibimos explícitamente que las capas externas (como la Web API o los servicios de infraestructura) modifiquen directamente el estado del expediente en memoria. Si un programador desea cambiar el estado del expediente, se ve obligado a invocar el método de negocio <code>ActualizarEstado()</code>, lo que garantiza que la transición sea validada por las reglas comerciales vigentes.</li>
+                <li><strong>Materialización de Entidades y el Constructor Privado sin Parámetros:</strong> Entity Framework Core (EF Core) necesita instanciar (hidratar) las entidades al recuperarlas desde la base de datos SQLite. Para ello, requiere un constructor sin parámetros. Al definir <code>private Expediente()</code> con el operador de perdón de nulos <code>null!</code> para la <code>Caratula</code>, permitimos que EF Core cree el objeto de forma técnica y transparente en segundo plano. Dado que es un constructor privado, ningún programador externo puede utilizarlo, protegiendo al objeto de ser instanciado de forma incorrecta o sin datos en otras capas.</li>
+                <li><strong>Factoría Técnica (Factory Method) <code>Reconstruir</code>:</strong> Durante la creación inicial de un expediente, el constructor público asigna un nuevo identificador (<code>Guid.NewGuid()</code>), marca las fechas actuales (<code>DateTime.Now</code>) y define el estado inicial como <code>RecienIniciado</code>. Sin embargo, al recuperar un expediente existente de la base de datos, no queremos asignarle valores nuevos ni mutar su historial de auditoría. El método estático <code>Reconstruir</code> actúa como una factoría técnica dedicada a inicializar un expediente con sus datos históricos reales provenientes de la base de datos sin disparar las reglas y firmas automáticas que se ejecutan durante una creación desde cero.</li>
+                <li><strong>Encapsulación de la Máquina de Estados Lógicos:</strong> El estado de un expediente administrativo no es una variable arbitraria que pueda cambiarse libremente. El método sobrecargado <code>ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)</code> implementa una máquina de estados determinista. Evalúa la etiqueta del último trámite ingresado y realiza la transición adecuada: por ejemplo, ante un trámite de tipo <code>PaseAlArchivo</code>, el estado se actualiza irreversiblemente a <code>Finalizado</code>. Al final de la transición, registra los datos de auditoría (<code>UsuarioUltimoCambio</code> y <code>FechaUltimaModificacion</code>) e informa mediante un valor booleano si la transición de estado fue efectiva.</li>
+            </ul>
+        </div>
+
+        <!-- Caratula -->
+        <div class="class-header" id="dom-caratula">Clase: Caratula.cs</div>
+        <p>
+            Es un Objeto de Valor (Value Object) que representa la carátula o el título identificador de un expediente.
+        </p>
+        <pre><code class="language-csharp">namespace SGE.Dominio.Expedientes;
+
+public record class Caratula
+{
+    public string Valor { get; }
+    
+    public Caratula(string valor)
+    {
+        if (string.IsNullOrWhiteSpace(valor))
+        {
+            throw new DomainException("El nombre de la caratula no puede estar vacío.");
+        }
+        Valor = valor.Trim();
+    }
+
+    public override string ToString() => Valor;
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Value Objects y Records):</h5>
+            <ul>
+                <li><strong>El concepto de Objeto de Valor (Value Object):</strong> En DDD, no todos los objetos del sistema requieren una identidad única e histórica (como un ID autoincremental). Un <code>Value Object</code> es un objeto que se define únicamente por el conjunto de sus atributos. La <code>Caratula</code> no posee un ciclo de vida independiente ni un identificador único; dos carátulas son idénticas si su texto es el mismo. Al modelarla como un Value Object, simplificamos el modelo mental y evitamos la sobrecarga de generar tablas relacionales adicionales.</li>
+                <li><strong>El tipo <code>record class</code> en C#:</strong> C# provee el tipo <code>record</code> para modelar de forma nativa estructuras de datos inmutables con comparaciones de igualdad basadas en valores en vez de referencias en memoria. Esto significa que si creamos dos objetos de tipo <code>Caratula</code> con el valor `"Expediente de Personal"`, la comparación <code>caratula1 == caratula2</code> evaluará a <code>true</code> de manera automática, sin necesidad de sobrecargar operadores de igualdad complejos.</li>
+                <li><strong>Validación Preventiva en el Constructor:</strong> Un Objeto de Valor no puede entrar en un estado inconsistente. El constructor de <code>Caratula</code> valida preventivamente que el texto provisto no sea nulo ni contenga espacios en blanco mediante <code>string.IsNullOrWhiteSpace()</code>. Si la validación falla, interrumpe el flujo arrojando una <code>DomainException</code> inmediatamente. De este modo, garantizamos que si logramos instanciar una carátula, esta es 100% válida para el sistema. Adicionalmente, aplica un <code>Trim()</code> para normalizar y limpiar el texto de espacios accidentales en los extremos.</li>
+            </ul>
+        </div>
+
+        <!-- Tramite -->
+        <div class="class-header" id="dom-tramite">Clase: Tramite.cs</div>
+        <p>
+            Esta entidad representa un trámite individual e histórico que se asocia a un expediente a través de la clave foránea <code>ExpedienteId</code>.
+        </p>
+        <pre><code class="language-csharp">namespace SGE.Dominio.Tramites;
+
+public class Tramite
+{
+    public Guid Id { get; private set; }
+    public Guid ExpedienteId { get; private set; }
+    public EtiquetaTramite Etiqueta { get; private set; }
+    public Contenido Contenido { get; private set; }
+    public DateTime FechaCreacion { get; private set; }
+    public DateTime FechaUltModificacion { get; private set; }
+    public Guid UsuarioUltCambio { get; private set; }
+
+    private Tramite()
+    {
+        Contenido = null!;
+    }
+
+    public Tramite(Guid expediente, EtiquetaTramite etiqueta, Contenido contenido, Guid user)
+        : this(Guid.NewGuid(), expediente, etiqueta, contenido, DateTime.Now, DateTime.Now, user)
+    {
+    }
+
+    private Tramite(Guid id, Guid exp, EtiquetaTramite etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
+    {
+        if (id == Guid.Empty)
+        {
+            throw new DomainException("El Id no puede ser vacío.");
+        }
+        if (ultModificacion.CompareTo(fechaCreacion) < 0)
+        {
+            throw new DomainException("La fecha de modificación no puede ser previa a la de creación.");
+        }
+
+        Id = id;
+        ExpedienteId = exp;
+        Etiqueta = etiqueta;
+        Contenido = contenido;
+        FechaCreacion = fechaCreacion;
+        FechaUltModificacion = ultModificacion;
+        UsuarioUltCambio = user;
+    }
+
+    public static Tramite Reconstruir(Guid id, Guid exp, EtiquetaTramite etiqueta, Contenido contenido, DateTime fechaCreacion, DateTime ultModificacion, Guid user)
+    {
+        return new Tramite(id, exp, etiqueta, contenido, fechaCreacion, ultModificacion, user);
+    }
+
+    public void ModificarContenido(Contenido nuevoContenido, Guid usuarioId)
+    {
+        Contenido = nuevoContenido;
+        UsuarioUltCambio = usuarioId;
+        FechaUltModificacion = DateTime.Now;
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Entidades Subordinadas y Auditoría):</h5>
+            <ul>
+                <li><strong>Entidad Subordinada en el Agregado:</strong> A diferencia de los objetos de valor inmutables, la clase <code>Tramite</code> representa una Entidad puesto que posee una identidad conceptual única representada por su propiedad <code>Id</code>. Sin embargo, no funciona de manera independiente; pertenece al agregado de <code>Expediente</code> y está enlazado a él a través de la clave foránea <code>ExpedienteId</code>.</li>
+                <li><strong>Encapsulamiento del Ciclo de Vida:</strong> De forma homóloga a <code>Expediente</code>, la clase <code>Tramite</code> define sus setters como privados. La única forma de alterar su contenido es invocando el método explícito de negocio <code>ModificarContenido(Contenido nuevoContenido, Guid usuarioId)</code>, que no solo realiza el cambio de texto sino que de forma atómica y obligatoria actualiza la fecha de modificación y la firma de auditoría del usuario que realizó la acción, evitando inconsistencias u omisiones en el log de auditoría.</li>
+                <li><strong>Constructor Privado y Reconstrucción:</strong> Cuenta con el constructor privado sin parámetros requerido por Entity Framework Core para materializar el trámite desde la base de datos sin ejecutar validaciones de creación, y provee el método estático <code>Reconstruir</code> para restaurar el estado original del trámite guardado en SQLite sin mutar la fecha de creación real.</li>
+            </ul>
+        </div>
+
+        <!-- Contenido -->
+        <div class="class-header" id="dom-contenido">Clase: Contenido.cs</div>
+        <p>
+            Value Object homólogo a <code>Caratula</code>, encargado de almacenar y validar el contenido textual descriptivo de un trámite.
+        </p>
+        <pre><code class="language-csharp">namespace SGE.Dominio.Tramites;
+
+public record class Contenido
+{
+    public string Valor { get; }
+    
+    public Contenido(string valor)
+    {
+        if (string.IsNullOrWhiteSpace(valor))
+        {
+            throw new DomainException("El nombre del contenido no puede estar vacío.");
+        }
+        Valor = valor.Trim();
+    }
+
+    public override string ToString() => Valor;
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Value Objects):</h5>
+            <ul>
+                <li><strong>Inmutabilidad y Consistencia del Historial de Trámites:</strong> Al igual que la carátula, el contenido de un trámite es un Objeto de Valor (Value Object) modelado como un <code>record class</code>. La inmutabilidad garantiza que, una vez emitido un trámite administrativo, su contenido descriptivo no pueda ser alterado de forma accidental sin pasar por las validaciones de negocio correspondientes, preservando la integridad del historial legal del expediente.</li>
+                <li><strong>Garantía de Calidad de Datos (Invariante):</strong> Centraliza la validación en su constructor arrojando de inmediato una excepción si se intenta crear un trámite con contenido nulo o vacío. Esto evita que la base de datos termine contaminada con descripciones administrativas vacías o sin sentido comercial.</li>
+            </ul>
+        </div>
+
+        <!-- Usuario -->
+        <div class="class-header" id="dom-usuario">Clase: Usuario.cs</div>
+        <p>
+            Representa a los usuarios del sistema, controlando si poseen perfil de administrador o delimitando sus permisos específicos en el sistema.
+        </p>
+        <pre><code class="language-csharp">namespace SGE.Dominio.Usuarios;
+
+using SGE.Aplicacion.Autorizacion;
+using SGE.Dominio.Excepciones;
+
+public class Usuario
+{
+    public Guid Id { get; private set; }
+    public string Nombre { get; set; }
+    public string Email { get; set; }
+    public string ContrasenaHash { get; set; }
+    public bool EsAdmin { get; private set; }
+    public IEnumerable<Permiso> Permisos { get; private set; }
+
+    public Usuario(string nombre, string email, string contrasenaHash) 
+        : this(Guid.NewGuid(), nombre, email, contrasenaHash, false, [])
+    {
+    }
+
+    private Usuario(Guid id, string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
+    {
+        if (id == Guid.Empty)
+        {
+            throw new DomainException("El Id no puede ser vacío.");
+        }
+        Id = id;
+        Nombre = nombre;
+        Email = email;
+        ContrasenaHash = contrasenaHash;
+        EsAdmin = esAdmin;
+        Permisos = permisos;
+    }
+
+    public static Usuario Reconstruir(Guid id, string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
+    {
+        return new Usuario(id, nombre, email, contrasenaHash, esAdmin, permisos);
+    }
+
+    public void CambiarPermisos(IEnumerable<Permiso> nuevosPermisos)
+    {
+        Permisos = nuevosPermisos;
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Seguridad y Privilegios en el Dominio):</h5>
+            <ul>
+                <li><strong>Seguridad a nivel de Entidad de Dominio:</strong> La clase <code>Usuario</code> encapsula la identidad y los privilegios granulares. Las propiedades críticas como <code>EsAdmin</code> y la colección de <code>Permisos</code> poseen setters privados (<code>private set</code>). Esto impide que las capas externas del sistema modifiquen arbitrariamente los permisos o promuevan una cuenta ordinaria a cuenta de administrador a través de asignaciones directas de propiedades en memoria.</li>
+                <li><strong>Asignación Controlada de Permisos:</strong> Los permisos de un usuario no administrador únicamente se pueden actualizar a través de la llamada al método de negocio <code>CambiarPermisos(IEnumerable&lt;Permiso&gt; nuevosPermisos)</code>. Esto nos permite centralizar reglas (por ejemplo, que los administradores no requieran permisos explícitos ya que los heredan todos por defecto) en el corazón del dominio.</li>
+                <li><strong>Restauración sin Pérdida de Estado:</strong> Provee un factory method <code>Reconstruir</code> para hidratar las cuentas de usuario y sus colecciones de permisos desde la base de datos de manera atómica, manteniendo los hashes de contraseñas correctos y los GUIDs originales de auditoría.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: CAPA DE APLICACIÓN -->
+    <section id="sec-aplicacion">
+        <h2 class="section-title">3. Detalle de Clases: Capa de Aplicación (SGE.Aplicacion)</h2>
+        <p>
+            Esta capa implementa las reglas de orquestación del sistema mediante Casos de Uso, DTOs y validaciones de seguridad específicas.
+        </p>
+
+        <div class="callout callout-design">
+            <div class="callout-title">Fundamentos Teóricos de la Capa de Aplicación</div>
+            <p>
+                La capa de <strong>Aplicación</strong> funciona como la orquestadora principal del sistema. Su misión es traducir las intenciones del usuario (recibidas en la API) en acciones de negocio sobre el dominio, coordinando el flujo de datos y controlando la infraestructura técnica mediante interfaces. Sus principios fundamentales son:
+            </p>
+            <p>
+                <strong>1. Casos de Uso (Orquestadores de Flujo):</strong> Cada caso de uso (como <code>AgregarExpedienteUseCase</code> o <code>LoginUseCase</code>) representa una operation lógica e individual del negocio. Los casos de uso no contienen las reglas esenciales del negocio (las cuales residen en el dominio), sino que se limitan a cargar entidades desde los repositorios, invocar los métodos comerciales del dominio y llamar al guardado de cambios. De esta forma, el caso de uso es un director de orquesta: dice <em>qué hacer</em> y <em>en qué orden</em>, pero la lógica fina la ejecutan los agregados de dominio.
+            </p>
+            <p>
+                <strong>2. Inversión de Dependencias a través de Puertos (Interfaces):</strong> La capa de aplicación no conoce bases de datos, redes o archivos físicos. Define interfaces de acceso (como <code>IExpedienteRepository</code> o <code>IUnidadDeTrabajo</code>) que actúan como "puertos". La capa de Infraestructura implementa estas interfaces (los "adaptadores"). Esto nos permite cambiar el motor de persistencia (por ejemplo, pasar de SQLite a SQL Server o una base de datos Mock para pruebas) sin modificar una sola línea de código en la capa de aplicación o de dominio.
+            </p>
+            <p>
+                <strong>3. Objetos de Transferencia de Datos (DTOs):</strong> Representan estructuras de datos planas (records o clases sin lógica) que viajan a través de los límites del sistema. Evitan el acoplamiento directo entre los clientes externos y las entidades de dominio (como <code>Expediente</code>), impidiendo problemas de seguridad (over-posting) y protegiendo el encapsulamiento interno al no exponer propiedades con set privado o relaciones circulares que complicarían la serialización.
+            </p>
+        </div>
+
+        <!-- UseCases Expediente -->
+        <div class="class-header" id="app-usecases-exp">Casos de Uso: Gestión de Expedientes</div>
+        
+        <p><strong>AgregarExpedienteUseCase.cs:</strong></p>
+        <pre><code class="language-csharp">public class AgregarExpedienteUseCase
+{
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly IExpedienteRepository _iExpRepo;
+    private readonly IAutorizacionService _autorizacion;
+
+    public AgregarExpedienteUseCase(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, IAutorizacionService autorizacion)
+    {
+        _uow = uow;
+        _iExpRepo = iExpRepo;
+        _autorizacion = autorizacion;
+    }
+
+    public AgregarExpedienteResponse Ejecutar(AgregarExpedienteRequest req, Guid idUsuario)
+    {
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteAlta))
+        {
+            throw new AutorizacionException("El usuario no tiene permisos para agregar expedientes");
+        }
+        
+        Caratula car = new Caratula(req.Caratula);
+        Expediente exp = new Expediente(car, idUsuario);
+
+        _iExpRepo.Agregar(exp);
+        _uow.Guardar();
+
+        return new AgregarExpedienteResponse(
+            exp.Id,
+            exp.Estado,
+            exp.Caratula.Valor,
+            exp.UsuarioUltimoCambio,
+            exp.FechaCreacion,
+            exp.FechaUltimaModificacion
+        );
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Casos de Uso e Inyección de Dependencias):</h5>
+            <ul>
+                <li><strong>El Patrón Command/Caso de Uso:</strong> En la arquitectura limpia, la capa de Aplicación contiene las reglas de proceso de la aplicación (los casos de uso). Esta clase coordina el flujo de datos desde el exterior, valida los permisos de seguridad y delega la lógica de negocio pura a los objetos del dominio. No contiene lógica de base de datos directa, lo que permite que sea fácil de testear de forma aislada.</li>
+                <li><strong>Inyección de Dependencias desacoplada (Constructor):</strong> Mediante el constructor, inyecta interfaces abstractas (<code>IUnidadDeTrabajo</code>, <code>IExpedienteRepository</code>, <code>IAutorizacionService</code>). Al depender de interfaces en lugar de implementaciones concretas (como una base de datos específica o un proveedor de JWT real), cumplimos con el principio de Inversión de Dependencias (Dependency Inversion Principle - SOLID), facilitando cambiar el motor de almacenamiento sin alterar una sola línea de lógica empresarial.</li>
+                <li><strong>Control Preventivo de Autorización:</strong> Invoca a <code>_autorizacion.PoseeElPermiso()</code> pasando el GUID del usuario y el permiso requerido <code>Permiso.ExpedienteAlta</code> antes de realizar cualquier operación. Si el chequeo falla, interrumpe el hilo arrojando una <code>AutorizacionException</code>. Esto actúa como un escudo de seguridad antes de procesar o guardar datos.</li>
+                <li><strong>Orquestación y Persistencia Transaccional:</strong> Transforma el string simple del DTO de entrada en un Value Object de tipo <code>Caratula</code> (lo que dispara sus validaciones internas). Crea la entidad de dominio <code>Expediente</code> y la registra en memoria en el repositorio mediante <code>Agregar()</code>. Finalmente, llama a <code>_uow.Guardar()</code> para consolidar la transacción a nivel físico, garantizando consistencia ACID.</li>
+                <li><strong>Mapeo a DTOs de Salida (Data Transfer Objects):</strong> Para evitar que la entidad de dominio <code>Expediente</code> se exponga directamente hacia el exterior (lo que acoplaría el modelo de dominio a la API y podría provocar bucles de serialización infinita), el caso de uso devuelve un objeto plano e inmutable de tipo <code>AgregarExpedienteResponse</code> que solo contiene los datos esenciales para la UI.</li>
+            </ul>
+        </div>
+
+        <p><strong>EliminarExpedienteUseCase.cs (Casos de Cascada Manual):</strong></p>
+        <pre><code class="language-csharp">public class EliminarExpedienteUseCase
+{
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly IExpedienteRepository _iExpRepo;
+    private readonly ITramiteRepository _iTramRepo;
+    private readonly IAutorizacionService _autorizacion;
+
+    public EliminarExpedienteUseCase(IUnidadDeTrabajo uow, IExpedienteRepository iExpRepo, ITramiteRepository iTramRepo, IAutorizacionService autorizacion)
+    {
+        _uow = uow;
+        _iExpRepo = iExpRepo;
+        _iTramRepo = iTramRepo;
+        _autorizacion = autorizacion;
+    }
+
+    public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest req, Guid idUsuario)
+    {
+        if (req == null)
+        {
+            throw new AplicationException("La solicitud no puede estar vacía."); 
+        }
+
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteBaja))
+        {
+            throw new AutorizacionException("El usuario no tiene permisos para eliminar este expediente.");
+        }
+
+        var expedienteABorrar = _iExpRepo.ObtenerPorId(req.ExpedienteId);
+        if (expedienteABorrar == null)
+        {
+            throw new AplicationException("No se encontró el expediente solicitado");
+        }
+
+        // Eliminación en Cascada programática a nivel de Aplicación
+        var tramites = _iTramRepo.ObtenerPorExpedienteId(req.ExpedienteId).ToList();
+        foreach (var t in tramites)
+        {
+            _iTramRepo.Eliminar(t.Id);
+        }
+
+        _iExpRepo.Eliminar(req.ExpedienteId);
+        _uow.Guardar();
+
+        return new EliminarExpedienteResponse(req.ExpedienteId);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Cascada Programática y Consistencia):</h5>
+            <ul>
+                <li><strong>Validación Defensiva del DTO de Entrada:</strong> Comprueba inmediatamente si la solicitud entrante <code>req</code> es nula. En arquitecturas REST, un cuerpo JSON mal estructurado puede ser deserializado como nulo; atrapar este caso temprano evita excepciones genéricas del sistema como `NullReferenceException`, arrojando en su lugar una excepción controlada de aplicación (<code>AplicationException</code>).</li>
+                <li><strong>Manejo de Eliminación en Cascada en Capa de Aplicación:</strong> La eliminación de un registro padre (el expediente) requiere la eliminación de todos sus hijos (los trámites) para mantener la integridad referencial. Aunque esto podría delegarse a reglas de cascada automáticas (ON DELETE CASCADE) de SQLite, realizarlo de forma explícita y programática a nivel de aplicación ofrece mayor visibilidad, portabilidad entre diferentes motores de bases de datos y facilita el logging de auditoría de cada trámite removido.</li>
+                <li><strong>Transaccionalidad Asegurada:</strong> Al recuperar y eliminar todos los trámites vinculados mediante <code>_iTramRepo.Eliminar(t.Id)</code> en un bucle antes de eliminar el expediente con <code>_iExpRepo.Eliminar()</code>, se encolan todas las instrucciones de borrado en el Change Tracker. El llamado final a <code>_uow.Guardar()</code> ejecuta todas estas operaciones en un único bloque transaccional. Si alguna falla, se revierte todo, impidiendo que queden trámites huérfanos.</li>
+            </ul>
+        </div>
+
+        <!-- UseCases Tramites -->
+        <div class="class-header" id="app-usecases-tra">Casos de Uso: Gestión de Trámites</div>
+        
+        <p><strong>AgregarTramiteUseCase.cs:</strong></p>
+        <pre><code class="language-csharp">public class AgregarTramiteUseCase
+{
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly ITramiteRepository _tramiteRepo;
+    private readonly ActualizadorEstadoExpedienteService _actualizador;
+    private readonly IAutorizacionService _autorizacion;
+
+    public AgregarTramiteUseCase(IUnidadDeTrabajo uow, ITramiteRepository tramiteRepo, ActualizadorEstadoExpedienteService actualizador, IAutorizacionService autorizacion)
+    {
+        _uow = uow;
+        _tramiteRepo = tramiteRepo;
+        _actualizador = actualizador;
+        _autorizacion = autorizacion;
+    }
+
+    public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req, Guid idUsuario)
+    {
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteAlta))
+        {
+            throw new AutorizacionException("El usuario no tiene permisos para agregar trámites");
+        }
+
+        Contenido contenido = new Contenido(req.Contenido);
+        
+        Tramite tramite = new Tramite(
+            req.ExpedienteId,
+            (EtiquetaTramite)req.Etiqueta,
+            contenido,
+            idUsuario
+        );
+
+        _tramiteRepo.Agregar(tramite);
+
+        // Dispara la regla del negocio: Actualización de estado del expediente
+        _actualizador.Ejecutar(tramite, idUsuario);
+        _uow.Guardar();
+
+        return new AgregarTramiteResponse(
+            tramite.Id,
+            tramite.ExpedienteId,
+            tramite.Etiqueta,
+            tramite.Contenido.Valor,
+            tramite.FechaCreacion,
+            tramite.FechaUltModificacion,
+            tramite.UsuarioUltCambio
+        );
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Orquestación entre Entidades del Agregado):</h5>
+            <ul>
+                <li><strong>Conversión de Tipos Primitivos a Objetos de Dominio:</strong> El caso de uso recibe tipos primitivos de la petición HTTP (un entero para <code>Etiqueta</code> y un string para <code>Contenido</code>). Para garantizar que se respeten las invariantes del negocio, castea el entero a la estructura tipada <code>EtiquetaTramite</code> e instancia el Value Object <code>Contenido</code>. Cualquier error de sintaxis o texto vacío se detecta inmediatamente antes de intentar interactuar con los repositorios.</li>
+                <li><strong>Colaboración Coordinada por el Caso de Uso:</strong> Un trámite no se crea de forma aislada; su inserción puede requerir la mutación del estado del expediente padre (por ejemplo, finalizar un expediente si la etiqueta es <code>PaseAlArchivo</code>). El caso de uso coordina esta interacción inyectando el servicio <code>ActualizadorEstadoExpedienteService</code> y pasándole el trámite recién creado. Este patrón mantiene a la entidad <code>Tramite</code> desacoplada de la lógica del ciclo de vida del <code>Expediente</code>.</li>
+            </ul>
+        </div>
+
+        <!-- UseCases Usuarios -->
+        <div class="class-header" id="app-usecases-usr">Casos de Uso: Gestión de Usuarios y Permisos</div>
+        
+        <p><strong>RegistrarUsuarioUseCase.cs:</strong></p>
+        <pre><code class="language-csharp">public class RegistrarUsuarioUseCase
+{
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly IUsuarioRepository _userRepo;
+
+    public RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo)
+    {
+        _uow = uow;
+        _userRepo = userRepo;
+    }
+
+    public RegistrarUsuarioResponse Ejecutar(RegistrarUsuarioRequest req)
+    {
+        if (_userRepo.ExistePorEmail(req.Email))
+        {
+            throw new AplicationException("El email ya está registrado");
+        }
+        
+        // Encripta la contraseña de texto plano a Hash SHA256 antes de instanciar al usuario
+        Usuario user = new Usuario(req.Nombre, req.Email, ContrasenaUtil.Convertir(req.Contrasena));
+
+        _userRepo.Agregar(user);
+        _uow.Guardar();
+
+        return new RegistrarUsuarioResponse(user.Id, user.Nombre, user.Email, user.EsAdmin, user.Permisos);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Criptografía y Reglas de Registro):</h5>
+            <ul>
+                <li><strong>Validación de Reglas de Negocio Únicas:</strong> Comprobar que un correo electrónico no esté duplicado en el sistema es una regla de negocio que una entidad individual de tipo <code>Usuario</code> no puede resolver por sí misma (ya que no tiene acceso a otros usuarios). El caso de uso resuelve esto coordinando con el repositorio mediante la consulta <code>ExistePorEmail(req.Email)</code>. Si el email existe, se lanza una excepción de aplicación controlada.</li>
+                <li><strong>Cifrado Unidireccional de Contraseñas (Hashing):</strong> De acuerdo con los estándares de seguridad modernos, las contraseñas nunca deben guardarse en texto plano. El caso de uso invoca a <code>ContrasenaUtil.Convertir(req.Contrasena)</code>, la cual aplica un algoritmo SHA-256 (hashing unidireccional criptográfico). De este modo, la contraseña viaja cifrada a la base de datos SQLite y, en caso de una filtración del archivo de datos, las credenciales reales de los usuarios permanecen protegidas.</li>
+            </ul>
+        </div>
+
+        <p><strong>LoginUseCase.cs:</strong></p>
+        <pre><code class="language-csharp">public class LoginUseCase(IUsuarioRepository repo, ITokenProvider tokenProvider)
+{
+    public LoginResponse Ejecutar(LoginRequest req)
+    {
+        Usuario? user = repo.ObtenerPorEmail(req.Email);
+        
+        if (user == null || !ContrasenaUtil.Comparar(req.Contrasena, user.ContrasenaHash))
+        {
+            throw new UnauthorizedAccessException("El mail o la contraseña son incorrectos.");
+        }
+
+        var token = tokenProvider.GenerarToken(user);
+        return new LoginResponse(token);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (C# 12 Primary Constructors y Autenticación):</h5>
+            <ul>
+                <li><strong>Sintaxis Modernizada mediante Primary Constructors:</strong> Utiliza la característica de constructores primarios de C# 12 (<code>class LoginUseCase(IUsuarioRepository repo...)</code>). Esto permite declarar los parámetros de entrada directamente en la firma de la clase, reduciendo las líneas de código repetitivo de variables privadas y asignaciones del constructor tradicional. El compilador de .NET gestiona el ciclo de vida de estas dependencias internamente.</li>
+                <li><strong>Mitigación de Ataques de Enumeración:</strong> Al validar la contraseña, si el usuario no existe o si la contraseña ingresada es incorrecta, la aplicación arroja exactamente el mismo error genérico (<code>"El mail o la contraseña son incorrectos."</code>) con un código de estado no autorizado. Esto evita que atacantes externos determinen qué direcciones de email están registradas en el sistema probando con diferentes contraseñas.</li>
+                <li><strong>Generación Desacoplada de Tokens de Seguridad:</strong> El caso de uso no sabe cómo armar o firmar criptográficamente un string JWT. Delega esta responsabilidad en la interfaz <code>ITokenProvider</code>, la cual encapsula la lógica criptográfica de JSON Web Tokens en la capa de infraestructura.</li>
+            </ul>
+        </div>
+
+        <p><strong>CambiarPermisosUseCase.cs:</strong></p>
+        <pre><code class="language-csharp">public class CambiarPermisosUseCase
+{
+    private readonly IUnidadDeTrabajo _uow;
+    private readonly IUsuarioRepository _userRepo;
+    private readonly IAutorizacionService _autorizacion;
+
+    public CambiarPermisosUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo, IAutorizacionService autorizacion)
+    {
+        _uow = uow;
+        _userRepo = userRepo;
+        _autorizacion = autorizacion;
+    }
+
+    public CambiarPermisosResponse Ejecutar(CambiarPermisosRequest req, Guid idUsuarioSolicitante)
+    {
+        // 1. Validar que el solicitante sea Administrador
+        var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);
+        if (solicitante == null || !solicitante.EsAdmin)
+        {
+            throw new AutorizacionException("Solo un administrador puede cambiar los permisos de un usuario.");
+        }
+
+        var usuarioObjetivo = _userRepo.ObtenerPorId(req.IdUsuarioObjetivo);
+        if (usuarioObjetivo == null)
+        {
+            throw new AplicationException("El usuario solicitado no existe.");
+        }
+
+        // 2. Prohibir la alteración de permisos de otro Administrador
+        if (usuarioObjetivo.EsAdmin)
+        {
+            throw new AplicationException("No se pueden modificar los permisos de un administrador.");
+        }
+
+        usuarioObjetivo.CambiarPermisos(req.NuevosPermisos);
+
+        _userRepo.Modificar(usuarioObjetivo);
+        _uow.Guardar();
+
+        return new CambiarPermisosResponse(usuarioObjetivo.Id, usuarioObjetivo.Nombre, usuarioObjetivo.Permisos);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Políticas de Seguridad y Modificaciones):</h5>
+            <ul>
+                <li><strong>Doble Capa de Verificación en Casos de Uso:</strong> Este caso de uso aplica políticas de seguridad complejas que no pueden automatizarse con un simple atributo de rol:
+                    <ul>
+                        <li><strong>Verificación del Solicitante:</strong> Carga al usuario que inició la petición (<code>idUsuarioSolicitante</code>) y comprueba explícitamente si su bandera <code>EsAdmin</code> es verdadera. Si no lo es, cancela la ejecución mediante una <code>AutorizacionException</code>, evitando elevaciones de privilegios no autorizadas.</li>
+                        <li><strong>Protección de Administradores:</strong> Carga al usuario objetivo a modificar y verifica si es un administrador. El sistema prohíbe explícitamente modificar los permisos de un administrador (ya que un administrador tiene todos los permisos implícitamente por rol y sus permisos individuales no deben alterarse). Esto actúa como una protección de seguridad interna (invariante de aplicación).</li>
+                    </ul>
+                </li>
+                <li><strong>Mutación a Través del Dominio:</strong> En vez de manipular directamente la base de datos o asignar una nueva lista directamente al modelo, invoca al método de dominio <code>usuarioObjetivo.CambiarPermisos(req.NuevosPermisos)</code> y luego persiste el estado. Esto respeta la encapsulación y la lógica de validaciones internas de la clase <code>Usuario</code>.</li>
+            </ul>
+        </div>
+
+        <!-- Servicios de Aplicación -->
+        <div class="class-header" id="app-servicios">Servicios de Aplicación y Utilidades</div>
+
+        <p><strong>ActualizadorEstadoExpedienteService.cs:</strong></p>
+        <pre><code class="language-csharp">public class ActualizadorEstadoExpedienteService
+{
+    private readonly IExpedienteRepository _expRepo;
+
+    public ActualizadorEstadoExpedienteService(IExpedienteRepository expRepo)
+    {
+        _expRepo = expRepo;
+    }
+
+    public void Ejecutar(Tramite tramite, Guid usuarioId)
+    {
+        // Regla: Solo si la etiqueta es PaseAlArchivo, se cierra y finaliza el expediente
+        if (tramite.Etiqueta == EtiquetaTramite.PaseAlArchivo)
+        {
+            var exp = _expRepo.ObtenerPorId(tramite.ExpedienteId);
+
+            if (exp != null)
+            {
+                exp.ActualizarEstado(tramite.Etiqueta, usuarioId);
+                _expRepo.Modificar(exp);
+            }
+        }
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Servicios de Aplicación y Colaboración):</h5>
+            <ul>
+                <li><strong>El concepto de Servicio de Aplicación:</strong> Cuando una regla de negocio requiere la coordinación de múltiples entidades o agregados (en este caso, asociar un <code>Tramite</code> nuevo a un <code>Expediente</code> y actualizar el estado de este último según su etiqueta), no es correcto colocar esta lógica dentro de una de las entidades aisladas, ya que violaría su cohesión. Un servicio de aplicación actúa como el mediador perfecto, encapsulando este flujo de colaboración entre objetos sin que las entidades dependan directamente una de la otra.</li>
+                <li><strong>Ejecución y Flujo de Auditoría:</strong> El método verifica si la etiqueta es <code>PaseAlArchivo</code>, recupera la entidad <code>Expediente</code> mediante su repositorio, invoca su máquina de estados interna <code>ActualizarEstado()</code> (pasándole la firma del usuario responsable para auditoría) y guarda el estado actualizado en el repositorio de expedientes, todo bajo el mismo contexto transaccional en curso.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: CAPA DE INFRAESTRUCTURA -->
+    <section id="sec-infraestructura">
+        <h2 class="section-title">4. Detalle de Clases: Capa de Infraestructura (SGE.Infraestructura)</h2>
+        <p>
+            La capa de infraestructura implementa las interfaces y provee el soporte técnico para las capas internas.
+        </p>
+
+        <div class="callout callout-design">
+            <div class="callout-title">Fundamentos Teóricos de la Capa de Infraestructura</div>
+            <p>
+                La capa de <strong>Infraestructura</strong> (implementada en el proyecto <code>SGE.Infraestructura</code>) es la encargada de dar soporte técnico a las reglas lógicas del negocio. Implementa las interfaces (puertos) definidas por las capas internas de Dominio y Aplicación, encargándose de la comunicación física con bases de datos relacionales, servicios de cifrado, archivos del sistema o redes. Sus pilares fundamentales son:
+            </p>
+            <p>
+                <strong>1. Mapeo Relacional de Objetos (ORM) y EF Core:</strong> El ORM (en nuestro caso, Entity Framework Core) actúa como un puente de traducción bidireccional entre el paradigma orientado a objetos (clases, herencia, encapsulamiento) y el paradigma relacional de SQL (tablas, columnas, claves foráneas). EF Core nos permite recuperar registros en base de datos e hidratar las clases de negocio automáticamente.
+            </p>
+            <p>
+                <strong>2. Conversores de Valor (Value Conversions):</strong> Dado que los motores relacionales sencillos (como SQLite) no comprenden de forma nativa los Value Objects del dominio (como <code>Caratula</code> o <code>Contenido</code>), la infraestructura utiliza la API fluida de EF Core (<code>HasConversion</code>) para aplanar estos objetos a cadenas primitivas de texto antes de guardarlos, y reconstruirlos mediante sus constructores de dominio al recuperarlos. Esto nos permite mantener un dominio puro y rico sin comprometer la sencillez técnica de la persistencia.
+            </p>
+            <p>
+                <strong>3. Patrones Repositorio y Unidad de Trabajo (Unit of Work):</strong> El *Patrón Repositorio* encapsula las consultas y escrituras de datos tras una interfaz en memoria, abstrayendo a la aplicación de los comandos SQL o llamadas al ORM. El *Patrón Unidad de Trabajo* asegura que todas las operaciones y cambios sobre múltiples repositorios ocurran dentro de una transacción de base de datos única y atómica. Si falla un cambio, toda la transacción se descarta, previniendo estados inconsistentes de la base de datos (por ejemplo, guardar un trámite pero que falle la actualización del expediente).
+            </p>
+            <p>
+                <strong>4. Servicios Externos de Criptografía e Identidad:</strong> Los mecanismos de seguridad (generación de JSON Web Tokens con algoritmos simétricos HMAC-SHA256, validación de firmas digitales y hashing de contraseñas de usuarios) son detalles técnicos de bajo nivel. Por lo tanto, se implementan en esta capa utilizando librerías específicas del sistema operativo o framework, exponiéndolas a través de contratos abstractos (como <code>ITokenProvider</code>) para evitar contaminar la capa de aplicación con librerías externas.
+            </p>
+        </div>
+
+        <!-- SGEContext -->
+        <div class="class-header" id="inf-contexto">DbContext: SGEContext.cs</div>
+        <p>
+            Clase encargada de orquestar la conexión y los mapeos entre clases orientadas a objetos y el motor relacional SQLite.
+        </p>
+        <pre><code class="language-csharp">public class SGEContext : DbContext
+{
+    public DbSet&lt;Expediente&gt; Expedientes { get; set; }
+    public DbSet&lt;Tramite&gt; Tramites { get; set; }
+    public DbSet&lt;Usuario&gt; Usuarios { get; set; }
+
+    public SGEContext(DbContextOptions&lt;SGEContext&gt; options) : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // Configuración de conversión del Value Object Caratula
+        modelBuilder.Entity&lt;Expediente&gt;(entity =>
+        {
+            entity.Property(e => e.Caratula)
+                .HasConversion(
+                    caratula => caratula.Valor,      // De Objeto C# a string BD
+                    valor => new Caratula(valor))   // De string BD a Objeto C#
+                .HasColumnName("Caratula");
+        });
+
+        // Configuración de conversión del Value Object Contenido
+        modelBuilder.Entity&lt;Tramite&gt;(entity =>
+        {
+            entity.Property(t => t.Contenido)
+                .HasConversion(
+                    contenido => contenido.Valor,
+                    valor => new Contenido(valor))
+                .HasColumnName("Contenido");
+        });
+
+        // Seed data
+        string hashAdmin = ContrasenaUtil.Convertir("admin123");
+        string hashPrueba = ContrasenaUtil.Convertir("prueba123");
+
+        var adminSemilla = Usuario.Reconstruir(
+            id: Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            nombre: "Admin SGE",
+            email: "admin@sge.com",
+            contrasenaHash: hashAdmin,
+            esAdmin: true,
+            permisos: []
+        );
+
+        var usuarioPrueba1 = Usuario.Reconstruir(
+            id: Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            nombre: "Usuario Solo Lectura",
+            email: "prueba1@sge.com",
+            contrasenaHash: hashPrueba,
+            esAdmin: false,
+            permisos: []
+        );
+
+        var usuarioPrueba2 = Usuario.Reconstruir(
+            id: Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            nombre: "Usuario Con Permisos",
+            email: "prueba2@sge.com",
+            contrasenaHash: hashPrueba,
+            esAdmin: false,
+            permisos: [Permiso.ExpedienteAlta, Permiso.TramiteAlta]
+        );
+
+        modelBuilder.Entity&lt;Usuario&gt;().HasData(adminSemilla, usuarioPrueba1, usuarioPrueba2);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Mapeo Relacional de Objetos - ORM):</h5>
+            <ul>
+                <li><strong>El DbContext como intermediario relacional:</strong> La clase heredada de <code>DbContext</code> de Entity Framework Core representa la sesión de trabajo con la base de datos SQLite y expone las tablas a través de propiedades de tipo <code>DbSet&lt;T&gt;</code>.</li>
+                <li><strong>Mapeo de Value Objects Complejos mediante <code>HasConversion</code> (Fluent API):</strong> La base de datos SQLite solo soporta tipos nativos simples (enteros, flotantes, texto, booleanos y blobs). Para persistir los Objetos de Valor <code>Caratula</code> y <code>Contenido</code> en formato de texto plano en SQLite, configuramos <code>HasConversion()</code> en el constructor del modelo. Esto le enseña a EF Core a ejecutar una serialización implícita: al escribir, extrae la propiedad string <code>Valor</code>; al leer, reconstruye el objeto instanciando un nuevo record <code>new Caratula(valor)</code>. Esto nos permite disfrutar de las validaciones y del encapsulamiento de DDD a nivel de C# sin alterar el esquema relacional de base de datos.</li>
+                <li><strong>Serialización Automática de Colecciones a JSON:</strong> En EF Core 8, las colecciones de elementos simples (como <code>IEnumerable&lt;Permiso&gt; Permisos</code>) se serializan por defecto en formato JSON textual dentro de una única columna de tipo TEXT en SQLite. Esto nos ahorra tener que crear tablas asociativas intermedias de muchos a muchos y realizar costosas consultas JOIN solo para guardar la lista de permisos de un usuario.</li>
+                <li><strong>Inserción de Datos Semilla (Data Seeding):</strong> Mediante <code>modelBuilder.Entity&lt;Usuario&gt;().HasData()</code>, insertamos registros iniciales en la base de datos en su creación. Los hashes de contraseñas de estos usuarios semillas se generan con <code>ContrasenaUtil.Convertir</code> para asegurar que las credenciales ya estén protegidas desde el momento cero del inicio de la aplicación.</li>
+            </ul>
+        </div>
+
+        <!-- Unidad de Trabajo -->
+        <div class="class-header" id="inf-uow">Clase: UnidadDeTrabajo.cs</div>
+        <p>
+            Implementa la interfaz <code>IUnidadDeTrabajo</code> inyectando el DbContext para encapsular la confirmación de cambios.
+        </p>
+        <pre><code class="language-csharp">using SGE.Aplicacion;
+
+namespace SGE.Infraestructura;
+
+public class UnidadDeTrabajo : IUnidadDeTrabajo
+{
+    private readonly SGEContext _context;
+    
+    public UnidadDeTrabajo(SGEContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+    
+    public void Guardar()
+    {
+        _context.SaveChanges();
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Patrón Unit of Work):</h5>
+            <ul>
+                <li><strong>El Patrón de Unidad de Trabajo (Unit of Work):</strong> El patrón Unit of Work mantiene una lista de objetos afectados por una transacción de negocio y coordina la escritura de cambios. En vez de que cada repositorio guarde cambios de forma independiente (lo que provocaría múltiples transacciones separadas y la posibilidad de que unas se guarden y otras fallen), los repositorios registran sus cambios en memoria en el tracker del <code>SGEContext</code>. Al finalizar el caso de uso, se invoca a <code>Guardar()</code>, consolidando todos los cambios de forma síncrona en una única transacción relacional. Esto asegura que la base de datos no quede en un estado inconsistente parcial (consistencia atómica ACID).</li>
+            </ul>
+        </div>
+
+        <!-- SGESqlite -->
+        <div class="class-header" id="inf-sqlite">Clase: SGESqlite.cs</div>
+        <p>
+            Inicializador seguro para asegurar la creación del archivo de base de datos SQLite y el impacto de los esquemas iniciales.
+        </p>
+        <pre><code class="language-csharp">namespace SGE.Infraestructura;
+
+public static class SGESqlite
+{
+    private static bool _initialized;
+    private static readonly object _lock = new();
+
+    public static void Inicializar(SGEContext context)
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        lock (_lock)
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            if (context.Database.EnsureCreated())
+            {
+                Console.WriteLine("Se creó base de datos");
+            }
+
+            _initialized = true;
+        }
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Concurrencia y Double-Checked Locking):</h5>
+            <ul>
+                <li><strong>Mitigación de Condiciones de Carrera (Race Conditions):</strong> En aplicaciones web con múltiples peticiones HTTP concurrentes al iniciar el servidor, es posible que dos o más hilos intenten inicializar y verificar la existencia de la base de datos al mismo tiempo, lo que causaría excepciones por archivos bloqueados o reescrituras de tablas.</li>
+                <li><strong>Patrón de Bloqueo de Doble Verificación:</strong> El método implementa el patrón <em>Double-Checked Locking</em>.
+                    <ul>
+                        <li>Primero realiza una comprobación rápida y sin bloqueo de la variable estática <code>_initialized</code>. Si ya está inicializado, sale del método inmediatamente sin incurrir en costos de sincronización de CPU.</li>
+                        <li>Si no está inicializada, adquiere un bloqueo exclusivo de hilo mediante <code>lock (_lock)</code>.</li>
+                        <li>Una vez dentro del bloqueo, realiza una segunda verificación del flag <code>_initialized</code> (ya que otro hilo podría haber completado la inicialización mientras este hilo esperaba el semáforo). Si sigue en false, invoca a <code>EnsureCreated()</code> de forma segura y establece el flag a true.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Repositorio -->
+        <div class="class-header" id="inf-repositorio">Repositorio: ExpedienteRepository.cs</div>
+        <p>
+            Implementa las operaciones CRUD encapsulando las sentencias de Entity Framework Core.
+        </p>
+        <pre><code class="language-csharp">public class ExpedienteRepository : IExpedienteRepository
+{
+    private SGEContext _context;
+    
+    public ExpedienteRepository(SGEContext context)
+    {
+        _context = context;
+    }
+
+    public void Agregar(Expediente expediente)
+    {
+        _context.Expedientes.Add(expediente);
+    }
+    
+    public Expediente? ObtenerPorId(Guid id)
+    {
+        return _context.Expedientes.FirstOrDefault(e => e.Id == id);
+    }
+
+    public IEnumerable&lt;Expediente&gt; ObtenerTodos()
+    {
+        return _context.Expedientes.ToList();
+    }
+
+    public void Modificar(Expediente expediente)
+    {
+        _context.Expedientes.Update(expediente);
+    }
+
+    public void Eliminar(Guid id)
+    {
+        Expediente? exp = _context.Expedientes.FirstOrDefault(e => e.Id.Equals(id));
+        if (exp == null)
+        {
+            throw new RepositoryException("No existe el expediente");
+        }
+        _context.Expedientes.Remove(exp);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Patrón Repositorio y EF Core Change Tracker):</h5>
+            <ul>
+                <li><strong>El Patrón Repositorio:</strong> Actúa como una colección de objetos de negocio en memoria. Desacopla la lógica de acceso a datos de los Casos de Uso, simulando que las entidades están guardadas en una colección común en memoria en vez de en un motor relacional físico.</li>
+                <li><strong>Operaciones Eficientes del Rastreador de EF Core (Change Tracker):</strong> Al ejecutar métodos como <code>Agregar()</code> o <code>Eliminar()</code>, Entity Framework Core no emite consultas SQL a la base de datos SQLite de forma inmediata. Simplemente registra en su tracker de memoria que el objeto se encuentra en estado <em>Added</em> o <em>Deleted</em>. Las sentencias SQL <code>INSERT</code> o <code>DELETE</code> se agrupan y se ejecutan optimizadamente en bloque recién cuando se invoca la Unidad de Trabajo (<code>SaveChanges()</code>), minimizando los accesos de disco y optimizando el rendimiento general del acceso a datos.</li>
+            </ul>
+        </div>
+
+        <!-- JWT Provider -->
+        <div class="class-header" id="inf-token">Proveedor de JWT: ProveedorTokenJwt.cs</div>
+        <p>
+            Se encarga de armar y firmar criptográficamente el token JWT a partir de los datos y permisos de un usuario autenticado.
+        </p>
+        <pre><code class="language-csharp">public class ProveedorTokenJwt : ITokenProvider
+{
+    private readonly string _claveSecreta;
+
+    public ProveedorTokenJwt(string claveSecreta)
+    {
+        _claveSecreta = claveSecreta;
+    }
+
+    public string GenerarToken(Usuario user)
+    {
+        var manejadorToken = new JwtSecurityTokenHandler();
+        var claveEnBytes = Encoding.UTF8.GetBytes(_claveSecreta);
+
+        var reclamos = new List&lt;Claim&gt;
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Nombre),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("esAdmin", user.EsAdmin.ToString().ToLower())
+        };
+
+        if (!user.EsAdmin)
+        {
+            foreach (var permiso in user.Permisos)
+            {
+                reclamos.Add(new Claim("permiso", permiso.ToString()));
+            }
+        }
+
+        var descriptorToken = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(reclamos),
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(claveEnBytes),
+                SecurityAlgorithms.HmacSha256Signature
+            )
+        };
+
+        var token = manejadorToken.CreateToken(descriptorToken);
+        return manejadorToken.WriteToken(token);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Generación de JSON Web Tokens):</h5>
+            <ul>
+                <li><strong>Estructura de un JWT (Claims / Reclamos):</strong> Un token JWT es un estándar abierto (RFC 7519) que define una forma compacta y autónoma para transmitir información de seguridad de forma segura. Los reclamos (claims) son piezas de información asociadas al usuario: su ID, nombre, email y un flag de administración. Para los usuarios que no son administradores globales, se añaden múltiples claims con la clave <code>"permiso"</code>, facilitando que el middleware de ASP.NET Core los lea de forma directa en cada petición HTTP sin necesidad de volver a consultar a la base de datos SQLite.</li>
+                <li><strong>Firma Digital y Clave Simétrica:</strong> El descriptor del token firma el payload utilizando una clave secreta codificada en bytes y el algoritmo criptográfico <code>HmacSha256Signature</code>. Esto produce una firma digital que se concatena al final del token. Si un atacante altera los permisos de usuario dentro del token JWT para intentar elevar privilegios en el cliente, la firma del token no coincidirá con el contenido modificado y el servidor rechazará la petición automáticamente en la etapa de middleware.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 5: PRESENTACIÓN -->
+    <section id="sec-presentation">
+        <h2 class="section-title">5. Detalle de Clases: Capa de Presentación (SGE.WebApi)</h2>
+        <p>
+            Esta capa expone los controladores REST e implementa el bootstrap de configuración inicial y filtros globales.
+        </p>
+
+        <div class="callout callout-design">
+            <div class="callout-title">Fundamentos Teóricos de ASP.NET Core Web API</div>
+            <p>
+                La capa de <strong>Presentación</strong> (implementada en el proyecto <code>SGE.WebApi</code>) constituye la frontera del sistema. Su propósito fundamental es exponer los servicios del negocio al mundo exterior mediante una API web HTTP, actuando como un adaptador de entrada (siguiendo los principios de la Arquitectura Hexagonal y la Arquitectura Limpia). A continuación se analizan sus componentes y mecanismos clave:
+            </p>
+            <p>
+                <strong>1. Arquitectura REST (Representational State Transfer):</strong> La Web API está construida sobre los principios de REST, lo que implica una comunicación cliente-servidor sin estado (stateless). Cada petición HTTP debe contener toda la información necesaria para ser procesada. La API utiliza <em>Endpoints</em> basados en URIs que identifican recursos (por ejemplo, <code>/api/expedientes</code>), verbos HTTP estandarizados para denotar intenciones (<code>GET</code> para lectura, <code>POST</code> para creación, <code>PUT</code>/<code>PATCH</code> para modificación y <code>DELETE</code> para eliminación) y códigos de estado HTTP semánticos (<code>200 OK</code>, <code>201 Created</code>, <code>400 Bad Request</code>, <code>401 Unauthorized</code>, <code>403 Forbidden</code>, <code>404 Not Found</code>, <code>500 Internal Server Error</code>) para comunicar el resultado de manera uniforme a los clientes.
+            </p>
+            <p>
+                <strong>2. El Bootstrap y el Contenedor de Inversión de Control (IoC):</strong> El archivo <code>Program.cs</code> funciona como el punto de entrada de la aplicación (bootstrap). En él se configuran e inicializan los servicios que componen la infraestructura técnica y del negocio. ASP.NET Core incluye un contenedor de dependencias nativo. En la sección de servicios (<code>builder.Services</code>), se registran los componentes del sistema indicando su ciclo de vida (Lifetime):
+            </p>
+            <ul>
+                <li><strong>Transient:</strong> Se crea una nueva instancia cada vez que se solicita el servicio. Adecuado para componentes livianos y sin estado.</li>
+                <li><strong>Scoped:</strong> Se crea una única instancia por cada petición HTTP. Todos los componentes inyectados dentro de una misma solicitud HTTP comparten esta instancia. Es el ciclo de vida crítico para el <code>SGEContext</code> y los Repositorios, ya que asegura que todas las operaciones de acceso a datos de una petición utilicen la misma conexión y sesión relacional.</li>
+                <li><strong>Singleton:</strong> Se crea una única instancia para toda la vida útil de la aplicación web. Se comparte entre todas las llamadas HTTP y todos los hilos, siendo ideal para proveedores de cifrado o servicios inmutables de configuración global.</li>
+            </ul>
+            <p>
+                <strong>3. El Pipeline de Middleware (Ciclo de Vida de una Petición):</strong> El procesamiento de solicitudes en ASP.NET Core se basa en un pipeline de middlewares dispuestos en forma de cebolla. Un <em>Middleware</em> es un componente de software intermedio que intercepta la solicitud y la respuesta. El orden de registro de los middlewares en <code>Program.cs</code> es fundamental porque determina su ejecución secuencial:
+            </p>
+            <ul>
+                <li><strong>Middleware de Excepciones:</strong> Registrado al principio del pipeline para capturar cualquier error lanzado por middlewares subsecuentes o controladores.</li>
+                <li><strong>Middleware de Autenticación (UseAuthentication):</strong> Examina la cabecera HTTP <code>Authorization</code>, valida la firma del token JWT y carga la identidad del usuario en el contexto de la petición (<code>HttpContext.User</code>).</li>
+                <li><strong>Middleware de Autorización (UseAuthorization):</strong> Evalúa las políticas de acceso y comprueba si la identidad autenticada posee los privilegios requeridos para ejecutar el recurso.</li>
+                <li><strong>Middleware de Enrutamiento y Controladores (MapControllers):</strong> Finalmente, dirige la llamada al controlador y acción correspondiente si las capas anteriores autorizaron el paso.</li>
+            </ul>
+            <p>
+                <strong>4. Controladores Delgados (Thin Controllers) y Model Binding:</strong> Los controladores heredan de <code>ControllerBase</code> y están anotados con <code>[ApiController]</code>. Este atributo activa la validación automática de DTOs de entrada y el enlace de datos (<em>Model Binding</em>), que traduce el cuerpo JSON de la petición HTTP directamente a objetos fuertemente tipados en C#. Siguiendo las buenas prácticas arquitectónicas, los controladores se mantienen "delgados" (thin): no contienen lógica de negocio ni de persistencia. Su única tarea es recibir los datos validados por el model binder, extraer la identidad del usuario del contexto de seguridad, delegar la ejecución real a los Casos de Uso de la capa de Aplicación y retornar el resultado formateado en una respuesta HTTP adecuada.
+            </p>
+        </div>
+
+        <!-- Program.cs -->
+        <div class="class-header" id="web-program">Configuración Inicial: Program.cs</div>
+        <p>
+            Es el punto de arranque de la aplicación web. Registra las dependencias, configura el middleware de autenticación de JWT y define el pipeline HTTP.
+        </p>
+        <pre><code class="language-csharp">using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+// Usings omitidos por brevedad...
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.DocumentFilter&lt;FiltroAutorizacion&gt;();
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = "Pegar el JWT completo o solo el token. Se enviará como Authorization."
+    });
+});
+
+// Registro de dependencias en contenedor IoC (Scoped)
+builder.Services.AddScoped&lt;IUsuarioRepository, UsuarioRepository&gt;();
+builder.Services.AddScoped&lt;LoginUseCase&gt;();
+builder.Services.AddScoped&lt;RegistrarUsuarioUseCase&gt;();
+builder.Services.AddScoped&lt;ModificarMisDatosUseCase&gt;();
+builder.Services.AddScoped&lt;CambiarPermisosUseCase&gt;();
+builder.Services.AddScoped&lt;ConsultarUsuarioUseCase&gt;();
+builder.Services.AddScoped&lt;EliminarUsuarioUseCase&gt;();
+
+builder.Services.AddScoped&lt;IExpedienteRepository, ExpedienteRepository&gt;();
+builder.Services.AddScoped&lt;AgregarExpedienteUseCase&gt;();
+builder.Services.AddScoped&lt;ConsultarExpedienteUseCase&gt;();
+builder.Services.AddScoped&lt;ListaExpedientesUseCase&gt;();
+builder.Services.AddScoped&lt;ModificarCaratulaUseCase&gt;();
+builder.Services.AddScoped&lt;CambiarEstadoExpediente&gt;();
+builder.Services.AddScoped&lt;EliminarExpedienteUseCase&gt;();
+
+builder.Services.AddScoped&lt;ITramiteRepository, TramiteRepository&gt;();
+builder.Services.AddScoped&lt;AgregarTramiteUseCase&gt;();
+builder.Services.AddScoped&lt;EliminarTramiteUseCase&gt;();
+builder.Services.AddScoped&lt;ModificarTramiteUseCase&gt;();
+builder.Services.AddScoped&lt;ListarTramitesPorExpedienteUseCase&gt;();
+builder.Services.AddScoped&lt;ConsultarTramiteUseCase&gt;();
+
+builder.Services.AddDbContext&lt;SGEContext&gt;(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlite(connectionString);
+});
+builder.Services.AddScoped&lt;IUnidadDeTrabajo, UnidadDeTrabajo&gt;();
+
+var claveSecretaJwt = builder.Configuration["JwtSettings:Secret"] ?? throw new InvalidOperationException("La clave secreta JWT no está configurada.");
+builder.Services.AddSingleton&lt;ITokenProvider&gt;(new ProveedorTokenJwt(claveSecretaJwt));
+builder.Services.AddScoped&lt;IAutorizacionService, AutorizacionService&gt;();
+builder.Services.AddScoped&lt;ActualizadorEstadoExpedienteService&gt;();
+
+// Configuración de autenticación JWT
+var claveEnBytes = Encoding.UTF8.GetBytes(claveSecretaJwt);
+builder.Services.AddAuthentication(opciones =>
+{
+    opciones.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opciones.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(opciones =>
+{
+    opciones.RequireHttpsMetadata = false;
+    opciones.SaveToken = true;
+    opciones.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var authorizationHeader = context.Request.Headers.Authorization.ToString();
+
+            if (string.IsNullOrWhiteSpace(authorizationHeader))
+            {
+                return Task.CompletedTask;
+            }
+
+            const string bearerPrefix = "Bearer ";
+
+            context.Token = authorizationHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase)
+                ? authorizationHeader[bearerPrefix.Length..].Trim()
+                : authorizationHeader.Trim();
+
+            return Task.CompletedTask;
+        }
+    };
+    opciones.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(claveEnBytes),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = false
+    };
+});
+
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
+// Inicialización de la base de datos SQLite
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<SGEContext>();
+    context.Database.EnsureCreated();
+}
+
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.ConfigObject.PersistAuthorization = true;
+});
+
+app.UseMiddleware&lt;ManejadorGlobalExcepcionesMiddleware&gt;();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGet("/SGE", () => Results.Redirect("/swagger/index.html"));
+app.MapControllers();
+
+app.Run();</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Arranque de la Aplicación y Lifetimes de DI):</h5>
+            <ul>
+                <li><strong>Ciclos de Vida en Inversión de Control (IoC):</strong> Registra las clases en el contenedor de dependencias nativo de .NET utilizando diferentes tiempos de vida:
+                    <ul>
+                        <li><strong>Scoped (ciclo Scoped):</strong> Utilizado para Repositorios, Casos de Uso y el DbContext (<code>AddScoped</code>). Significa que .NET instanciará un objeto único por cada petición HTTP que reciba la API, compartiendo esa misma instancia a lo largo de toda la llamada. Al terminar la llamada HTTP, las instancias se destruyen automáticamente, asegurando que las conexiones a la base de datos SQLite se liberen correctamente.</li>
+                        <li><strong>Singleton (ciclo Único):</strong> Utilizado para el <code>ProveedorTokenJwt</code> (<code>AddSingleton</code>). Significa que se crea una única instancia en memoria para toda la vida útil de la aplicación web, siendo reutilizada por todas las peticiones entrantes. Esto es ideal para clases utilitarias de cifrado que no guardan estado de usuario y consumen muchos recursos de CPU en su inicialización.</li>
+                    </ul>
+                </li>
+                <li><strong>Flexibilización de Recepción de Tokens (Events JwtBearer):</strong> Por defecto, el middleware JwtBearer de Microsoft requiere de forma rígida que el token JWT sea enviado con el prefijo `"Bearer "` en la cabecera HTTP. Para flexibilizar el uso de clientes web (como Swagger) o integraciones externas, el evento <code>OnMessageReceived</code> intercepta la cabecera. Si detecta el token pero no tiene el prefijo, extrae el token crudo en texto plano y lo asigna a mano mediante <code>context.Token</code>, permitiendo que la validación criptográfica continúe normalmente.</li>
+                <li><strong>Inicialización y Semilla en el Bootstrap:</strong> Al finalizar la configuración del pipeline HTTP pero antes de iniciar el servidor (<code>app.Run()</code>), el bootstrap abre un scope transitorio de dependencias (<code>app.Services.CreateScope()</code>) para obtener el <code>SGEContext</code> de forma segura y ejecutar <code>EnsureCreated()</code>. Esto garantiza que el archivo de base de datos SQLite con las tablas e inserciones semilla esté listo antes de que la Web API empiece a escuchar peticiones en los puertos de red.</li>
+            </ul>
+        </div>
+
+        <!-- Middleware -->
+        <div class="class-header" id="web-middleware">Middleware: ManejadorGlobalExcepcionesMiddleware.cs</div>
+        <p>
+            Intercepta el pipeline de peticiones de ASP.NET Core capturando excepciones del sistema y devolviendo respuestas uniformes en formato JSON.
+        </p>
+        <pre><code class="language-csharp">public sealed class ManejadorGlobalExcepcionesMiddleware
+{
+    private readonly RequestDelegate _siguiente;
+    private readonly ILogger&lt;ManejadorGlobalExcepcionesMiddleware&gt; _logger;
+
+    public ManejadorGlobalExcepcionesMiddleware(RequestDelegate siguiente, ILogger&lt;ManejadorGlobalExcepcionesMiddleware&gt; logger)
+    {
+        _siguiente = siguiente;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext contexto)
+    {
+        try
+        {
+            await _siguiente(contexto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ocurrió una excepción no controlada al procesar la solicitud.");
+
+            var (codigoEstado, titulo) = MapearExcepcion(ex);
+
+            contexto.Response.StatusCode = codigoEstado;
+            contexto.Response.ContentType = "application/json";
+
+            var respuesta = new ProblemDetails
+            {
+                Status = codigoEstado,
+                Title = titulo,
+                Detail = ex.Message,
+                Instance = contexto.Request.Path
+            };
+
+            await contexto.Response.WriteAsJsonAsync(respuesta);
+        }
+    }
+
+    private static (int CodigoEstado, string Titulo) MapearExcepcion(Exception ex)
+    {
+        return ex switch
+        {
+            AutorizacionException => ((int)HttpStatusCode.Forbidden, "Error de autorización"),
+            UnauthorizedAccessException => ((int)HttpStatusCode.Unauthorized, "No autorizado"),
+            AplicationException when ex.Message.Contains("no existe", StringComparison.OrdinalIgnoreCase) || 
+                                     ex.Message.Contains("no encontrado", StringComparison.OrdinalIgnoreCase)
+                => ((int)HttpStatusCode.NotFound, "Recurso no encontrado"),
+            AplicationException => ((int)HttpStatusCode.BadRequest, "Error de aplicación"),
+            DomainException => ((int)HttpStatusCode.BadRequest, "Error de dominio"),
+            RepositoryException => ((int)HttpStatusCode.NotFound, "Recurso no encontrado"),
+            _ => ((int)HttpStatusCode.InternalServerError, "Error inesperado")
+        };
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Middleware de Manejo Global de Errores):</h5>
+            <ul>
+                <li><strong>Flujo del Pipeline de ASP.NET Core:</strong> Un middleware es un componente de software que se ensambla en el pipeline (tubería) de la aplicación para gestionar solicitudes y respuestas HTTP. Al colocar este middleware al principio del pipeline, envolvemos toda la ejecución de la API en un gran bloque <code>try-catch</code> mediante <code>await _siguiente(contexto)</code>. Si cualquier controlador, caso de uso o entidad arroja un error imprevisto, la petición retrocede hasta este middleware, evitando que el servidor devuelva errores crudos de .NET o pantallas amarillas de error.</li>
+                <li><strong>Mapeo Semántico de Códigos HTTP:</strong> El método <code>MapearExcepcion()</code> traduce las excepciones lógicas y de negocio a códigos de estado HTTP estándar:
+                    <ul>
+                        <li><code>AutorizacionException</code> se traduce al código <code>403 Forbidden</code> (Acceso prohibido).</li>
+                        <li><code>UnauthorizedAccessException</code> se traduce al código <code>401 Unauthorized</code> (No autenticado).</li>
+                        <li>Excepciones de dominio o aplicación (<code>DomainException</code> o <code>AplicationException</code>) se traducen a <code>400 BadRequest</code> (Petición incorrecta).</li>
+                        <li>Excepciones no controladas o genéricas del sistema se traducen a <code>500 InternalServerError</code>, logueando el error con <code>LogError</code> para que el equipo de desarrollo pueda revisarlo.</li>
+                    </ul>
+                </li>
+                <li><strong>Estandarización bajo Problem Details (RFC 7807):</strong> En lugar de retornar un texto simple de error, formatea la respuesta en un JSON estructurado bajo el estándar internacional <strong>RFC 7807 (Problem Details for HTTP APIs)</strong>. Esto proporciona metadatos consistentes sobre el error (como el status, el título descriptivo, el detalle del error y la ruta exacta donde ocurrió) para que los clientes web o frontend los procesen de forma consistente.</li>
+            </ul>
+        </div>
+
+        <!-- Filtro Swagger -->
+        <div class="class-header" id="web-filtro">Swagger Filter: FiltroAutorizacion.cs</div>
+        <p>
+            Añade de forma dinámica los esquemas y candados de seguridad Bearer JWT en Swagger UI para endpoints autenticados.
+        </p>
+        <pre><code class="language-csharp">public sealed class FiltroAutorizacion : IDocumentFilter
+{
+    public void Apply(OpenApiDocument documento, DocumentFilterContext contexto)
+    {
+        foreach (var apiDescription in contexto.ApiDescriptions)
+        {
+            var metadatosDelEndpoint = apiDescription.ActionDescriptor.EndpointMetadata;
+            var tieneAutorizacion = metadatosDelEndpoint.OfType&lt;AuthorizeAttribute&gt;().Any();
+            var permiteAnonimo = metadatosDelEndpoint.OfType&lt;AllowAnonymousAttribute&gt;().Any();
+
+            if (!tieneAutorizacion || permiteAnonimo) continue;
+
+            if (string.IsNullOrWhiteSpace(apiDescription.RelativePath) || string.IsNullOrWhiteSpace(apiDescription.HttpMethod))
+            {
+                continue;
+            }
+
+            var ruta = "/" + apiDescription.RelativePath.Split('?')[0].TrimEnd('/');
+            if (ruta == "//") ruta = "/";
+
+            if (!documento.Paths.TryGetValue(ruta, out var pathItem)) continue;
+
+            if (!pathItem.Operations.TryGetValue(new System.Net.Http.HttpMethod(apiDescription.HttpMethod), out var operation))
+            {
+                continue;
+            }
+
+            operation.Security ??= [];
+
+            var yaMarcado = operation.Security.Any(requisito =>
+                requisito.Keys.OfType&lt;OpenApiSecuritySchemeReference&gt;().Any(referencia =>
+                    string.Equals(referencia.Reference?.Id, "Bearer", StringComparison.Ordinal)));
+
+            if (yaMarcado) continue;
+
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", documento)] = new List&lt;string&gt;()
+            });
+        }
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Metadatos Dinámicos en Swagger UI):</h5>
+            <ul>
+                <li><strong>Extracción en Tiempo de Compilación e Inicialización:</strong> Swagger (OpenAPI) genera la documentación visual interactiva leyendo el código fuente. Sin embargo, no sabe de forma nativa qué controladores o endpoints REST están protegidos por el atributo <code>[Authorize]</code>. Este filtro personalizado (<code>IDocumentFilter</code>) se ejecuta al iniciar la aplicación, recorriendo la colección de descriptores de endpoints (<code>contexto.ApiDescriptions</code>).</li>
+                <li><strong>Inyección Dinámica de Requisitos de Seguridad Bearer:</strong> Si el endpoint posee la directiva de autorización y no permite el acceso anónimo, el filtro localiza su ruta relativa y método HTTP dentro del árbol de OpenAPI (<code>documento.Paths</code>). Si no está marcado como seguro, le inyecta dinámicamente un objeto de tipo <code>OpenApiSecurityRequirement</code> asociado al esquema <code>Bearer</code>. Esto hace que en Swagger UI aparezca el icono del candado en cada endpoint correspondiente, forzando a la interfaz a adjuntar el JWT en las cabeceras HTTP de forma automatizada al testear.</li>
+            </ul>
+        </div>
+
+        <!-- Controlador -->
+        <div class="class-header" id="web-controllers">Controlador: ExpedientesController.cs</div>
+        <p>
+            Mapea las peticiones HTTP y enruta las solicitudes hacia los Casos de Uso del dominio del expediente.
+        </p>
+        <pre><code class="language-csharp">[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class ExpedientesController : ControllerBase
+{
+    private readonly AgregarExpedienteUseCase _agregarExpedienteUseCase;
+    private readonly ListaExpedientesUseCase _listaExpedientesUseCase;
+    private readonly ConsultarExpedienteUseCase _consultarExpedienteUseCase;
+    private readonly ModificarCaratulaUseCase _modificarCaratulaUseCase;
+    private readonly CambiarEstadoExpediente _cambiarEstadoExpediente;
+    private readonly EliminarExpedienteUseCase _eliminarExpedienteUseCase;
+
+    public ExpedientesController(
+        AgregarExpedienteUseCase agregarExpedienteUseCase,
+        ListaExpedientesUseCase listaExpedientesUseCase,
+        ConsultarExpedienteUseCase consultarExpedienteUseCase,
+        ModificarCaratulaUseCase modificarCaratulaUseCase,
+        CambiarEstadoExpediente cambiarEstadoExpediente,
+        EliminarExpedienteUseCase eliminarExpedienteUseCase)
+    {
+        _agregarExpedienteUseCase = agregarExpedienteUseCase;
+        _listaExpedientesUseCase = listaExpedientesUseCase;
+        _consultarExpedienteUseCase = consultarExpedienteUseCase;
+        _modificarCaratulaUseCase = modificarCaratulaUseCase;
+        _cambiarEstadoExpediente = cambiarEstadoExpediente;
+        _eliminarExpedienteUseCase = eliminarExpedienteUseCase;
+    }
+
+    private Guid ObtenerIdUsuarioDelToken()
+    {
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim == null)
+        {
+            throw new UnauthorizedAccessException("No se pudo obtener el ID del usuario del token.");
+        }
+        return Guid.Parse(claim.Value);
+    }
+
+    [HttpPost]
+    public IActionResult Agregar([FromBody] AgregarExpedienteRequest request)
+    {
+        var idUsuario = ObtenerIdUsuarioDelToken();
+        var response = _agregarExpedienteUseCase.Ejecutar(request, idUsuario);
+        return Ok(response);
+    }
+}</code></pre>
+
+        <div class="explanation-block">
+            <h5>Explicación detallada del bloque (Controladores REST y Extracción de Contexto):</h5>
+            <ul>
+                <li><strong>Atributos Declarativos de ASP.NET Core:</strong> El atributo <code>[ApiController]</code> habilita comportamientos específicos de API REST (como validaciones automáticas de modelos de entrada y enrutamiento inteligente). El atributo <code>[Authorize]</code> a nivel de clase actúa como un guardián: garantiza que ningún método (como <code>Agregar()</code>) pueda ser ejecutado a menos que el cliente envíe una cabecera con un token JWT firmado y validado por el middleware de seguridad.</li>
+                <li><strong>Extracción de Identidad del Token JWT (Firma Digital):</strong> El método helper <code>ObtenerIdUsuarioDelToken()</code> lee la propiedad interna <code>User</code> (que representa al Principal de seguridad de la petición actual). Busca el claim <code>ClaimTypes.NameIdentifier</code>, extrae su valor en string y lo parsea a un tipo GUID. Este enfoque es altamente seguro ya que la identidad del usuario proviene del token firmado criptográficamente, impidiendo que un cliente malicioso envíe peticiones suplantando el ID de otro usuario en el cuerpo de la solicitud JSON.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 6: GUÍA DE DEFENSA y PREPARACIÓN DEL EXAMEN -->
+    <section id="sec-defensa" style="margin-top: 40px; border-top: 2px solid var(--border); padding-top: 40px;">
+        <h2 class="section-title">6. Guía de Estudio y Defensa del Proyecto (Preguntas Frecuentes)</h2>
+        <p>
+            Esta sección funciona como una guía rápida para el examen o defensa oral del proyecto. Contiene las preguntas teóricas y técnicas más frecuentes de los evaluadores, junto con sus fundamentos arquitectónicos explicados conceptualmente:
+        </p>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P1: ¿Por qué eligieron una Arquitectura Limpia/Hexagonal y no una tradicional de 3 Capas?</div>
+            <p>
+                <strong>Respuesta:</strong> En una arquitectura tradicional de 3 capas (Presentación -> Negocio -> Acceso a Datos), la lógica de negocio depende directamente de los detalles de infraestructura. Si cambia la base de datos o el ORM, se debe modificar y recompilar todo el sistema.
+            </p>
+            <p>
+                Al utilizar <strong>Arquitectura Limpia</strong>, aplicamos el principio de <em>Inversión de Dependencias (D de SOLID)</em>. El Dominio (las reglas puras del negocio) y la Aplicación (los casos de uso) están en el centro del sistema y no conocen los detalles técnicos externos. Definen interfaces abstractas (puertos como <code>IExpedienteRepository</code>). La capa de Infraestructura implementa estos puertos (adaptadores). Esto provee:
+            </p>
+            <ul>
+                <li><strong>Desacoplamiento total:</strong> Se puede cambiar SQLite por PostgreSQL o SQL Server modificando únicamente los adaptadores de infraestructura, sin alterar el código comercial.</li>
+                <li><strong>Testabilidad independiente:</strong> Permite probar unitariamente la lógica comercial inyectando repositorios simulados (mocks) en memoria, sin necesidad de conectarse a una base de datos física real.</li>
+            </ul>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P2: ¿Cuál es la diferencia conceptual entre una Entidad, un Value Object y un DTO?</div>
+            <p>
+                <strong>Respuesta:</strong> Cada uno posee una responsabilidad única en la arquitectura:
+            </p>
+            <ul>
+                <li><strong>Entidad (ej. <code>Expediente</code>, <code>Usuario</code>):</strong> Posee una identidad única mutable (`Guid Id`) y un ciclo de vida con estados. Dos entidades son idénticas si comparten el mismo identificador único, aunque sus propiedades internas difieran en el tiempo.</li>
+                <li><strong>Value Object (ej. <code>Caratula</code>, <code>Contenido</code>):</strong> Carece de identidad. Se define puramente por el valor de sus propiedades y es inmutable. Si cambia, se crea una nueva instancia completa. La comparación se hace por igualdad estructural de sus campos y no por puntero. Se utiliza para auto-validar lógica comercial primitiva.</li>
+                <li><strong>DTO (Data Transfer Object):</strong> Estructura plana de datos (sin comportamiento) diseñada únicamente para transferir información a través de los límites del sistema (desde el cliente HTTP hacia la API y viceversa). Evita exponer las entidades internas del dominio directo a los clientes externos.</li>
+            </ul>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P3: ¿Cómo funciona el Patrón Unidad de Trabajo (Unit of Work) y cuál es su beneficio?</div>
+            <p>
+                <strong>Respuesta:</strong> El patrón <code>IUnidadDeTrabajo</code> coordina múltiples llamadas a repositorios bajo una única transacción de base de datos lógica. 
+            </p>
+            <p>
+                Si no usáramos Unidad de Trabajo y cada repositorio realizara su propio guardado de cambios a base de datos, un error en la mitad de un caso de uso (como registrar un trámite con éxito pero fallar al actualizar el estado del expediente asociado) dejaría la base de datos en un estado corrupto e inconsistente. Al agruparlas bajo la Unidad de Trabajo, los cambios quedan guardados en el <em>Change Tracker</em> de EF Core y se aplican de manera atómica (todo o nada) en una transacción transaccional.
+            </p>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P4: ¿Por qué implementaron una Autorización basada en Permisos en lugar de Roles?</div>
+            <p>
+                <strong>Respuesta:</strong> La autorización basada en Roles (ej: <code>[Authorize(Roles = "Admin")]</code>) es rígida. Si mañana el negocio requiere un nuevo rol (ej. "OperadorJunior") con un subconjunto de acciones de otro rol, se requeriría modificar el código C# en todos los controladores donde se definieron los accesos.
+            </p>
+            <p>
+                Con la autorización basada en <strong>Permisos granulares</strong> (ej: <code>ExpedienteAlta</code>, <code>TramiteAlta</code>), protegemos cada endpoint individualmente con el permiso correspondiente. Los usuarios tienen asignada una lista de permisos específicos. La creación de nuevos roles o el ajuste de privilegios de un usuario se realiza dinámicamente desde la persistencia o asignándolos en el token JWT, sin requerir cambios ni recompilaciones en el código de la API.
+            </p>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P5: ¿Cómo mantienen la pureza del Dominio si utilizan Entity Framework Core como ORM?</div>
+            <p>
+                <strong>Respuesta:</strong> Para evitar acoplar la capa comercial con infraestructura, las entidades de dominio no utilizan atributos decorativos del ORM (como <code>[Key]</code>, <code>[Table]</code> o <code>[Required]</code>). 
+            </p>
+            <p>
+                Toda la configuración del mapeo de tablas, llaves foráneas y tipos relacionales se realiza en la capa de Infraestructura (dentro de <code>SGEContext.cs</code>) utilizando la <strong>API Fluida</strong> (Fluent API). Asimismo, los Value Objects complejos se mapean a tipos relacionales primitivos mediante conversores de valor (<code>HasConversion</code>). De este modo, el dominio se mantiene como código C# puro (POCO) completamente ajeno a los mecanismos relacionales físicos.
+            </p>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P6: ¿Cómo interactúan el Middleware de Seguridad y el Filtro de Autorización?</div>
+            <p>
+                <strong>Respuesta:</strong> El proceso consta de dos fases secuenciales:
+            </p>
+            <ol>
+                <li><strong>Autenticación (Middleware):</strong> Cuando llega la petición HTTP, el middleware de ASP.NET Core intercepta la cabecera <code>Authorization</code>, valida la firma criptográfica del JWT y mapea los claims de seguridad (como los permisos del usuario) en el principal del contexto (<code>HttpContext.User</code>).</li>
+                <li><strong>Autorización (Filtro):</strong> El filtro <code>FiltroAutorizacion</code> intercepta la llamada justo antes de llegar al controlador, recupera el permiso requerido por la acción del controlador y verifica si el usuario autenticado tiene ese permiso en sus claims. Si no lo tiene, interrumpe el flujo y devuelve un error <code>403 Forbidden</code> sin llegar a procesar el controlador.</li>
+            </ol>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P7: ¿Cómo se configuran los Endpoints en la Web API y cómo se mapean los parámetros (Model Binding)?</div>
+            <p>
+                <strong>Respuesta:</strong> Los endpoints se exponen a través de controladores REST que heredan de <code>ControllerBase</code>. Su configuración y el mapeo de datos se realiza mediante atributos declarativos de ASP.NET Core:
+            </p>
+            <ul>
+                <li><strong><code>[ApiController]</code>:</strong> Activa comportamientos orientados a APIs, como la validación automática del estado del modelo (si el JSON de entrada no cumple con las anotaciones, devuelve un <code>400 Bad Request</code> automáticamente) e infiere el origen de los parámetros.</li>
+                <li><strong><code>[Route("api/[controller]")]</code>:</strong> Define la plantilla de URL base para acceder a los endpoints del controlador (por ejemplo, <code>api/expedientes</code>).</li>
+                <li><strong>Verbos HTTP (<code>[HttpPost]</code>, <code>[HttpGet("{id}")]</code>, etc.):</strong> Determinan el método HTTP requerido para la acción. Al usar llaves en la ruta (como <code>"{id}"</code>), se define una variable de ruta dinámica.</li>
+                <li><strong>Mapeo de Datos (Model Binding):</strong>
+                    <ul>
+                        <li><strong><code>[FromBody]</code>:</strong> Le indica al framework que debe deserializar el cuerpo JSON de la petición HTTP directamente a una clase DTO de entrada (ej: <code>AgregarExpedienteRequest</code>).</li>
+                        <li><strong><code>[FromRoute]</code>:</strong> Indica que el parámetro debe ser extraído del segmento dinámico de la URL (ej: el <code>Guid id</code> en la ruta <code>/api/expedientes/{id}</code>).</li>
+                        <li><strong>Seguridad de Contexto:</strong> La identidad del usuario (su ID de cuenta) nunca se pasa en el JSON del cuerpo por motivos de seguridad; se extrae en el servidor leyendo el claim del token JWT autenticado (<code>User.FindFirst(ClaimTypes.NameIdentifier)</code>).</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="callout callout-design" style="margin-bottom: 25px;">
+            <div class="callout-title">P8: ¿Cómo defender la ubicación de un archivo si sale al azar en una "bolilla" de examen?</div>
+            <p>
+                <strong>Respuesta:</strong> Si el tribunal elige un archivo al azar de la solución, la clave para defenderlo es clasificarlo en su capa correspondiente y explicar su responsabilidad en la arquitectura:
+            </p>
+            <ul>
+                <li><strong>Capa de Dominio (SGE.Dominio) — El Corazón del Negocio:</strong>
+                    <ul>
+                        <li><em>Archivos ejemplo:</em> <code>Expediente.cs</code>, <code>Caratula.cs</code>, <code>EstadoExpediente.cs</code>, <code>DomainException.cs</code>.</li>
+                        <li><em>Defensa:</em> "Este archivo está en el Dominio porque representa las reglas esenciales e invariantes del negocio. Es código C# puro (POCO), no tiene dependencias de bases de datos, APIs ni librerías externas. Si las normas del sistema de gestión de expedientes cambian en la vida real, se modifica en esta capa".</li>
+                    </ul>
+                </li>
+                <li><strong>Capa de Aplicación (SGE.Aplicacion) — Los Orquestadores de Casos de Uso:</strong>
+                    <ul>
+                        <li><em>Archivos ejemplo:</em> <code>AgregarExpedienteUseCase.cs</code>, <code>IExpedienteRepository.cs</code>, <code>AgregarExpedienteRequest.cs</code>.</li>
+                        <li><em>Defensa:</em> "Pertenece a la capa de Aplicación porque coordina el flujo de los datos del sistema. Los archivos UseCase implementan las intenciones del usuario llamando al dominio y persistiendo a través de interfaces. Aquí definimos las interfaces (puertos) porque la Aplicación dicta qué necesita para operar, pero delega el cómo se hace a la infraestructura".</li>
+                    </ul>
+                </li>
+                <li><strong>Capa de Infraestructura (SGE.Infraestructura) — Los Detalles Tecnológicos:</strong>
+                    <ul>
+                        <li><em>Archivos ejemplo:</em> <code>SGEContext.cs</code>, <code>ExpedienteRepository.cs</code>, <code>ProveedorTokenJwt.cs</code>, <code>SGESqlite.cs</code>.</li>
+                        <li><em>Defensa:</em> "Este archivo es de Infraestructura porque contiene la implementación tecnológica concreta (los adaptadores). Aquí nos acoplamos a paquetes externos (como Entity Framework Core para SQLite o JwtBearer para seguridad). Es la capa encargada de interactuar con el disco duro, la base de datos física o los algoritmos de encriptación".</li>
+                    </ul>
+                </li>
+                <li><strong>Capa de Presentación (SGE.WebApi) — El Punto de Entrada Técnico:</strong>
+                    <ul>
+                        <li><em>Archivos ejemplo:</em> <code>ExpedientesController.cs</code>, <code>Program.cs</code>, <code>ManejadorGlobalExcepcionesMiddleware.cs</code>, <code>FiltroAutorizacion.cs</code>.</li>
+                        <li><em>Defensa:</em> "Está en la capa de Presentación porque actúa como el punto de inicio de la aplicación para el cliente externo. Configura el pipeline HTTP de ASP.NET Core, realiza la inyección de dependencias, valida el token JWT de entrada y rutea las peticiones REST hacia la capa de aplicación".</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>
