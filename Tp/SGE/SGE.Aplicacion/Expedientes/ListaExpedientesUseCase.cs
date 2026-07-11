@@ -6,15 +6,15 @@ public class ListaExpedientesUseCase(IExpedienteRepository iExpRepo)
 {
     private readonly IExpedienteRepository _iExpRepo = iExpRepo;
 
-    public List<ConsultarExpedienteResponse> Ejecutar(ListarExpedientesRequest req)
+    public List<ConsultarExpedienteResponseDTO> Ejecutar(ListarExpedientesDTO req)
     {
         var expedientes = _iExpRepo.ObtenerTodos();
 
-        var listaResultados = new List<ConsultarExpedienteResponse>();
+        var listaResultados = new List<ConsultarExpedienteResponseDTO>();
 
         foreach(var exp in expedientes)
         {
-            var dto=new ConsultarExpedienteResponse(exp.Id, exp.Caratula.Valor, exp.Estado.ToString(), exp.FechaCreacion, exp.FechaUltimaModificacion);
+            var dto=new ConsultarExpedienteResponseDTO(exp.Id, exp.Caratula.Valor, exp.Estado.ToString(), exp.FechaCreacion, exp.FechaUltimaModificacion);
 
              listaResultados.Add(dto);
         }

@@ -46,7 +46,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpPost("registrar")]
         [AllowAnonymous]
-        public IActionResult Registrar([FromBody] RegistrarUsuarioRequest request)
+        public IActionResult Registrar([FromBody] RegistrarUsuarioDTO request)
         {
             var response = _registrarUsuarioUseCase.Ejecutar(request);
             return Ok(response);
@@ -54,7 +54,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public IActionResult Login([FromBody] LoginDTO request)
         {
             var response = _loginUseCase.Ejecutar(request);
             return Ok(response);
@@ -62,7 +62,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpPut("modificar")]
         [Authorize]
-        public IActionResult ModificarMisDatos([FromBody] ModificarMisDatosRequest request)
+        public IActionResult ModificarMisDatos([FromBody] ModificarMisDatosDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _modificarMisDatosUseCase.Ejecutar(request, idUsuario);
@@ -71,7 +71,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpPut("permisos")]
         [Authorize]
-        public IActionResult CambiarPermisos([FromBody] CambiarPermisosRequest request)
+        public IActionResult CambiarPermisos([FromBody] CambiarPermisosDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _cambiarPermisosUseCase.Ejecutar(request, idUsuario);
@@ -80,7 +80,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpGet("consultar")]
         [Authorize]
-        public IActionResult Consultar([FromQuery] ConsultarUsuarioRequest request)
+        public IActionResult Consultar([FromQuery] ConsultarUsuarioDTO request)
         {
             var response = _consultarUsuarioUseCase.Ejecutar(request);
             return Ok(response);
@@ -88,7 +88,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpDelete("eliminar")]
         [Authorize]
-        public IActionResult Eliminar([FromBody] EliminarUsuarioRequest request)
+        public IActionResult Eliminar([FromBody] EliminarUsuarioDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _eliminarUsuarioUseCase.Ejecutar(request, idUsuario);

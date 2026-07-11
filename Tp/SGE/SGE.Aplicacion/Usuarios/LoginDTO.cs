@@ -1,3 +1,5 @@
-public record class LoginRequest(string Email, string Contrasena);
+namespace SGE.Aplicacion.Usuarios.DTOs;
 
-public record class LoginResponse(string Token);
+public record class LoginDTO(string Email, string Contrasena);
+
+public record class LoginResponseDTO(string Token);

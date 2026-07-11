@@ -12,7 +12,7 @@ public class ConsultarUsuarioUseCase
         _userRepo = userRepo;
     }
 
-    public ConsultarUsuarioResponse Ejecutar(ConsultarUsuarioRequest req)
+    public ConsultarUsuarioResponseDTO Ejecutar(ConsultarUsuarioDTO req)
     {
         var usuario = _userRepo.ObtenerPorId(req.IdUsuario);
         if (usuario == null)
@@ -20,7 +20,7 @@ public class ConsultarUsuarioUseCase
             throw new AplicationException("El usuario solicitado no existe.");
         }
 
-        return new ConsultarUsuarioResponse(
+        return new ConsultarUsuarioResponseDTO(
             usuario.Id,
             usuario.Nombre,
             usuario.Email,

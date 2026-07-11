@@ -17,6 +17,7 @@ namespace SGE.WebApi.Controllers
         private readonly ModificarCaratulaUseCase _modificarCaratulaUseCase;
         private readonly CambiarEstadoExpediente _cambiarEstadoExpediente;
         private readonly EliminarExpedienteUseCase _eliminarExpedienteUseCase;
+        private readonly ObtenerExpedientePorIdUseCase _obtenerExpedientePorIdUseCase;
 
         public ExpedientesController(
             AgregarExpedienteUseCase agregarExpedienteUseCase,
@@ -24,7 +25,8 @@ namespace SGE.WebApi.Controllers
             ConsultarExpedienteUseCase consultarExpedienteUseCase,
             ModificarCaratulaUseCase modificarCaratulaUseCase,
             CambiarEstadoExpediente cambiarEstadoExpediente,
-            EliminarExpedienteUseCase eliminarExpedienteUseCase)
+            EliminarExpedienteUseCase eliminarExpedienteUseCase,
+            ObtenerExpedientePorIdUseCase obtenerExpedientePorIdUseCase)
         {
             _agregarExpedienteUseCase = agregarExpedienteUseCase;
             _listaExpedientesUseCase = listaExpedientesUseCase;
@@ -32,6 +34,7 @@ namespace SGE.WebApi.Controllers
             _modificarCaratulaUseCase = modificarCaratulaUseCase;
             _cambiarEstadoExpediente = cambiarEstadoExpediente;
             _eliminarExpedienteUseCase = eliminarExpedienteUseCase;
+            _obtenerExpedientePorIdUseCase = obtenerExpedientePorIdUseCase;
         }
 
         private Guid ObtenerIdUsuarioDelToken()
@@ -45,7 +48,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Agregar([FromBody] AgregarExpedienteRequest request)
+        public IActionResult Agregar([FromBody] AgregarExpedienteDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _agregarExpedienteUseCase.Ejecutar(request, idUsuario);
@@ -54,7 +57,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Listar([FromQuery] ListarExpedientesRequest request)
+        public IActionResult Listar([FromQuery] ListarExpedientesDTO request)
         {
             var response = _listaExpedientesUseCase.Ejecutar(request);
             return Ok(response);
@@ -62,14 +65,22 @@ namespace SGE.WebApi.Controllers
 
         [HttpGet("consultar")]
         [AllowAnonymous]
-        public IActionResult Consultar([FromQuery] ConsultarExpedienteRequest request)
+        public IActionResult Consultar([FromQuery] ConsultarExpedienteDTO request)
         {
             var response = _consultarExpedienteUseCase.Ejecutar(request);
             return Ok(response);
         }
 
+        [HttpGet("{id:guid}")]
+        [AllowAnonymous]
+        public IActionResult ObtenerPorId([FromRoute] Guid id)
+        {
+            var response = _obtenerExpedientePorIdUseCase.Ejecutar(new ObtenerExpedientePorIdDTO(id));
+            return Ok(response);
+        }
+
         [HttpPut("caratula")]
-        public IActionResult ModificarCaratula([FromBody] ModificarCaratulaRequest request)
+        public IActionResult ModificarCaratula([FromBody] ModificarCaratulaDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _modificarCaratulaUseCase.Ejecutar(request, idUsuario);
@@ -77,7 +88,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpPut("estado")]
-        public IActionResult CambiarEstado([FromBody] CambiarEstadoExpRequest request)
+        public IActionResult CambiarEstado([FromBody] CambiarEstadoExpDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _cambiarEstadoExpediente.Ejecutar(request, idUsuario);
@@ -85,7 +96,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Eliminar([FromBody] EliminarExpedienteRequest request)
+        public IActionResult Eliminar([FromBody] EliminarExpedienteDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _eliminarExpedienteUseCase.Ejecutar(request, idUsuario);

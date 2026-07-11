@@ -17,7 +17,7 @@ public class CambiarPermisosUseCase
         _autorizacion = autorizacion;
     }
 
-    public CambiarPermisosResponse Ejecutar(CambiarPermisosRequest req, Guid idUsuarioSolicitante)
+    public CambiarPermisosResponseDTO Ejecutar(CambiarPermisosDTO req, Guid idUsuarioSolicitante)
     {
         // Verificar que el solicitante sea admin
         var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);
@@ -53,6 +53,6 @@ public class CambiarPermisosUseCase
         _userRepo.Modificar(usuarioObjetivo);
         _uow.Guardar();
 
-        return new CambiarPermisosResponse(usuarioObjetivo.Id, usuarioObjetivo.Nombre, usuarioObjetivo.Permisos);
+        return new CambiarPermisosResponseDTO(usuarioObjetivo.Id, usuarioObjetivo.Nombre, usuarioObjetivo.Permisos);
     }
 }

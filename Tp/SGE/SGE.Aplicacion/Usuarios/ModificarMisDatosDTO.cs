@@ -1,14 +1,15 @@
 using SGE.Dominio.Usuarios;
 
-namespace SGE.Aplicacion.Usuarios;
-public record class ModificarMisDatosRequest
+namespace SGE.Aplicacion.Usuarios.DTOs;
+
+public record class ModificarMisDatosDTO
 (
     string? NuevoNombre,
     string? NuevoEmail,
     string? NuevaClave
 );
 
-public record class ModificarMisDatosResponse
+public record class ModificarMisDatosResponseDTO
 (
     Guid id,
     string NuevoNombre,

@@ -2,6 +2,7 @@ using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Usuarios;
+using SGE.Aplicacion.Usuarios.DTOs;
 using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Usuarios.UseCases;
@@ -17,7 +18,7 @@ public class ModificarMisDatosUseCase
         _uow = uow;
     }
 
-    public ModificarMisDatosResponse Ejecutar(ModificarMisDatosRequest req, Guid id)
+    public ModificarMisDatosResponseDTO Ejecutar(ModificarMisDatosDTO req, Guid id)
     {
         Usuario? user = _repo.ObtenerPorId(id);
        
@@ -44,6 +45,6 @@ public class ModificarMisDatosUseCase
         _repo.Modificar(user);
         _uow.Guardar();
 
-        return new ModificarMisDatosResponse(user.Id, user.Nombre, user.Email);
+        return new ModificarMisDatosResponseDTO(user.Id, user.Nombre, user.Email);
     }
 }

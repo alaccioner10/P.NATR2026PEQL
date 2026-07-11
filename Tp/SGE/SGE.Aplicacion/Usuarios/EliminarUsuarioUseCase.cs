@@ -15,7 +15,7 @@ public class EliminarUsuarioUseCase
         _userRepo = userRepo;
     }
 
-    public EliminarUsuarioResponse Ejecutar(EliminarUsuarioRequest req, Guid idUsuarioSolicitante)
+    public EliminarUsuarioResponseDTO Ejecutar(EliminarUsuarioDTO req, Guid idUsuarioSolicitante)
     {
         // Verificar que el solicitante sea admin
         var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);
@@ -38,6 +38,6 @@ public class EliminarUsuarioUseCase
         _userRepo.Eliminar(req.IdUsuario);
         _uow.Guardar();
 
-        return new EliminarUsuarioResponse(req.IdUsuario, "Usuario eliminado con éxito.");
+        return new EliminarUsuarioResponseDTO(req.IdUsuario, "Usuario eliminado con éxito.");
     }
 }

@@ -7,7 +7,7 @@ public class ConsultarTramiteUseCase(ITramiteRepository tramiteRepo)
 {
     private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
 
-    public ConsultarTramiteResponse Ejecutar(ConsultarTramiteRequest req)
+    public ConsultarTramiteResponseDTO Ejecutar(ConsultarTramiteDTO req)
     {
         if (req == null)
         {
@@ -20,7 +20,7 @@ public class ConsultarTramiteUseCase(ITramiteRepository tramiteRepo)
             throw new AplicationException("El trámite solicitado no existe");
         }
 
-        return new ConsultarTramiteResponse(
+        return new ConsultarTramiteResponseDTO(
             tramite.Id,
             tramite.ExpedienteId,
             tramite.Etiqueta,

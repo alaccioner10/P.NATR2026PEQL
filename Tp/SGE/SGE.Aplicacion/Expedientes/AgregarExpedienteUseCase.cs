@@ -18,7 +18,7 @@ public class AgregarExpedienteUseCase
         _autorizacion = autorizacion;
     }
 
-    public AgregarExpedienteResponse Ejecutar(AgregarExpedienteRequest req, Guid idUsuario)
+    public AgregarExpedienteResponseDTO Ejecutar(AgregarExpedienteDTO req, Guid idUsuario)
     {
         if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteAlta))
         {
@@ -30,7 +30,7 @@ public class AgregarExpedienteUseCase
         _iExpRepo.Agregar(exp);
         _uow.Guardar();
 
-        return new AgregarExpedienteResponse(
+        return new AgregarExpedienteResponseDTO(
             exp.Id,
             exp.Estado,
             exp.Caratula.Valor,

@@ -1,11 +1,11 @@
 namespace SGE.Aplicacion.Tramites.DTOs;
 
-public record ModificarTramiteRequest(
+public record ModificarTramiteDTO(
     Guid TramiteId, 
     string NuevoContenido
 );
 
-public record ModificarTramiteResponse(
+public record ModificarTramiteResponseDTO(
     Guid Id, 
     string ContenidoActualizado, 
     Guid UsuarioModificador,

@@ -42,7 +42,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Agregar([FromBody] AgregarTramiteRequest request)
+        public IActionResult Agregar([FromBody] AgregarTramiteDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _agregarTramiteUseCase.Ejecutar(request, idUsuario);
@@ -50,7 +50,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult Modificar([FromBody] ModificarTramiteRequest request)
+        public IActionResult Modificar([FromBody] ModificarTramiteDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _modificarTramiteUseCase.Ejecutar(request, idUsuario);
@@ -58,7 +58,7 @@ namespace SGE.WebApi.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Eliminar([FromBody] EliminarTramiteRequest request)
+        public IActionResult Eliminar([FromBody] EliminarTramiteDTO request)
         {
             var idUsuario = ObtenerIdUsuarioDelToken();
             var response = _eliminarTramiteUseCase.Ejecutar(request, idUsuario);
@@ -67,7 +67,7 @@ namespace SGE.WebApi.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Listar([FromQuery] ListaTramitesPorExpedienteRequest request)
+        public IActionResult Listar([FromQuery] ListarTramitesPorExpedienteDTO request)
         {
             var response = _listarTramitesUseCase.Ejecutar(request);
             return Ok(response);
@@ -77,7 +77,7 @@ namespace SGE.WebApi.Controllers
         [AllowAnonymous]
         public IActionResult Consultar([FromRoute] Guid id)
         {
-            var response = _consultarTramiteUseCase.Ejecutar(new ConsultarTramiteRequest(id));
+            var response = _consultarTramiteUseCase.Ejecutar(new ConsultarTramiteDTO(id));
             return Ok(response);
         }
     }

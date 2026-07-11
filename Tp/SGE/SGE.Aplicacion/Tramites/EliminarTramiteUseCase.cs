@@ -21,7 +21,7 @@ public class EliminarTramiteUseCase
         _actualizador = actualizador;
     }
 
-    public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest req, Guid idUsuario)
+    public EliminarTramiteResponseDTO Ejecutar(EliminarTramiteDTO req, Guid idUsuario)
     {
         
         if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteBaja))
@@ -40,6 +40,6 @@ public class EliminarTramiteUseCase
         _actualizador.Ejecutar(tramite, idUsuario);
         _uow.Guardar();
 
-        return new EliminarTramiteResponse(req.TramiteId, "Trámite eliminado con éxito.");
+        return new EliminarTramiteResponseDTO(req.TramiteId, "Trámite eliminado con éxito.");
     }
 }

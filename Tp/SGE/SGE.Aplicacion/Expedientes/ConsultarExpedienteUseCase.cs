@@ -8,7 +8,7 @@ public class ConsultarExpedienteUseCase(IExpedienteRepository iExpRepo)
 {
     private readonly IExpedienteRepository _iExpRepo = iExpRepo;
 
-    public ConsultarExpedienteResponse Ejecutar (ConsultarExpedienteRequest req)
+    public ConsultarExpedienteResponseDTO Ejecutar (ConsultarExpedienteDTO req)
     {
 
         if (req == null)
@@ -23,7 +23,7 @@ public class ConsultarExpedienteUseCase(IExpedienteRepository iExpRepo)
             throw new AplicationException("El expediente solicitado no existe");
         }
 
-        return new ConsultarExpedienteResponse(exp.Id,
+        return new ConsultarExpedienteResponseDTO(exp.Id,
             exp.Caratula.Valor,     
             exp.Estado.ToString(),  
             exp.FechaCreacion,

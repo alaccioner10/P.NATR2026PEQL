@@ -7,7 +7,7 @@ public class ListarTramitesPorExpedienteUseCase(ITramiteRepository tramiteRepo)
 {
     private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
 
-    public List<ListarTramitesPorExpedienteResponse> Ejecutar(ListaTramitesPorExpedienteRequest req)
+    public List<ListarTramitesPorExpedienteResponseDTO> Ejecutar(ListarTramitesPorExpedienteDTO req)
     {
         if (req == null)
         {
@@ -16,11 +16,11 @@ public class ListarTramitesPorExpedienteUseCase(ITramiteRepository tramiteRepo)
 
         var tramites= _tramiteRepo.ObtenerPorExpedienteId(req.ExpedienteID);
 
-        var listaResultados = new List<ListarTramitesPorExpedienteResponse>();
+        var listaResultados = new List<ListarTramitesPorExpedienteResponseDTO>();
 
         foreach (var t in tramites)
         {
-            var dto = new ListarTramitesPorExpedienteResponse(t.Id, t.ExpedienteId, t.Etiqueta,t.Contenido.Valor,t.FechaCreacion,t.FechaUltModificacion,t.UsuarioUltCambio);
+            var dto = new ListarTramitesPorExpedienteResponseDTO(t.Id, t.ExpedienteId, t.Etiqueta,t.Contenido.Valor,t.FechaCreacion,t.FechaUltModificacion,t.UsuarioUltCambio);
 
             listaResultados.Add(dto);
         }

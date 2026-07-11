@@ -19,7 +19,7 @@ public class CambiarEstadoExpediente
         _autorizacion = autorizacion;
     }
 
-    public CambiarEstadoExpResponse Ejecutar(CambiarEstadoExpRequest req, Guid idUsuario)
+    public CambiarEstadoExpResponseDTO Ejecutar(CambiarEstadoExpDTO req, Guid idUsuario)
     {
         if (req == null)
         {
@@ -42,6 +42,6 @@ public class CambiarEstadoExpediente
         _iExpRepo.Modificar(exp);
         _uow.Guardar();
 
-        return new CambiarEstadoExpResponse(exp.Id,exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
+        return new CambiarEstadoExpResponseDTO(exp.Id,exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
 }

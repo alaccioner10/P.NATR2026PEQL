@@ -2,9 +2,13 @@ using SGE.Dominio.Tramites;
 
 namespace SGE.Aplicacion.Tramites.DTOs;
 
-public record class ConsultarTramiteRequest(Guid TramiteId);
+public record AgregarTramiteDTO(
+    Guid ExpedienteId, 
+    EtiquetaTramite Etiqueta, 
+    string Contenido
+);
 
-public record class ConsultarTramiteResponse(
+public record AgregarTramiteResponseDTO(
     Guid Id,
     Guid ExpedienteId,
     EtiquetaTramite Etiqueta,

@@ -18,7 +18,7 @@ public class RegistrarUsuarioUseCase
         _userRepo = userRepo;
     }
 
-    public RegistrarUsuarioResponse Ejecutar(RegistrarUsuarioRequest req)
+    public RegistrarUsuarioResponseDTO Ejecutar(RegistrarUsuarioDTO req)
     {
         if (_userRepo.ExistePorEmail(req.Email))
         {
@@ -29,6 +29,6 @@ public class RegistrarUsuarioUseCase
         _userRepo.Agregar(user);
         _uow.Guardar();
 
-        return new RegistrarUsuarioResponse(user.Id,user.Nombre,user.Email,user.EsAdmin,user.Permisos);
+        return new RegistrarUsuarioResponseDTO(user.Id,user.Nombre,user.Email,user.EsAdmin,user.Permisos);
     }
 }

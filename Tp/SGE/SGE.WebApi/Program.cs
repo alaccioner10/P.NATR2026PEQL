@@ -49,6 +49,7 @@ builder.Services.AddScoped<ListaExpedientesUseCase>();
 builder.Services.AddScoped<ModificarCaratulaUseCase>();
 builder.Services.AddScoped<CambiarEstadoExpediente>();
 builder.Services.AddScoped<EliminarExpedienteUseCase>();
+builder.Services.AddScoped<ObtenerExpedientePorIdUseCase>();
 
 builder.Services.AddScoped<ITramiteRepository, TramiteRepository>();
 builder.Services.AddScoped<AgregarTramiteUseCase>();

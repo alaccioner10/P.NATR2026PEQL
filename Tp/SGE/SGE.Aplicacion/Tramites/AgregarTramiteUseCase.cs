@@ -21,7 +21,7 @@ public class AgregarTramiteUseCase
         _autorizacion = autorizacion;
     }
 
-    public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest req, Guid idUsuario)
+    public AgregarTramiteResponseDTO Ejecutar(AgregarTramiteDTO req, Guid idUsuario)
     {
         if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteAlta))
         {
@@ -42,7 +42,7 @@ public class AgregarTramiteUseCase
         _actualizador.Ejecutar(tramite, idUsuario);
         _uow.Guardar();
 
-        return new AgregarTramiteResponse(
+        return new AgregarTramiteResponseDTO(
             tramite.Id,
             tramite.ExpedienteId,
             tramite.Etiqueta,

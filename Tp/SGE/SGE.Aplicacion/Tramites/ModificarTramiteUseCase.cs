@@ -21,7 +21,7 @@ public class ModificarTramiteUseCase
         _autorizacion = autorizacion;
     }
 
-    public ModificarTramiteResponse Ejecutar(ModificarTramiteRequest req, Guid idUsuario)
+    public ModificarTramiteResponseDTO Ejecutar(ModificarTramiteDTO req, Guid idUsuario)
     {
         if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteModificacion))
         {
@@ -42,7 +42,7 @@ public class ModificarTramiteUseCase
 
         _uow.Guardar();
 
-        return new ModificarTramiteResponse(
+        return new ModificarTramiteResponseDTO(
             tramite.Id, 
             tramite.Contenido.Valor, 
             tramite.UsuarioUltCambio,

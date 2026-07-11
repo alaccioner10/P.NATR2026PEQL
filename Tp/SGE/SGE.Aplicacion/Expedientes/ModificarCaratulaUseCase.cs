@@ -19,7 +19,7 @@ public class ModificarCaratulaUseCase
         _autorizacion = autorizacion;
     }
 
-    public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest req, Guid idUsuario)
+    public ModificarCaratulaResponseDTO Ejecutar(ModificarCaratulaDTO req, Guid idUsuario)
     {
        
         if (req == null)
@@ -46,6 +46,6 @@ public class ModificarCaratulaUseCase
 
         _uow.Guardar();
 
-        return new ModificarCaratulaResponse(exp.Id, req.NuevaCaratula, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
+        return new ModificarCaratulaResponseDTO(exp.Id, req.NuevaCaratula, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
 }

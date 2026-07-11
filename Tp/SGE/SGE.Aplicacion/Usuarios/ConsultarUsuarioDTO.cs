@@ -2,9 +2,9 @@ using SGE.Aplicacion.Autorizacion;
 
 namespace SGE.Aplicacion.Usuarios.DTOs;
 
-public record ConsultarUsuarioRequest(Guid IdUsuario);
+public record class ConsultarUsuarioDTO(Guid IdUsuario);
 
-public record ConsultarUsuarioResponse(
+public record class ConsultarUsuarioResponseDTO(
     Guid Id,
     string Nombre,
     string Email,

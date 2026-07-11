@@ -3,13 +3,13 @@ using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Usuarios.DTOs;
 
-public record RegistrarUsuarioRequest( 
+public record RegistrarUsuarioDTO( 
     string Email,
     string Nombre,
     string Contrasena
 );
 
-public record RegistrarUsuarioResponse(
+public record RegistrarUsuarioResponseDTO(
     Guid Id,
     string Nombre,
     string Email,

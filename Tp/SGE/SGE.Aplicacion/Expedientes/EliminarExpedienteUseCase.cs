@@ -22,7 +22,7 @@ public class EliminarExpedienteUseCase
         _autorizacion = autorizacion;
     }
 
-    public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest req, Guid idUsuario)
+    public EliminarExpedienteResponseDTO Ejecutar(EliminarExpedienteDTO req, Guid idUsuario)
     {
 
         if(req == null)
@@ -50,6 +50,6 @@ public class EliminarExpedienteUseCase
         _iExpRepo.Eliminar(req.ExpedienteId);
         _uow.Guardar();
 
-        return new EliminarExpedienteResponse(req.ExpedienteId);
+        return new EliminarExpedienteResponseDTO(req.ExpedienteId);
     }
 }

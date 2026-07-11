@@ -1,9 +1,8 @@
-
 namespace SGE.Aplicacion.Expedientes.DTOs;
 
-public record class ConsultarExpedienteRequest(Guid ExpedienteId);
+public record class ConsultarExpedienteDTO(Guid ExpedienteId);
 
-public record class ConsultarExpedienteResponse(
+public record class ConsultarExpedienteResponseDTO(
     Guid Id, 
     string Caratula, 
     string Estado, 

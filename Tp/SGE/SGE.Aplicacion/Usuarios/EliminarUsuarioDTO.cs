@@ -1,5 +1,5 @@
 namespace SGE.Aplicacion.Usuarios.DTOs;
 
-public record EliminarUsuarioRequest(Guid IdUsuario);
+public record EliminarUsuarioDTO(Guid IdUsuario);
 
-public record EliminarUsuarioResponse(Guid Id, string Mensaje);
+public record EliminarUsuarioResponseDTO(Guid Id, string Mensaje);
