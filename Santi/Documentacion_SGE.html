@@ -432,8 +432,8 @@
 
     <!-- PORTADA -->
     <div class="cover">
-        <h1>MANUAL TÉCNICO EXHAUSTIVO Y GUÍA COMPLETA DE CLASES</h1>
-        <h2>Documentación Detallada de cada Clase, Flujo y Decisión de Diseño del SGE</h2>
+        <h1>GUÍA DE ESTUDIO TÉCNICA Y EXPLICACIÓN COMPLETA DEL SGE</h1>
+        <h2>Documentación Detallada de cada Clase, Flujo, Decisión de Diseño y Relación entre Capas</h2>
         <div style="flex-grow: 1;"></div>
         <div class="meta-info">
             <p><strong>Proyecto:</strong> Sistema de Gestión de Expedientes (SGE)</p>
@@ -446,11 +446,191 @@
         </div>
     </div>
 
+    <!-- ÍNDICE SUPERIOR DE NAVEGACIÓN -->
+    <div class="index-card" id="sec-indice-superior">
+        <h3>Índice Rápido de Estudio</h3>
+        <p>
+            Este índice sirve para ir directo a la parte del documento que más ayuda a estudiar o defender el proyecto según la consigna del grupo.
+        </p>
+        <div class="index-grid">
+            <div class="index-column">
+                <h4>Lectura general</h4>
+                <ul>
+                    <li><a href="#sec-como-leer">Cómo estudiar el proyecto</a></li>
+                    <li><a href="#sec-indice-archivos">Mapa de archivos por capas</a></li>
+                    <li><a href="#sec-flujo">Flujo general de ejecución</a></li>
+                </ul>
+            </div>
+            <div class="index-column">
+                <h4>Capas principales</h4>
+                <ul>
+                    <li><a href="#sec-dominio">Capa de Dominio</a></li>
+                    <li><a href="#sec-aplicacion">Capa de Aplicación</a></li>
+                    <li><a href="#sec-infraestructura">Capa de Infraestructura</a></li>
+                    <li><a href="#sec-presentation">Capa de Presentación</a></li>
+                </ul>
+            </div>
+            <div class="index-column">
+                <h4>Apoyo para examen</h4>
+                <ul>
+                    <li><a href="#sec-estudio-alternativa">Versión alternativa de estudio</a></li>
+                    <li><a href="#sec-api">Guía técnica de la API</a></li>
+                    <li><a href="#sec-partes-clave">Partes fundamentales del proyecto</a></li>
+                    <li><a href="#sec-defensa">Preguntas frecuentes y defensa</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 0: CÓMO LEER ESTA GUÍA -->
+    <section id="sec-como-leer">
+        <h2 class="section-title">0. Cómo Estudiar el Proyecto y Entender la Ingeniería del Trabajo</h2>
+        <p>
+            Este documento no está pensado como manual para un usuario final. La idea es que les sirva al grupo para repasar qué hace cada archivo, por qué existe, cómo se conecta con el resto y qué decisión de diseño lo justifica, aunque el código haya sido escrito por personas distintas.
+        </p>
+
+        <div class="callout callout-design">
+            <div class="callout-title">Idea central para estudiar el proyecto</div>
+            <p>
+                Si quieren ubicar rápido cualquier clase, conviene preguntarse primero <strong>qué problema resuelve</strong> y después <strong>dónde vive</strong>. En este proyecto la lógica se divide en capas: la <strong>Presentación</strong> recibe pedidos HTTP, la <strong>Aplicación</strong> coordina acciones, el <strong>Dominio</strong> guarda las reglas del negocio y la <strong>Infraestructura</strong> resuelve persistencia, seguridad y detalles técnicos.
+            </p>
+            <p>
+                Esa separación no es decorativa: permite que cada integrante trabaje sobre una parte concreta del sistema sin romper el resto. Y también ayuda mucho en la defensa, porque cada archivo tiene una razón de ser clara dentro de la arquitectura.
+            </p>
+        </div>
+
+        <h3 class="subsection-title">0.1 Cómo identificar la responsabilidad de cada archivo</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Si ves esto...</th>
+                    <th>Normalmente significa...</th>
+                    <th>Cómo explicarlo en una defensa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Controller, Route, HttpPost, HttpGet</td>
+                    <td>Capa de Presentación</td>
+                    <td>Expone endpoints, recibe el JSON y delega el trabajo a la aplicación</td>
+                </tr>
+                <tr>
+                    <td>UseCase, Request, Response, DTO</td>
+                    <td>Capa de Aplicación</td>
+                    <td>Orquesta el flujo, valida permisos y coordina repositorios y dominio</td>
+                </tr>
+                <tr>
+                    <td>Entidad, Value Object, Enum, DomainException</td>
+                    <td>Capa de Dominio</td>
+                    <td>Contiene las reglas y validaciones del negocio sin depender de tecnología externa</td>
+                </tr>
+                <tr>
+                    <td>Repository, DbContext, UnitOfWork, JWT, Middleware</td>
+                    <td>Capa de Infraestructura</td>
+                    <td>Implementa la persistencia, autenticación y los detalles técnicos del sistema</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subsection-title">0.2 Flujo mental para seguir cualquier caso de uso</h3>
+        <ol>
+            <li>El cliente llama un endpoint de la Web API.</li>
+            <li>El controlador recibe el DTO y, si hace falta, toma el usuario autenticado del token.</li>
+            <li>El caso de uso chequea permisos y convierte lo que llega en objetos de dominio.</li>
+            <li>El dominio valida las reglas que no se pueden romper.</li>
+            <li>La infraestructura guarda los cambios y se encarga de SQLite.</li>
+            <li>El caso de uso arma la respuesta y el controlador devuelve HTTP.</li>
+        </ol>
+
+        <p>
+            Si entienden ese recorrido, el resto del código deja de verse como archivos sueltos y pasa a leerse como una cadena de responsabilidades que encaja. Esa cadena es útil para estudiar porque permite seguir el camino de un dato desde que entra al sistema hasta que termina guardado o devuelto al cliente.
+        </p>
+
+        <h3 class="subsection-title">0.3 Qué hace cada módulo y por qué está separado</h3>
+        <p>
+            En esta parte conviene mirar el proyecto como si cada módulo fuera una pieza distinta de un mismo mecanismo. Algunos se ocupan de las reglas, otros de la coordinación y otros de la tecnología. Esa separación evita mezclar todo en un único archivo y hace que el trabajo se pueda repartir y entender mejor.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Módulo</th>
+                    <th>Qué hace</th>
+                    <th>Por qué está en su propia capa o carpeta</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SGE.Dominio</td>
+                    <td>Modela el negocio puro: expedientes, trámites, usuarios, permisos, estados y reglas de validación. Acá están las decisiones que no deberían cambiar aunque cambie la base de datos o la interfaz.</td>
+                    <td>Se aísla para que las reglas del negocio no dependan de SQLite, JWT ni de la Web API. Si mañana cambia la tecnología, el dominio debería seguir igual.</td>
+                </tr>
+                <tr>
+                    <td>SGE.Aplicacion - General</td>
+                    <td>Contiene interfaces y servicios transversales como autorización, unidad de trabajo y manejo de excepciones de aplicación. Es el soporte que usan varios módulos sin repetir código.</td>
+                    <td>Separa las necesidades comunes del negocio para que los casos de uso no repitan lógica técnica y para que las dependencias queden ordenadas.</td>
+                </tr>
+                <tr>
+                    <td>SGE.Aplicacion - Expedientes</td>
+                    <td>Coordina altas, consultas, modificaciones, cambios de estado y eliminaciones de expedientes. Acá se ve el ciclo de vida completo del expediente desde que nace hasta que cambia de estado o se elimina.</td>
+                    <td>Agrupa todo lo relacionado con el expediente para que el flujo sea fácil de seguir y para que no quede repartido entre varias carpetas.</td>
+                </tr>
+                <tr>
+                    <td>SGE.Aplicacion - Trámites</td>
+                    <td>Orquesta la creación, edición, consulta, listado y baja de trámites asociados a un expediente. También conecta el alta del trámite con el cambio de estado del expediente cuando corresponde.</td>
+                    <td>Se separa porque el trámite no se maneja igual que un expediente y tiene sus propias reglas, etiquetas y efectos sobre el agregado principal.</td>
+                </tr>
+                <tr>
+                    <td>SGE.Aplicacion - Usuarios</td>
+                    <td>Gestiona registro, login, modificación de datos, permisos y consulta/eliminación de usuarios. Es uno de los módulos más sensibles porque de acá depende quién puede hacer qué dentro del sistema.</td>
+                    <td>Se aísla porque la seguridad y la identidad del usuario afectan a toda la aplicación y conviene tenerlo claramente separado del resto del negocio.</td>
+                </tr>
+                <tr>
+                    <td>SGE.Infraestructura</td>
+                    <td>Implementa la persistencia en SQLite, los repositorios, la autenticación JWT y la coordinación física de datos. También traduce las entidades del dominio a estructuras guardables en base.</td>
+                    <td>Porque son detalles técnicos que pueden cambiar sin alterar el corazón del negocio. Así el dominio y la aplicación no quedan atados a una tecnología específica.</td>
+                </tr>
+                <tr>
+                    <td>SGE.WebApi</td>
+                    <td>Expone los controladores HTTP, configura Swagger, el middleware, la autenticación y el arranque de la aplicación. Es la cara pública del sistema y el punto por donde entra todo lo externo.</td>
+                    <td>Es la frontera de entrada del sistema; traduce las peticiones externas al lenguaje de la aplicación y decide cómo presentar la respuesta.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- VERSIÓN ALTERNATIVA DE ESTUDIO -->
+    <section id="sec-estudio-alternativa">
+        <h2 class="section-title">0.Alt. Resumen Alternativo para Estudiar en Grupo</h2>
+        <p>
+            Esta versión complementaria está pensada para repasar rápido. No reemplaza la explicación completa: sólo la ordena como si tuvieran que identificar enseguida qué hace cada parte del código.
+        </p>
+
+        <div class="callout callout-design">
+            <div class="callout-title">Cómo pensar el sistema en una frase</div>
+            <p>
+                El SGE recibe pedidos desde la Web API, los transforma en casos de uso, valida las reglas de negocio en el Dominio, resuelve la persistencia en Infraestructura y devuelve una respuesta al cliente.
+            </p>
+        </div>
+
+        <h3 class="subsection-title">Lectura corta por módulo</h3>
+        <ul>
+            <li><strong>SGE.WebApi:</strong> existe para recibir HTTP, autenticar, autorizar y derivar. Es la capa que traduce la intención externa al lenguaje interno del sistema.</li>
+            <li><strong>SGE.Aplicacion:</strong> existe para coordinar el trabajo del sistema y decidir en qué orden se ejecutan las cosas. Acá se ve el paso lógico que sigue cada operación.</li>
+            <li><strong>SGE.Dominio:</strong> existe para guardar las reglas reales del negocio y evitar estados inválidos. Es el lugar donde se protege la lógica más importante.</li>
+            <li><strong>SGE.Infraestructura:</strong> existe para guardar datos, validar tokens, conectarse a SQLite y materializar repositorios. Es la parte técnica que sostiene todo lo demás.</li>
+        </ul>
+
+        <h3 class="subsection-title">Cómo defenderlo oralmente</h3>
+            <p>
+                Si les preguntan por cualquier archivo, conviene responder en este orden: qué problema resuelve, qué capa ocupa, qué dependencia tiene y por qué no está mezclado con otra responsabilidad. Esa es la forma más segura de mostrar que se entendió la ingeniería del trabajo y no sólo los nombres de las clases.
+            </p>
+    </section>
+
     <!-- SECCIÓN 0: INDICE DE ARCHIVOS COMPLETO -->
     <div class="index-card" id="sec-indice-archivos">
         <h3>Estructura Completa de Archivos del Sistema</h3>
         <p>
-            Para garantizar que ningún componente quede fuera, a continuación se desglosa el inventario total de los archivos del proyecto SGE por capas.
+            Para garantizar que ningún componente quede fuera, a continuación se desglosa el inventario total de los archivos del proyecto SGE por capas. Esta lista sirve como mapa para estudiar el código en grupo y relacionar cada archivo con su función real dentro de la arquitectura.
         </p>
         <div class="index-grid">
             <div class="index-column">
@@ -1102,6 +1282,20 @@ public class Expediente
                 <li><strong>Materialización de Entidades y el Constructor Privado sin Parámetros:</strong> Entity Framework Core (EF Core) necesita instanciar (hidratar) las entidades al recuperarlas desde la base de datos SQLite. Para ello, requiere un constructor sin parámetros. Al definir <code>private Expediente()</code> con el operador de perdón de nulos <code>null!</code> para la <code>Caratula</code>, permitimos que EF Core cree el objeto de forma técnica y transparente en segundo plano. Dado que es un constructor privado, ningún programador externo puede utilizarlo, protegiendo al objeto de ser instanciado de forma incorrecta o sin datos en otras capas.</li>
                 <li><strong>Factoría Técnica (Factory Method) <code>Reconstruir</code>:</strong> Durante la creación inicial de un expediente, el constructor público asigna un nuevo identificador (<code>Guid.NewGuid()</code>), marca las fechas actuales (<code>DateTime.Now</code>) y define el estado inicial como <code>RecienIniciado</code>. Sin embargo, al recuperar un expediente existente de la base de datos, no queremos asignarle valores nuevos ni mutar su historial de auditoría. El método estático <code>Reconstruir</code> actúa como una factoría técnica dedicada a inicializar un expediente con sus datos históricos reales provenientes de la base de datos sin disparar las reglas y firmas automáticas que se ejecutan durante una creación desde cero.</li>
                 <li><strong>Encapsulación de la Máquina de Estados Lógicos:</strong> El estado de un expediente administrativo no es una variable arbitraria que pueda cambiarse libremente. El método sobrecargado <code>ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)</code> implementa una máquina de estados determinista. Evalúa la etiqueta del último trámite ingresado y realiza la transición adecuada: por ejemplo, ante un trámite de tipo <code>PaseAlArchivo</code>, el estado se actualiza irreversiblemente a <code>Finalizado</code>. Al final de la transición, registra los datos de auditoría (<code>UsuarioUltimoCambio</code> y <code>FechaUltimaModificacion</code>) e informa mediante un valor booleano si la transición de estado fue efectiva.</li>
+                <li><strong>Qué deja listo para el resto del sistema:</strong> Este bloque muestra que <code>Expediente</code> no sólo guarda datos, sino que también protege el ciclo de vida completo del agregado. Cada cambio queda centralizado acá, por eso los casos de uso no modifican campos sueltos: llaman a métodos de la entidad y luego persisten el resultado.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>public Guid Id { get; private set; }</code> y el resto de las propiedades:</strong> guardan el estado del expediente, pero desde afuera no se pueden cambiar libremente. Eso obliga a usar los métodos de negocio.</li>
+                <li><strong><code>private Expediente()</code>:</strong> existe para que Entity Framework pueda reconstruir objetos desde SQLite sin ejecutar lógica de creación manual.</li>
+                <li><strong><code>public Expediente(Caratula caratula, Guid user)</code>:</strong> crea un expediente nuevo con id, fechas actuales y estado inicial <code>RecienIniciado</code>.</li>
+                <li><strong><code>private Expediente(...)</code>:</strong> concentra la validación de invariantes básicas como el id no vacío y la fecha de modificación válida.</li>
+                <li><strong><code>Reconstruir(...)</code>:</strong> arma otra vez un expediente desde datos ya guardados, sin inventar valores nuevos.</li>
+                <li><strong><code>RegistrarModificacion(Guid idUser)</code>:</strong> centraliza la auditoría para no repetir la actualización de usuario y fecha en cada método.</li>
+                <li><strong><code>ModificarCaratula(...)</code>:</strong> cambia la carátula y luego registra quién hizo la modificación.</li>
+                <li><strong><code>ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)</code>:</strong> traduce la última etiqueta del trámite al estado del expediente y devuelve si el estado cambió.</li>
+                <li><strong><code>ActualizarEstado(EstadoExpediente nuevoEstado, Guid idUser)</code>:</strong> permite forzar un estado concreto cuando el caso de uso ya sabe cuál debe ser el resultado.</li>
             </ul>
         </div>
 
@@ -1134,6 +1328,16 @@ public record class Caratula
                 <li><strong>El concepto de Objeto de Valor (Value Object):</strong> En DDD, no todos los objetos del sistema requieren una identidad única e histórica (como un ID autoincremental). Un <code>Value Object</code> es un objeto que se define únicamente por el conjunto de sus atributos. La <code>Caratula</code> no posee un ciclo de vida independiente ni un identificador único; dos carátulas son idénticas si su texto es el mismo. Al modelarla como un Value Object, simplificamos el modelo mental y evitamos la sobrecarga de generar tablas relacionales adicionales.</li>
                 <li><strong>El tipo <code>record class</code> en C#:</strong> C# provee el tipo <code>record</code> para modelar de forma nativa estructuras de datos inmutables con comparaciones de igualdad basadas en valores en vez de referencias en memoria. Esto significa que si creamos dos objetos de tipo <code>Caratula</code> con el valor `"Expediente de Personal"`, la comparación <code>caratula1 == caratula2</code> evaluará a <code>true</code> de manera automática, sin necesidad de sobrecargar operadores de igualdad complejos.</li>
                 <li><strong>Validación Preventiva en el Constructor:</strong> Un Objeto de Valor no puede entrar en un estado inconsistente. El constructor de <code>Caratula</code> valida preventivamente que el texto provisto no sea nulo ni contenga espacios en blanco mediante <code>string.IsNullOrWhiteSpace()</code>. Si la validación falla, interrumpe el flujo arrojando una <code>DomainException</code> inmediatamente. De este modo, garantizamos que si logramos instanciar una carátula, esta es 100% válida para el sistema. Adicionalmente, aplica un <code>Trim()</code> para normalizar y limpiar el texto de espacios accidentales en los extremos.</li>
+                <li><strong>Para qué se usa en el resto del código:</strong> La carátula entra como texto simple desde la API, pero antes de persistirse se transforma en este Value Object. Eso permite que el sistema detecte errores temprano y que la base de datos reciba un dato normalizado, no una cadena cualquiera.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>public record class Caratula</code>:</strong> declara un value object inmutable, pensado para compararse por valor y no por identidad.</li>
+                <li><strong><code>public string Valor { get; }</code>:</strong> guarda el texto real de la carátula y evita que se cambie después de creada.</li>
+                <li><strong>Constructor <code>Caratula(string valor)</code>:</strong> valida que el texto no venga vacío y, si está bien, lo normaliza con <code>Trim()</code>.</li>
+                <li><strong><code>throw new DomainException(...)</code>:</strong> corta la creación cuando la entrada no cumple la regla de negocio.</li>
+                <li><strong><code>ToString()</code>:</strong> devuelve el texto puro de la carátula para mostrarlo o serializarlo de forma simple.</li>
             </ul>
         </div>
 
@@ -1203,6 +1407,17 @@ public class Tramite
                 <li><strong>Entidad Subordinada en el Agregado:</strong> A diferencia de los objetos de valor inmutables, la clase <code>Tramite</code> representa una Entidad puesto que posee una identidad conceptual única representada por su propiedad <code>Id</code>. Sin embargo, no funciona de manera independiente; pertenece al agregado de <code>Expediente</code> y está enlazado a él a través de la clave foránea <code>ExpedienteId</code>.</li>
                 <li><strong>Encapsulamiento del Ciclo de Vida:</strong> De forma homóloga a <code>Expediente</code>, la clase <code>Tramite</code> define sus setters como privados. La única forma de alterar su contenido es invocando el método explícito de negocio <code>ModificarContenido(Contenido nuevoContenido, Guid usuarioId)</code>, que no solo realiza el cambio de texto sino que de forma atómica y obligatoria actualiza la fecha de modificación y la firma de auditoría del usuario que realizó la acción, evitando inconsistencias u omisiones en el log de auditoría.</li>
                 <li><strong>Constructor Privado y Reconstrucción:</strong> Cuenta con el constructor privado sin parámetros requerido por Entity Framework Core para materializar el trámite desde la base de datos sin ejecutar validaciones de creación, y provee el método estático <code>Reconstruir</code> para restaurar el estado original del trámite guardado en SQLite sin mutar la fecha de creación real.</li>
+                <li><strong>Qué devuelve o deja listo:</strong> El método <code>ModificarContenido()</code> no devuelve un objeto nuevo; deja la misma entidad actualizada con nuevo contenido, nuevo usuario responsable y nueva fecha de modificación. Por eso el caso de uso sólo necesita persistir el cambio después.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>public Guid Id { get; private set; }</code> y propiedades asociadas:</strong> identifican el trámite y guardan su vínculo con el expediente, su etiqueta, su contenido y su auditoría.</li>
+                <li><strong><code>private Tramite()</code>:</strong> permite que EF Core materialice la entidad desde la base sin pasar por la creación manual.</li>
+                <li><strong><code>public Tramite(...)</code>:</strong> crea un trámite nuevo con id propio y fechas de creación/modificación iniciales.</li>
+                <li><strong><code>private Tramite(...)</code>:</strong> valida el id y la coherencia temporal antes de asignar los datos reales.</li>
+                <li><strong><code>Reconstruir(...)</code>:</strong> recupera un trámite guardado en SQLite y lo deja listo sin cambiar su historia.</li>
+                <li><strong><code>ModificarContenido(...)</code>:</strong> reemplaza el contenido, actualiza el usuario responsable y marca la fecha de modificación actual.</li>
             </ul>
         </div>
 
@@ -1234,6 +1449,16 @@ public record class Contenido
             <ul>
                 <li><strong>Inmutabilidad y Consistencia del Historial de Trámites:</strong> Al igual que la carátula, el contenido de un trámite es un Objeto de Valor (Value Object) modelado como un <code>record class</code>. La inmutabilidad garantiza que, una vez emitido un trámite administrativo, su contenido descriptivo no pueda ser alterado de forma accidental sin pasar por las validaciones de negocio correspondientes, preservando la integridad del historial legal del expediente.</li>
                 <li><strong>Garantía de Calidad de Datos (Invariante):</strong> Centraliza la validación en su constructor arrojando de inmediato una excepción si se intenta crear un trámite con contenido nulo o vacío. Esto evita que la base de datos termine contaminada con descripciones administrativas vacías o sin sentido comercial.</li>
+                <li><strong>Relación con el caso de uso:</strong> El contenido llega como string desde la petición HTTP, pero el caso de uso lo convierte en este Value Object antes de crear el trámite. Así se separa el texto recibido del objeto válido que realmente entiende el dominio.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>public record class Contenido</code>:</strong> modela el texto del trámite como un value object, no como una cadena suelta.</li>
+                <li><strong><code>public string Valor { get; }</code>:</strong> conserva el texto interno ya validado y lo deja sólo de lectura.</li>
+                <li><strong>Constructor <code>Contenido(string valor)</code>:</strong> rechaza texto vacío y limpia espacios al inicio o al final.</li>
+                <li><strong><code>throw new DomainException(...)</code>:</strong> detiene la creación cuando el contenido no cumple la regla mínima.</li>
+                <li><strong><code>ToString()</code>:</strong> devuelve el valor textual para mostrarlo o serializarlo con facilidad.</li>
             </ul>
         </div>
 
@@ -1292,6 +1517,18 @@ public class Usuario
                 <li><strong>Seguridad a nivel de Entidad de Dominio:</strong> La clase <code>Usuario</code> encapsula la identidad y los privilegios granulares. Las propiedades críticas como <code>EsAdmin</code> y la colección de <code>Permisos</code> poseen setters privados (<code>private set</code>). Esto impide que las capas externas del sistema modifiquen arbitrariamente los permisos o promuevan una cuenta ordinaria a cuenta de administrador a través de asignaciones directas de propiedades en memoria.</li>
                 <li><strong>Asignación Controlada de Permisos:</strong> Los permisos de un usuario no administrador únicamente se pueden actualizar a través de la llamada al método de negocio <code>CambiarPermisos(IEnumerable&lt;Permiso&gt; nuevosPermisos)</code>. Esto nos permite centralizar reglas (por ejemplo, que los administradores no requieran permisos explícitos ya que los heredan todos por defecto) en el corazón del dominio.</li>
                 <li><strong>Restauración sin Pérdida de Estado:</strong> Provee un factory method <code>Reconstruir</code> para hidratar las cuentas de usuario y sus colecciones de permisos desde la base de datos de manera atómica, manteniendo los hashes de contraseñas correctos y los GUIDs originales de auditoría.</li>
+                <li><strong>Qué representa para la aplicación:</strong> Este objeto concentra identidad, credenciales y permisos en un solo lugar. Gracias a eso, los casos de uso de usuarios sólo tienen que pedirle al dominio que cambie permisos o guardar la entidad; no tienen que reinventar reglas de seguridad.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>public Guid Id { get; private set; }</code>:</strong> identifica al usuario de forma única y no se puede cambiar desde afuera.</li>
+                <li><strong><code>Nombre</code>, <code>Email</code> y <code>ContrasenaHash</code>:</strong> guardan los datos principales de autenticación y perfil.</li>
+                <li><strong><code>EsAdmin</code> y <code>Permisos</code>:</strong> modelan el nivel de acceso del usuario dentro del sistema.</li>
+                <li><strong>Constructor público <code>Usuario(string nombre, string email, string contrasenaHash)</code>:</strong> crea un usuario nuevo de forma estándar y lo deja como no administrador por defecto.</li>
+                <li><strong>Constructor privado:</strong> valida el id y centraliza la asignación de todos los campos reales.</li>
+                <li><strong><code>Reconstruir(...)</code>:</strong> permite hidratar usuarios ya existentes desde la base sin alterar sus datos históricos.</li>
+                <li><strong><code>CambiarPermisos(...)</code>:</strong> reemplaza la colección de permisos del usuario cuando un caso de uso autorizado lo requiere.</li>
             </ul>
         </div>
     </section>
@@ -1368,6 +1605,19 @@ public class Usuario
                 <li><strong>Control Preventivo de Autorización:</strong> Invoca a <code>_autorizacion.PoseeElPermiso()</code> pasando el GUID del usuario y el permiso requerido <code>Permiso.ExpedienteAlta</code> antes de realizar cualquier operación. Si el chequeo falla, interrumpe el hilo arrojando una <code>AutorizacionException</code>. Esto actúa como un escudo de seguridad antes de procesar o guardar datos.</li>
                 <li><strong>Orquestación y Persistencia Transaccional:</strong> Transforma el string simple del DTO de entrada en un Value Object de tipo <code>Caratula</code> (lo que dispara sus validaciones internas). Crea la entidad de dominio <code>Expediente</code> y la registra en memoria en el repositorio mediante <code>Agregar()</code>. Finalmente, llama a <code>_uow.Guardar()</code> para consolidar la transacción a nivel físico, garantizando consistencia ACID.</li>
                 <li><strong>Mapeo a DTOs de Salida (Data Transfer Objects):</strong> Para evitar que la entidad de dominio <code>Expediente</code> se exponga directamente hacia el exterior (lo que acoplaría el modelo de dominio a la API y podría provocar bucles de serialización infinita), el caso de uso devuelve un objeto plano e inmutable de tipo <code>AgregarExpedienteResponse</code> que solo contiene los datos esenciales para la UI.</li>
+                <li><strong>Qué devuelve y por qué:</strong> Devuelve un DTO de respuesta con la información recién creada para que la API pueda confirmar el alta sin exponer la entidad completa. Ese retorno sirve para mostrar el id generado, el estado inicial y las fechas de auditoría.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly IUnidadDeTrabajo _uow;</code> y <code>private readonly IExpedienteRepository _iExpRepo;</code>:</strong> guardan las piezas necesarias para persistir el expediente sin depender de una base concreta.</li>
+                <li><strong><code>private readonly IAutorizacionService _autorizacion;</code>:</strong> permite verificar si el usuario tiene permiso antes de tocar datos.</li>
+                <li><strong>Constructor:</strong> recibe las dependencias por inyección y deja al caso de uso listo para orquestar el proceso.</li>
+                <li><strong><code>if (!_autorizacion.PoseeElPermiso(...))</code>:</strong> corta la ejecución si el usuario no está habilitado para crear expedientes.</li>
+                <li><strong><code>Caratula car = new Caratula(req.Caratula);</code>:</strong> transforma el texto de entrada en un objeto de dominio validado.</li>
+                <li><strong><code>Expediente exp = new Expediente(car, idUsuario);</code>:</strong> crea el expediente nuevo con su estado inicial y auditoría.</li>
+                <li><strong><code>_iExpRepo.Agregar(exp);</code> y <code>_uow.Guardar();</code>:</strong> registran y confirman el alta de forma transaccional.</li>
+                <li><strong><code>return new AgregarExpedienteResponse(...)</code>:</strong> devuelve al controlador los datos útiles del expediente recién creado.</li>
             </ul>
         </div>
 
@@ -1425,6 +1675,19 @@ public class Usuario
                 <li><strong>Validación Defensiva del DTO de Entrada:</strong> Comprueba inmediatamente si la solicitud entrante <code>req</code> es nula. En arquitecturas REST, un cuerpo JSON mal estructurado puede ser deserializado como nulo; atrapar este caso temprano evita excepciones genéricas del sistema como `NullReferenceException`, arrojando en su lugar una excepción controlada de aplicación (<code>AplicationException</code>).</li>
                 <li><strong>Manejo de Eliminación en Cascada en Capa de Aplicación:</strong> La eliminación de un registro padre (el expediente) requiere la eliminación de todos sus hijos (los trámites) para mantener la integridad referencial. Aunque esto podría delegarse a reglas de cascada automáticas (ON DELETE CASCADE) de SQLite, realizarlo de forma explícita y programática a nivel de aplicación ofrece mayor visibilidad, portabilidad entre diferentes motores de bases de datos y facilita el logging de auditoría de cada trámite removido.</li>
                 <li><strong>Transaccionalidad Asegurada:</strong> Al recuperar y eliminar todos los trámites vinculados mediante <code>_iTramRepo.Eliminar(t.Id)</code> en un bucle antes de eliminar el expediente con <code>_iExpRepo.Eliminar()</code>, se encolan todas las instrucciones de borrado en el Change Tracker. El llamado final a <code>_uow.Guardar()</code> ejecuta todas estas operaciones en un único bloque transaccional. Si alguna falla, se revierte todo, impidiendo que queden trámites huérfanos.</li>
+                <li><strong>Qué deja listo al terminar:</strong> El caso de uso no sólo borra el expediente; también limpia sus trámites y deja a la base en un estado coherente. Por eso el retorno es un DTO simple con el id eliminado, para que la API pueda confirmar la operación sin mostrar detalles internos.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly ITramiteRepository _iTramRepo;</code>:</strong> permite buscar y borrar todos los trámites vinculados al expediente.</li>
+                <li><strong><code>private readonly IExpedienteRepository _iExpRepo;</code>:</strong> se usa para cargar y eliminar el expediente principal.</li>
+                <li><strong><code>if (req == null)</code>:</strong> protege el caso de uso frente a una solicitud vacía o mal formada.</li>
+                <li><strong><code>if (!_autorizacion.PoseeElPermiso(...))</code>:</strong> valida que quien pide el borrado tenga permiso de baja.</li>
+                <li><strong><code>var expedienteABorrar = _iExpRepo.ObtenerPorId(...)</code>:</strong> busca el expediente antes de eliminarlo y corta si no existe.</li>
+                <li><strong>Bucle de trámites:</strong> recorre cada trámite del expediente y lo elimina uno por uno para evitar huérfanos.</li>
+                <li><strong><code>_iExpRepo.Eliminar(...)</code> y <code>_uow.Guardar();</code>:</strong> borran el expediente y confirman la operación completa.</li>
+                <li><strong><code>return new EliminarExpedienteResponse(...)</code>:</strong> devuelve sólo el id borrado como confirmación mínima.</li>
             </ul>
         </div>
 
@@ -1487,6 +1750,18 @@ public class Usuario
                 <li><strong>Conversión de Tipos Primitivos a Objetos de Dominio:</strong> El caso de uso recibe tipos primitivos de la petición HTTP (un entero para <code>Etiqueta</code> y un string para <code>Contenido</code>). Para garantizar que se respeten las invariantes del negocio, castea el entero a la estructura tipada <code>EtiquetaTramite</code> e instancia el Value Object <code>Contenido</code>. Cualquier error de sintaxis o texto vacío se detecta inmediatamente antes de intentar interactuar con los repositorios.</li>
                 <li><strong>Colaboración Coordinada por el Caso de Uso:</strong> Un trámite no se crea de forma aislada; su inserción puede requerir la mutación del estado del expediente padre (por ejemplo, finalizar un expediente si la etiqueta es <code>PaseAlArchivo</code>). El caso de uso coordina esta interacción inyectando el servicio <code>ActualizadorEstadoExpedienteService</code> y pasándole el trámite recién creado. Este patrón mantiene a la entidad <code>Tramite</code> desacoplada de la lógica del ciclo de vida del <code>Expediente</code>.</li>
             </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly ITramiteRepository _tramiteRepo;</code>:</strong> guarda el acceso para persistir el nuevo trámite.</li>
+                <li><strong><code>private readonly ActualizadorEstadoExpedienteService _actualizador;</code>:</strong> encapsula la regla que puede cambiar el estado del expediente.</li>
+                <li><strong><code>if (!_autorizacion.PoseeElPermiso(...))</code>:</strong> evita que alguien sin permiso pueda agregar trámites.</li>
+                <li><strong><code>Contenido contenido = new Contenido(req.Contenido);</code>:</strong> valida el texto del trámite antes de usarlo.</li>
+                <li><strong><code>Tramite tramite = new Tramite(...)</code>:</strong> crea la entidad trámite con expediente, etiqueta, contenido y usuario responsable.</li>
+                <li><strong><code>_tramiteRepo.Agregar(tramite);</code>:</strong> deja el trámite preparado para persistirse.</li>
+                <li><strong><code>_actualizador.Ejecutar(tramite, idUsuario);</code>:</strong> aplica la regla que actualiza el estado del expediente si corresponde.</li>
+                <li><strong><code>return new AgregarTramiteResponse(...)</code>:</strong> devuelve al controlador los datos del trámite recién creado.</li>
+            </ul>
         </div>
 
         <!-- UseCases Usuarios -->
@@ -1527,6 +1802,17 @@ public class Usuario
                 <li><strong>Validación de Reglas de Negocio Únicas:</strong> Comprobar que un correo electrónico no esté duplicado en el sistema es una regla de negocio que una entidad individual de tipo <code>Usuario</code> no puede resolver por sí misma (ya que no tiene acceso a otros usuarios). El caso de uso resuelve esto coordinando con el repositorio mediante la consulta <code>ExistePorEmail(req.Email)</code>. Si el email existe, se lanza una excepción de aplicación controlada.</li>
                 <li><strong>Cifrado Unidireccional de Contraseñas (Hashing):</strong> De acuerdo con los estándares de seguridad modernos, las contraseñas nunca deben guardarse en texto plano. El caso de uso invoca a <code>ContrasenaUtil.Convertir(req.Contrasena)</code>, la cual aplica un algoritmo SHA-256 (hashing unidireccional criptográfico). De este modo, la contraseña viaja cifrada a la base de datos SQLite y, en caso de una filtración del archivo de datos, las credenciales reales de los usuarios permanecen protegidas.</li>
             </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly IUnidadDeTrabajo _uow;</code> y <code>private readonly IUsuarioRepository _userRepo;</code>:</strong> guardan las dependencias del caso de uso. El primero se usa para confirmar los cambios al final y el segundo para consultar y guardar usuarios.</li>
+                <li><strong>Constructor:</strong> recibe esas dependencias por inyección. Esto hace que el caso de uso no dependa de una base de datos concreta, sino de contratos.</li>
+                <li><strong><code>if (_userRepo.ExistePorEmail(req.Email))</code>:</strong> verifica si el correo ya está registrado antes de crear nada. Si ya existe, corta el proceso y devuelve un error controlado.</li>
+                <li><strong><code>Usuario user = new Usuario(...)</code>:</strong> instancia el usuario recién creado. Antes de hacerlo, convierte la contraseña de texto plano en hash SHA-256 para no almacenar la clave original.</li>
+                <li><strong><code>_userRepo.Agregar(user);</code>:</strong> registra el usuario en el repositorio, pero todavía no lo deja fijo en la base de datos física.</li>
+                <li><strong><code>_uow.Guardar();</code>:</strong> confirma la operación completa. Acá se persiste de verdad y se mantiene la idea de transacción atómica.</li>
+                <li><strong><code>return new RegistrarUsuarioResponse(...)</code>:</strong> devuelve al controlador un objeto de salida con los datos útiles del usuario creado: id, nombre, email, si es administrador y sus permisos.</li>
+            </ul>
         </div>
 
         <p><strong>LoginUseCase.cs:</strong></p>
@@ -1552,6 +1838,17 @@ public class Usuario
                 <li><strong>Sintaxis Modernizada mediante Primary Constructors:</strong> Utiliza la característica de constructores primarios de C# 12 (<code>class LoginUseCase(IUsuarioRepository repo...)</code>). Esto permite declarar los parámetros de entrada directamente en la firma de la clase, reduciendo las líneas de código repetitivo de variables privadas y asignaciones del constructor tradicional. El compilador de .NET gestiona el ciclo de vida de estas dependencias internamente.</li>
                 <li><strong>Mitigación de Ataques de Enumeración:</strong> Al validar la contraseña, si el usuario no existe o si la contraseña ingresada es incorrecta, la aplicación arroja exactamente el mismo error genérico (<code>"El mail o la contraseña son incorrectos."</code>) con un código de estado no autorizado. Esto evita que atacantes externos determinen qué direcciones de email están registradas en el sistema probando con diferentes contraseñas.</li>
                 <li><strong>Generación Desacoplada de Tokens de Seguridad:</strong> El caso de uso no sabe cómo armar o firmar criptográficamente un string JWT. Delega esta responsabilidad en la interfaz <code>ITokenProvider</code>, la cual encapsula la lógica criptográfica de JSON Web Tokens en la capa de infraestructura.</li>
+                <li><strong>Qué devuelve al final:</strong> Si las credenciales son correctas, retorna un <code>LoginResponse</code> con el token JWT listo para que la API lo entregue al cliente y ese cliente lo reuse en los siguientes pedidos autenticados.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>IUsuarioRepository repo</code> y <code>ITokenProvider tokenProvider</code>:</strong> son las dependencias mínimas para buscar al usuario y generar el token.</li>
+                <li><strong><code>Usuario? user = repo.ObtenerPorEmail(req.Email);</code>:</strong> intenta traer el usuario que corresponde al email enviado.</li>
+                <li><strong><code>if (user == null || !ContrasenaUtil.Comparar(...))</code>:</strong> valida en un solo punto si el usuario existe y si la contraseña coincide.</li>
+                <li><strong><code>throw new UnauthorizedAccessException(...)</code>:</strong> devuelve el mismo error genérico para no filtrar información sobre cuentas válidas.</li>
+                <li><strong><code>var token = tokenProvider.GenerarToken(user);</code>:</strong> arma el JWT con los datos del usuario autenticado.</li>
+                <li><strong><code>return new LoginResponse(token);</code>:</strong> entrega al controlador el token listo para responder al cliente.</li>
             </ul>
         </div>
 
@@ -1609,6 +1906,20 @@ public class Usuario
                     </ul>
                 </li>
                 <li><strong>Mutación a Través del Dominio:</strong> En vez de manipular directamente la base de datos o asignar una nueva lista directamente al modelo, invoca al método de dominio <code>usuarioObjetivo.CambiarPermisos(req.NuevosPermisos)</code> y luego persiste el estado. Esto respeta la encapsulación y la lógica de validaciones internas de la clase <code>Usuario</code>.</li>
+                <li><strong>Qué deja listo y por qué importa:</strong> Al finalizar, no sólo queda guardada la nueva lista de permisos, sino también una confirmación clara para la API de que el cambio se aplicó sobre el usuario correcto. Eso evita que la interfaz tenga que reconstruir el estado internamente y mantiene la coherencia entre dominio, base y respuesta HTTP.</li>
+                <li><strong>Qué deja listo:</strong> Al terminar, el usuario objetivo queda con su nueva colección de permisos persistida y el caso de uso devuelve un <code>CambiarPermisosResponse</code> con el id, el nombre y los permisos actualizados para que la API confirme el cambio.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly IUsuarioRepository _userRepo;</code>:</strong> permite buscar al solicitante y al usuario que se va a modificar.</li>
+                <li><strong><code>private readonly IAutorizacionService _autorizacion;</code>:</strong> queda disponible por consistencia con otros casos, aunque aquí la validación principal la hace el repositorio y la bandera admin.</li>
+                <li><strong><code>var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);</code>:</strong> identifica a quien pide el cambio y verifica si es administrador.</li>
+                <li><strong><code>if (solicitante == null || !solicitante.EsAdmin)</code>:</strong> bloquea cualquier intento de cambio que no venga de un admin.</li>
+                <li><strong><code>var usuarioObjetivo = _userRepo.ObtenerPorId(req.IdUsuarioObjetivo);</code>:</strong> carga al usuario que va a recibir los permisos nuevos.</li>
+                <li><strong><code>if (usuarioObjetivo.EsAdmin)</code>:</strong> impide tocar los permisos de otro administrador.</li>
+                <li><strong><code>usuarioObjetivo.CambiarPermisos(req.NuevosPermisos);</code>:</strong> aplica el cambio desde el dominio, no desde una asignación directa.</li>
+                <li><strong><code>return new CambiarPermisosResponse(...)</code>:</strong> devuelve los permisos ya actualizados al controlador.</li>
             </ul>
         </div>
 
@@ -1646,6 +1957,19 @@ public class Usuario
             <ul>
                 <li><strong>El concepto de Servicio de Aplicación:</strong> Cuando una regla de negocio requiere la coordinación de múltiples entidades o agregados (en este caso, asociar un <code>Tramite</code> nuevo a un <code>Expediente</code> y actualizar el estado de este último según su etiqueta), no es correcto colocar esta lógica dentro de una de las entidades aisladas, ya que violaría su cohesión. Un servicio de aplicación actúa como el mediador perfecto, encapsulando este flujo de colaboración entre objetos sin que las entidades dependan directamente una de la otra.</li>
                 <li><strong>Ejecución y Flujo de Auditoría:</strong> El método verifica si la etiqueta es <code>PaseAlArchivo</code>, recupera la entidad <code>Expediente</code> mediante su repositorio, invoca su máquina de estados interna <code>ActualizarEstado()</code> (pasándole la firma del usuario responsable para auditoría) y guarda el estado actualizado en el repositorio de expedientes, todo bajo el mismo contexto transaccional en curso.</li>
+                <li><strong>Qué devuelve o deja preparado:</strong> Este servicio no arma una respuesta propia ni devuelve un DTO. Su salida real es dejar el expediente actualizado en memoria para que el caso de uso lo persista junto con el trámite recién creado, sin romper la coherencia del agregado.</li>
+                <li><strong>Qué deja resuelto:</strong> Este servicio no responde por sí mismo al cliente; deja el agregado coherente después de un alta de trámite. Su trabajo es asegurar que el expediente y el trámite queden sincronizados antes de que el caso de uso persista todo.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly IExpedienteRepository _expRepo;</code>:</strong> le da acceso al expediente que puede necesitar actualizarse.</li>
+                <li><strong>Constructor:</strong> recibe el repositorio por inyección para no depender de una implementación concreta.</li>
+                <li><strong><code>if (tramite.Etiqueta == EtiquetaTramite.PaseAlArchivo)</code>:</strong> decide cuándo esta regla se aplica.</li>
+                <li><strong><code>var exp = _expRepo.ObtenerPorId(...)</code>:</strong> busca el expediente asociado al trámite recién creado.</li>
+                <li><strong><code>exp.ActualizarEstado(...)</code>:</strong> deja que el dominio calcule y registre el nuevo estado.</li>
+                <li><strong><code>_expRepo.Modificar(exp);</code>:</strong> marca el expediente como actualizado para persistirlo después.</li>
+                <li><strong><code>void Ejecutar(...)</code>:</strong> no devuelve datos, sólo deja el agregado listo para guardarse coherentemente.</li>
             </ul>
         </div>
     </section>
@@ -1757,6 +2081,17 @@ public class Usuario
                 <li><strong>Mapeo de Value Objects Complejos mediante <code>HasConversion</code> (Fluent API):</strong> La base de datos SQLite solo soporta tipos nativos simples (enteros, flotantes, texto, booleanos y blobs). Para persistir los Objetos de Valor <code>Caratula</code> y <code>Contenido</code> en formato de texto plano en SQLite, configuramos <code>HasConversion()</code> en el constructor del modelo. Esto le enseña a EF Core a ejecutar una serialización implícita: al escribir, extrae la propiedad string <code>Valor</code>; al leer, reconstruye el objeto instanciando un nuevo record <code>new Caratula(valor)</code>. Esto nos permite disfrutar de las validaciones y del encapsulamiento de DDD a nivel de C# sin alterar el esquema relacional de base de datos.</li>
                 <li><strong>Serialización Automática de Colecciones a JSON:</strong> En EF Core 8, las colecciones de elementos simples (como <code>IEnumerable&lt;Permiso&gt; Permisos</code>) se serializan por defecto en formato JSON textual dentro de una única columna de tipo TEXT en SQLite. Esto nos ahorra tener que crear tablas asociativas intermedias de muchos a muchos y realizar costosas consultas JOIN solo para guardar la lista de permisos de un usuario.</li>
                 <li><strong>Inserción de Datos Semilla (Data Seeding):</strong> Mediante <code>modelBuilder.Entity&lt;Usuario&gt;().HasData()</code>, insertamos registros iniciales en la base de datos en su creación. Los hashes de contraseñas de estos usuarios semillas se generan con <code>ContrasenaUtil.Convertir</code> para asegurar que las credenciales ya estén protegidas desde el momento cero del inicio de la aplicación.</li>
+                <li><strong>Qué deja listo para la capa superior:</strong> El contexto no decide reglas de negocio ni responde a la API; deja listas las tablas, las conversiones y los datos iniciales para que los repositorios trabajen con entidades ya compatibles con SQLite.</li>
+                <li><strong>Qué devuelve al sistema:</strong> No devuelve una respuesta HTTP ni un DTO; deja configurado el modelo relacional para que los repositorios puedan leer y escribir entidades sin preocuparse por conversiones manuales ni por la estructura física de SQLite.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>public DbSet&lt;Expediente&gt; Expedientes</code>, <code>Tramites</code> y <code>Usuarios</code>:</strong> exponen las tablas que el resto del sistema puede consultar y modificar.</li>
+                <li><strong><code>public SGEContext(DbContextOptions&lt;SGEContext&gt; options)</code>:</strong> recibe la configuración de conexión y la entrega a la clase base.</li>
+                <li><strong><code>OnModelCreating(ModelBuilder modelBuilder)</code>:</strong> define cómo se traduce el dominio a la base relacional.</li>
+                <li><strong><code>HasConversion()</code> en <code>Caratula</code> y <code>Contenido</code>:</strong> convierte los value objects a texto para guardarlos y los reconstruye al leerlos.</li>
+                <li><strong><code>HasData(...)</code>:</strong> inserta usuarios semilla con ids fijos y contraseñas hasheadas.</li>
             </ul>
         </div>
 
@@ -1788,6 +2123,15 @@ public class UnidadDeTrabajo : IUnidadDeTrabajo
             <h5>Explicación detallada del bloque (Patrón Unit of Work):</h5>
             <ul>
                 <li><strong>El Patrón de Unidad de Trabajo (Unit of Work):</strong> El patrón Unit of Work mantiene una lista de objetos afectados por una transacción de negocio y coordina la escritura de cambios. En vez de que cada repositorio guarde cambios de forma independiente (lo que provocaría múltiples transacciones separadas y la posibilidad de que unas se guarden y otras fallen), los repositorios registran sus cambios en memoria en el tracker del <code>SGEContext</code>. Al finalizar el caso de uso, se invoca a <code>Guardar()</code>, consolidando todos los cambios de forma síncrona en una única transacción relacional. Esto asegura que la base de datos no quede en un estado inconsistente parcial (consistencia atómica ACID).</li>
+                <li><strong>Qué papel cumple en la orquestación:</strong> No reemplaza a los repositorios ni al dominio; sólo marca el punto exacto donde todo lo que se fue acumulando en memoria se confirma de una sola vez. Eso simplifica explicar el flujo porque los casos de uso saben cuándo termina realmente la operación.</li>
+                <li><strong>Qué hace en la práctica:</strong> No crea datos nuevos ni devuelve entidades; sólo marca el punto exacto donde la memoria del contexto pasa a la base real. Por eso los casos de uso lo llaman al final, después de agregar, modificar o eliminar.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly SGEContext _context;</code>:</strong> guarda la sesión real con la base de datos.</li>
+                <li><strong>Constructor:</strong> recibe el contexto por inyección y controla que no venga nulo.</li>
+                <li><strong><code>Guardar()</code>:</strong> llama a <code>SaveChanges()</code> para confirmar todos los cambios acumulados.</li>
             </ul>
         </div>
 
@@ -1838,6 +2182,18 @@ public static class SGESqlite
                         <li>Una vez dentro del bloqueo, realiza una segunda verificación del flag <code>_initialized</code> (ya que otro hilo podría haber completado la inicialización mientras este hilo esperaba el semáforo). Si sigue en false, invoca a <code>EnsureCreated()</code> de forma segura y establece el flag a true.</li>
                     </ul>
                 </li>
+                <li><strong>Qué deja listo al final del arranque:</strong> El beneficio concreto es que sólo una vez se crea la base y el resto de las peticiones arranca sobre un archivo ya válido. Eso evita inicializaciones duplicadas y hace más predecible el inicio de la API.</li>
+                <li><strong>Qué deja listo al arrancar:</strong> Su tarea es asegurar que la base de datos exista antes de atender peticiones. No expone datos ni retorna un objeto de negocio; sólo garantiza que la aplicación arranque con el esquema listo.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private static bool _initialized;</code>:</strong> recuerda si la base ya fue creada para no repetir el trabajo.</li>
+                <li><strong><code>private static readonly object _lock</code>:</strong> sirve como candado para que sólo un hilo inicialice a la vez.</li>
+                <li><strong><code>if (_initialized)</code> al inicio:</strong> hace una salida rápida cuando no hace falta volver a inicializar.</li>
+                <li><strong><code>lock (_lock)</code> y segunda verificación:</strong> evita carreras entre múltiples peticiones simultáneas.</li>
+                <li><strong><code>context.Database.EnsureCreated()</code>:</strong> crea el esquema si todavía no existe.</li>
+                <li><strong><code>_initialized = true;</code>:</strong> marca que la inicialización ya quedó completada.</li>
             </ul>
         </div>
 
@@ -1891,6 +2247,18 @@ public static class SGESqlite
             <ul>
                 <li><strong>El Patrón Repositorio:</strong> Actúa como una colección de objetos de negocio en memoria. Desacopla la lógica de acceso a datos de los Casos de Uso, simulando que las entidades están guardadas en una colección común en memoria en vez de en un motor relacional físico.</li>
                 <li><strong>Operaciones Eficientes del Rastreador de EF Core (Change Tracker):</strong> Al ejecutar métodos como <code>Agregar()</code> o <code>Eliminar()</code>, Entity Framework Core no emite consultas SQL a la base de datos SQLite de forma inmediata. Simplemente registra en su tracker de memoria que el objeto se encuentra en estado <em>Added</em> o <em>Deleted</em>. Las sentencias SQL <code>INSERT</code> o <code>DELETE</code> se agrupan y se ejecutan optimizadamente en bloque recién cuando se invoca la Unidad de Trabajo (<code>SaveChanges()</code>), minimizando los accesos de disco y optimizando el rendimiento general del acceso a datos.</li>
+                <li><strong>Qué devuelve a la capa superior:</strong> El repositorio no arma respuestas de API; devuelve entidades o colecciones de entidades al caso de uso, o bien deja preparada la operación para que luego <code>Guardar()</code> aplique el cambio definitivo.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private SGEContext _context;</code>:</strong> mantiene acceso directo al contexto de EF Core.</li>
+                <li><strong>Constructor:</strong> recibe el contexto y lo deja listo para operar sobre expedientes.</li>
+                <li><strong><code>Agregar(Expediente expediente)</code>:</strong> agrega el expediente al conjunto de EF Core.</li>
+                <li><strong><code>ObtenerPorId(Guid id)</code>:</strong> busca un expediente específico por id.</li>
+                <li><strong><code>ObtenerTodos()</code>:</strong> devuelve la lista completa de expedientes.</li>
+                <li><strong><code>Modificar(Expediente expediente)</code>:</strong> marca la entidad como actualizada para que el contexto la persista.</li>
+                <li><strong><code>Eliminar(Guid id)</code>:</strong> busca, valida que exista y luego lo remueve; si no aparece, lanza una excepción de repositorio.</li>
             </ul>
         </div>
 
@@ -1948,6 +2316,18 @@ public static class SGESqlite
             <ul>
                 <li><strong>Estructura de un JWT (Claims / Reclamos):</strong> Un token JWT es un estándar abierto (RFC 7519) que define una forma compacta y autónoma para transmitir información de seguridad de forma segura. Los reclamos (claims) son piezas de información asociadas al usuario: su ID, nombre, email y un flag de administración. Para los usuarios que no son administradores globales, se añaden múltiples claims con la clave <code>"permiso"</code>, facilitando que el middleware de ASP.NET Core los lea de forma directa en cada petición HTTP sin necesidad de volver a consultar a la base de datos SQLite.</li>
                 <li><strong>Firma Digital y Clave Simétrica:</strong> El descriptor del token firma el payload utilizando una clave secreta codificada en bytes y el algoritmo criptográfico <code>HmacSha256Signature</code>. Esto produce una firma digital que se concatena al final del token. Si un atacante altera los permisos de usuario dentro del token JWT para intentar elevar privilegios en el cliente, la firma del token no coincidirá con el contenido modificado y el servidor rechazará la petición automáticamente en la etapa de middleware.</li>
+                <li><strong>Qué devuelve al final:</strong> Devuelve un string con el JWT completo, listo para copiarse en la cabecera <code>Authorization</code>. Ese string es el resultado que luego consume la Web API para autenticar y autorizar el resto de las operaciones.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly string _claveSecreta;</code>:</strong> conserva la clave usada para firmar los tokens.</li>
+                <li><strong>Constructor:</strong> recibe la clave y la deja disponible para cada generación de JWT.</li>
+                <li><strong><code>JwtSecurityTokenHandler</code> y <code>Encoding.UTF8.GetBytes</code>:</strong> preparan el mecanismo criptográfico y la clave en bytes.</li>
+                <li><strong>Lista de <code>Claim</code>:</strong> arma la identidad del usuario con id, nombre, email y flag de admin.</li>
+                <li><strong>Bucle de permisos:</strong> agrega claims extra sólo si el usuario no es administrador global.</li>
+                <li><strong><code>SecurityTokenDescriptor</code>:</strong> define el contenido y la firma del token.</li>
+                <li><strong><code>CreateToken()</code> y <code>WriteToken()</code>:</strong> construyen el JWT final y lo devuelven como string.</li>
             </ul>
         </div>
     </section>
@@ -2132,6 +2512,20 @@ app.Run();</code></pre>
                 </li>
                 <li><strong>Flexibilización de Recepción de Tokens (Events JwtBearer):</strong> Por defecto, el middleware JwtBearer de Microsoft requiere de forma rígida que el token JWT sea enviado con el prefijo `"Bearer "` en la cabecera HTTP. Para flexibilizar el uso de clientes web (como Swagger) o integraciones externas, el evento <code>OnMessageReceived</code> intercepta la cabecera. Si detecta el token pero no tiene el prefijo, extrae el token crudo en texto plano y lo asigna a mano mediante <code>context.Token</code>, permitiendo que la validación criptográfica continúe normalmente.</li>
                 <li><strong>Inicialización y Semilla en el Bootstrap:</strong> Al finalizar la configuración del pipeline HTTP pero antes de iniciar el servidor (<code>app.Run()</code>), el bootstrap abre un scope transitorio de dependencias (<code>app.Services.CreateScope()</code>) para obtener el <code>SGEContext</code> de forma segura y ejecutar <code>EnsureCreated()</code>. Esto garantiza que el archivo de base de datos SQLite con las tablas e inserciones semilla esté listo antes de que la Web API empiece a escuchar peticiones en los puertos de red.</li>
+                <li><strong>Qué pone en marcha realmente:</strong> No sólo registra servicios, también deja armada toda la ruta de entrada para que autenticación, autorización, persistencia y Swagger trabajen en conjunto desde el primer request.</li>
+                <li><strong>Qué deja listo para el resto del sistema:</strong> Este bloque no responde pedidos ni devuelve DTOs; prepara todo el entorno para que la API pueda recibir tráfico con servicios bien registrados, tokens aceptados y base inicial creada.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>var builder = WebApplication.CreateBuilder(args);</code>:</strong> arranca la configuración de la API y su contenedor de servicios.</li>
+                <li><strong><code>AddControllers()</code> y <code>AddSwaggerGen()</code>:</strong> habilitan controladores y documentación interactiva.</li>
+                <li><strong>Registros <code>AddScoped</code> y <code>AddSingleton</code>:</strong> conectan interfaces con implementaciones concretas y definen su ciclo de vida.</li>
+                <li><strong><code>AddDbContext&lt;SGEContext&gt;(...UseSqlite...)</code>:</strong> configura la conexión real a SQLite.</li>
+                <li><strong><code>AddAuthentication()</code> y <code>AddJwtBearer()</code>:</strong> configuran cómo se leen y validan los tokens.</li>
+                <li><strong><code>app.Services.CreateScope()</code> + <code>EnsureCreated()</code>:</strong> crea la base antes de aceptar tráfico.</li>
+                <li><strong><code>UseMiddleware</code>, <code>UseAuthentication</code>, <code>UseAuthorization</code>:</strong> ordenan el pipeline de seguridad y errores.</li>
+                <li><strong><code>MapGet("/SGE", ...)</code> y <code>MapControllers()</code>:</strong> dejan pública la entrada a Swagger y conectan los controladores.</li>
             </ul>
         </div>
 
@@ -2208,6 +2602,18 @@ app.Run();</code></pre>
                     </ul>
                 </li>
                 <li><strong>Estandarización bajo Problem Details (RFC 7807):</strong> En lugar de retornar un texto simple de error, formatea la respuesta en un JSON estructurado bajo el estándar internacional <strong>RFC 7807 (Problem Details for HTTP APIs)</strong>. Esto proporciona metadatos consistentes sobre el error (como el status, el título descriptivo, el detalle del error y la ruta exacta donde ocurrió) para que los clientes web o frontend los procesen de forma consistente.</li>
+                <li><strong>Qué garantiza hacia afuera:</strong> Ninguna excepción sale “en bruto” al cliente; siempre queda traducida a una respuesta entendible y homogénea. Eso hace más simple depurar la API y también más predecible consumirla desde frontend o pruebas manuales.</li>
+                <li><strong>Qué devuelve al cliente:</strong> Siempre devuelve una respuesta HTTP consistente con un cuerpo JSON de error; no deja excepciones sin formato ni respuestas ambiguas, así el frontend puede manejar todos los fallos de la misma manera.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>private readonly RequestDelegate _siguiente;</code> y <code>ILogger&lt;...&gt; _logger;</code>:</strong> guardan el siguiente paso del pipeline y el logger para registrar fallos.</li>
+                <li><strong><code>InvokeAsync(HttpContext contexto)</code>:</strong> envuelve la ejecución real en un <code>try/catch</code>.</li>
+                <li><strong><code>await _siguiente(contexto);</code>:</strong> deja pasar la petición al siguiente middleware o al controlador.</li>
+                <li><strong><code>catch (Exception ex)</code>:</strong> intercepta cualquier error no controlado.</li>
+                <li><strong><code>MapearExcepcion(ex)</code>:</strong> traduce la excepción a un status y un título HTTP adecuados.</li>
+                <li><strong><code>ProblemDetails</code> + <code>WriteAsJsonAsync</code>:</strong> construyen la respuesta JSON estándar que recibe el cliente.</li>
             </ul>
         </div>
 
@@ -2264,6 +2670,18 @@ app.Run();</code></pre>
             <ul>
                 <li><strong>Extracción en Tiempo de Compilación e Inicialización:</strong> Swagger (OpenAPI) genera la documentación visual interactiva leyendo el código fuente. Sin embargo, no sabe de forma nativa qué controladores o endpoints REST están protegidos por el atributo <code>[Authorize]</code>. Este filtro personalizado (<code>IDocumentFilter</code>) se ejecuta al iniciar la aplicación, recorriendo la colección de descriptores de endpoints (<code>contexto.ApiDescriptions</code>).</li>
                 <li><strong>Inyección Dinámica de Requisitos de Seguridad Bearer:</strong> Si el endpoint posee la directiva de autorización y no permite el acceso anónimo, el filtro localiza su ruta relativa y método HTTP dentro del árbol de OpenAPI (<code>documento.Paths</code>). Si no está marcado como seguro, le inyecta dinámicamente un objeto de tipo <code>OpenApiSecurityRequirement</code> asociado al esquema <code>Bearer</code>. Esto hace que en Swagger UI aparezca el icono del candado en cada endpoint correspondiente, forzando a la interfaz a adjuntar el JWT en las cabeceras HTTP de forma automatizada al testear.</li>
+                <li><strong>Qué resuelve para estudiar y probar:</strong> El documento generado queda alineado con la seguridad real de la API, así que el grupo no tiene que adivinar qué endpoints van con token y cuáles no. Eso reduce errores al practicar y hace más clara la defensa del diseño.</li>
+                <li><strong>Qué aporta al trabajo en grupo:</strong> No cambia la lógica del sistema, pero sí la forma de estudiarlo y probarlo. Gracias a este filtro, Swagger muestra visualmente qué endpoints requieren token y ayuda a no confundirse al practicar con la API.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>foreach (var apiDescription in contexto.ApiDescriptions)</code>:</strong> recorre todos los endpoints que Swagger conoce.</li>
+                <li><strong><code>EndpointMetadata</code>:</strong> lee los atributos del endpoint para saber si requiere autorización o permite anónimo.</li>
+                <li><strong><code>if (!tieneAutorizacion || permiteAnonimo) continue;</code>:</strong> salta los endpoints que no deben llevar candado.</li>
+                <li><strong>Validación de ruta y método HTTP:</strong> evita trabajar sobre descripciones incompletas.</li>
+                <li><strong><code>documento.Paths.TryGetValue(...)</code> y <code>Operations.TryGetValue(...)</code>:</strong> ubican la operación exacta dentro del documento OpenAPI.</li>
+                <li><strong><code>operation.Security.Add(...)</code>:</strong> marca el endpoint como protegido por Bearer.</li>
             </ul>
         </div>
 
@@ -2324,6 +2742,18 @@ public class ExpedientesController : ControllerBase
             <ul>
                 <li><strong>Atributos Declarativos de ASP.NET Core:</strong> El atributo <code>[ApiController]</code> habilita comportamientos específicos de API REST (como validaciones automáticas de modelos de entrada y enrutamiento inteligente). El atributo <code>[Authorize]</code> a nivel de clase actúa como un guardián: garantiza que ningún método (como <code>Agregar()</code>) pueda ser ejecutado a menos que el cliente envíe una cabecera con un token JWT firmado y validado por el middleware de seguridad.</li>
                 <li><strong>Extracción de Identidad del Token JWT (Firma Digital):</strong> El método helper <code>ObtenerIdUsuarioDelToken()</code> lee la propiedad interna <code>User</code> (que representa al Principal de seguridad de la petición actual). Busca el claim <code>ClaimTypes.NameIdentifier</code>, extrae su valor en string y lo parsea a un tipo GUID. Este enfoque es altamente seguro ya que la identidad del usuario proviene del token firmado criptográficamente, impidiendo que un cliente malicioso envíe peticiones suplantando el ID de otro usuario en el cuerpo de la solicitud JSON.</li>
+                <li><strong>Qué deja listo en la frontera HTTP:</strong> El controlador no procesa el negocio completo, pero sí prepara la entrada correcta: valida que haya identidad, toma el dato útil del token y deja al caso de uso recibir un contexto limpio, tipado y listo para ejecutar la regla real.</li>
+                <li><strong>Qué devuelve el controlador:</strong> El controlador no ejecuta reglas de negocio ni guarda datos por sí mismo. Su trabajo es devolver la respuesta HTTP correcta que le entrega el caso de uso, normalmente envuelta en <code>Ok(...)</code>, o bien dejar que el middleware transforme cualquier excepción en un error uniforme.</li>
+            </ul>
+
+            <h5>Lectura paso a paso del código</h5>
+            <ul>
+                <li><strong><code>[ApiController]</code>:</strong> habilita el comportamiento automático de API y validación de modelos.</li>
+                <li><strong><code>[Route("api/[controller]")]</code> y <code>[Authorize]</code>:</strong> definen la URL base y exigen token válido.</li>
+                <li><strong>Inyección de casos de uso por constructor:</strong> deja al controlador como una capa delgada que sólo coordina llamadas.</li>
+                <li><strong><code>ObtenerIdUsuarioDelToken()</code>:</strong> extrae el id del usuario autenticado desde el claim principal.</li>
+                <li><strong><code>[HttpPost]</code> + <code>Agregar(...)</code>:</strong> recibe el request, toma el usuario del token y delega la creación al caso de uso.</li>
+                <li><strong><code>return Ok(response);</code>:</strong> devuelve al cliente lo que generó la capa de aplicación sin mezclar negocio con HTTP.</li>
             </ul>
         </div>
     </section>
@@ -2451,6 +2881,435 @@ public class ExpedientesController : ControllerBase
                         <li><em>Defensa:</em> "Está en la capa de Presentación porque actúa como el punto de inicio de la aplicación para el cliente externo. Configura el pipeline HTTP de ASP.NET Core, realiza la inyección de dependencias, valida el token JWT de entrada y rutea las peticiones REST hacia la capa de aplicación".</li>
                     </ul>
                 </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: GUÍA DE USO REAL DE LA API -->
+    <section id="sec-api">
+        <h2 class="section-title">4. Guía de Uso Real de la API y Contratos de Entrada/Salida</h2>
+        <p>
+            Esta sección resume lo que realmente necesita quien consume el sistema: rutas exactas, autenticación, formatos JSON, enums y datos precargados. Aquí conviene usar la guía como referencia práctica para probar Swagger sin perder tiempo interpretando la arquitectura.
+        </p>
+
+        <div class="callout">
+            <div class="callout-title">Acceso inicial</div>
+            <p>
+                La aplicación se abre desde <code>/SGE</code>, que redirige a Swagger. También puede accederse directamente a <code>/swagger/index.html</code>. En Swagger, el botón <strong>Authorize</strong> acepta el JWT completo o sólo el token puro, porque el middleware de la API contempla ambas variantes en la cabecera <code>Authorization</code>.
+            </p>
+        </div>
+
+        <h3 class="subsection-title">4.1 Rutas y nivel de autorización</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Recurso</th>
+                    <th>Método</th>
+                    <th>Ruta real</th>
+                    <th>Autenticación</th>
+                    <th>Uso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Usuarios</td>
+                    <td>POST</td>
+                    <td>/api/Usuarios/registrar</td>
+                    <td>No</td>
+                    <td>Crear usuario nuevo</td>
+                </tr>
+                <tr>
+                    <td>Usuarios</td>
+                    <td>POST</td>
+                    <td>/api/Usuarios/login</td>
+                    <td>No</td>
+                    <td>Obtener JWT</td>
+                </tr>
+                <tr>
+                    <td>Usuarios</td>
+                    <td>PUT</td>
+                    <td>/api/Usuarios/modificar</td>
+                    <td>Sí</td>
+                    <td>Modificar mis datos</td>
+                </tr>
+                <tr>
+                    <td>Usuarios</td>
+                    <td>PUT</td>
+                    <td>/api/Usuarios/permisos</td>
+                    <td>Sí</td>
+                    <td>Asignar o quitar permisos</td>
+                </tr>
+                <tr>
+                    <td>Usuarios</td>
+                    <td>GET</td>
+                    <td>/api/Usuarios/consultar</td>
+                    <td>Sí</td>
+                    <td>Consultar usuario por id</td>
+                </tr>
+                <tr>
+                    <td>Usuarios</td>
+                    <td>DELETE</td>
+                    <td>/api/Usuarios/eliminar</td>
+                    <td>Sí</td>
+                    <td>Eliminar usuario</td>
+                </tr>
+                <tr>
+                    <td>Expedientes</td>
+                    <td>POST</td>
+                    <td>/api/Expedientes</td>
+                    <td>Sí</td>
+                    <td>Alta de expediente</td>
+                </tr>
+                <tr>
+                    <td>Expedientes</td>
+                    <td>GET</td>
+                    <td>/api/Expedientes</td>
+                    <td>No</td>
+                    <td>Listar expedientes</td>
+                </tr>
+                <tr>
+                    <td>Expedientes</td>
+                    <td>GET</td>
+                    <td>/api/Expedientes/consultar</td>
+                    <td>No</td>
+                    <td>Consultar expediente por id</td>
+                </tr>
+                <tr>
+                    <td>Expedientes</td>
+                    <td>PUT</td>
+                    <td>/api/Expedientes/caratula</td>
+                    <td>Sí</td>
+                    <td>Modificar carátula</td>
+                </tr>
+                <tr>
+                    <td>Expedientes</td>
+                    <td>PUT</td>
+                    <td>/api/Expedientes/estado</td>
+                    <td>Sí</td>
+                    <td>Cambiar estado manualmente</td>
+                </tr>
+                <tr>
+                    <td>Expedientes</td>
+                    <td>DELETE</td>
+                    <td>/api/Expedientes</td>
+                    <td>Sí</td>
+                    <td>Eliminar expediente</td>
+                </tr>
+                <tr>
+                    <td>Trámites</td>
+                    <td>POST</td>
+                    <td>/api/Tramites</td>
+                    <td>Sí</td>
+                    <td>Alta de trámite</td>
+                </tr>
+                <tr>
+                    <td>Trámites</td>
+                    <td>PUT</td>
+                    <td>/api/Tramites</td>
+                    <td>Sí</td>
+                    <td>Modificar trámite</td>
+                </tr>
+                <tr>
+                    <td>Trámites</td>
+                    <td>DELETE</td>
+                    <td>/api/Tramites</td>
+                    <td>Sí</td>
+                    <td>Eliminar trámite</td>
+                </tr>
+                <tr>
+                    <td>Trámites</td>
+                    <td>GET</td>
+                    <td>/api/Tramites</td>
+                    <td>No</td>
+                    <td>Listar trámites por expediente</td>
+                </tr>
+                <tr>
+                    <td>Trámites</td>
+                    <td>GET</td>
+                    <td>/api/Tramites/{id}</td>
+                    <td>No</td>
+                    <td>Consultar un trámite puntual</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subsection-title">4.2 Contratos JSON que conviene tener a mano</h3>
+        <p>
+            Los enums se serializan como números enteros en el JSON. Eso significa que, al probar Swagger o Postman, conviene enviar los valores numéricos en lugar del nombre textual.
+        </p>
+
+        <div class="explanation-block">
+            <h5>Usuarios</h5>
+            <pre><code class="language-json">POST /api/Usuarios/registrar
+{
+  "email": "nuevo@sge.com",
+  "nombre": "Nuevo Usuario",
+  "contrasena": "clave123"
+}
+
+POST /api/Usuarios/login
+{
+  "email": "admin@sge.com",
+  "contrasena": "admin123"
+}
+
+PUT /api/Usuarios/modificar
+{
+  "nuevoNombre": "Nombre Actualizado",
+  "nuevoEmail": "actualizado@sge.com",
+  "nuevaClave": "nuevaClave123"
+}
+
+PUT /api/Usuarios/permisos
+{
+  "idUsuarioObjetivo": "33333333-3333-3333-3333-333333333333",
+  "nuevosPermisos": [0, 3]
+}
+
+GET /api/Usuarios/consultar?IdUsuario=11111111-1111-1111-1111-111111111111
+DELETE /api/Usuarios/eliminar
+{
+  "idUsuario": "33333333-3333-3333-3333-333333333333"
+}</code></pre>
+        </div>
+
+        <div class="explanation-block">
+            <h5>Expedientes</h5>
+            <pre><code class="language-json">POST /api/Expedientes
+{
+  "caratula": "Expediente de pruebas"
+}
+
+PUT /api/Expedientes/caratula
+{
+  "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "nuevaCaratula": "Nueva carátula"
+}
+
+PUT /api/Expedientes/estado
+{
+  "idExp": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "estado": 4
+}
+
+DELETE /api/Expedientes
+{
+  "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+}
+
+GET /api/Expedientes/consultar?ExpedienteId=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee</code></pre>
+        </div>
+
+        <div class="explanation-block">
+            <h5>Trámites</h5>
+            <pre><code class="language-json">POST /api/Tramites
+{
+  "expedienteId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "etiqueta": 0,
+  "contenido": "Escrito presentado por la parte actora"
+}
+
+PUT /api/Tramites
+{
+  "tramiteId": "ffffffff-1111-2222-3333-444444444444",
+  "nuevoContenido": "Contenido actualizado"
+}
+
+DELETE /api/Tramites
+{
+  "tramiteId": "ffffffff-1111-2222-3333-444444444444"
+}
+
+GET /api/Tramites?ExpedienteID=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+GET /api/Tramites/ffffffff-1111-2222-3333-444444444444</code></pre>
+        </div>
+
+        <h3 class="subsection-title">4.3 Enumeraciones y permisos reales</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Enum</th>
+                    <th>Valor</th>
+                    <th>Significado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>EstadoExpediente</td>
+                    <td>0</td>
+                    <td>RecienIniciado</td>
+                </tr>
+                <tr>
+                    <td>EstadoExpediente</td>
+                    <td>1</td>
+                    <td>ParaResolver</td>
+                </tr>
+                <tr>
+                    <td>EstadoExpediente</td>
+                    <td>2</td>
+                    <td>ConResolucion</td>
+                </tr>
+                <tr>
+                    <td>EstadoExpediente</td>
+                    <td>3</td>
+                    <td>EnNotificacion</td>
+                </tr>
+                <tr>
+                    <td>EstadoExpediente</td>
+                    <td>4</td>
+                    <td>Finalizado</td>
+                </tr>
+                <tr>
+                    <td>EtiquetaTramite</td>
+                    <td>0</td>
+                    <td>EscritoPresentado</td>
+                </tr>
+                <tr>
+                    <td>EtiquetaTramite</td>
+                    <td>1</td>
+                    <td>PaseAEstudio</td>
+                </tr>
+                <tr>
+                    <td>EtiquetaTramite</td>
+                    <td>2</td>
+                    <td>Despacho</td>
+                </tr>
+                <tr>
+                    <td>EtiquetaTramite</td>
+                    <td>3</td>
+                    <td>Resolucion</td>
+                </tr>
+                <tr>
+                    <td>EtiquetaTramite</td>
+                    <td>4</td>
+                    <td>Notificacion</td>
+                </tr>
+                <tr>
+                    <td>EtiquetaTramite</td>
+                    <td>5</td>
+                    <td>PaseAlArchivo</td>
+                </tr>
+                <tr>
+                    <td>Permiso</td>
+                    <td>0</td>
+                    <td>ExpedienteAlta</td>
+                </tr>
+                <tr>
+                    <td>Permiso</td>
+                    <td>1</td>
+                    <td>ExpedienteBaja</td>
+                </tr>
+                <tr>
+                    <td>Permiso</td>
+                    <td>2</td>
+                    <td>ExpedienteModificacion</td>
+                </tr>
+                <tr>
+                    <td>Permiso</td>
+                    <td>3</td>
+                    <td>TramiteAlta</td>
+                </tr>
+                <tr>
+                    <td>Permiso</td>
+                    <td>4</td>
+                    <td>TramiteBaja</td>
+                </tr>
+                <tr>
+                    <td>Permiso</td>
+                    <td>5</td>
+                    <td>TramiteModificacion</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subsection-title">4.4 Usuarios precargados en la base</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Contraseña</th>
+                    <th>Id</th>
+                    <th>Acceso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Administrador SGE</td>
+                    <td>admin@sge.com</td>
+                    <td>admin123</td>
+                    <td>11111111-1111-1111-1111-111111111111</td>
+                    <td>Todos los permisos</td>
+                </tr>
+                <tr>
+                    <td>Usuario Solo Lectura</td>
+                    <td>prueba1@sge.com</td>
+                    <td>prueba123</td>
+                    <td>22222222-2222-2222-2222-222222222222</td>
+                    <td>Sin permisos de modificación</td>
+                </tr>
+                <tr>
+                    <td>Usuario Con Permisos</td>
+                    <td>prueba2@sge.com</td>
+                    <td>prueba123</td>
+                    <td>33333333-3333-3333-3333-333333333333</td>
+                    <td>ExpedienteAlta y TramiteAlta</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="subsection-title">4.5 Errores, validaciones y comportamiento técnico</h3>
+        <ul>
+            <li>El middleware global devuelve <code>401</code> cuando falta autenticación y <code>403</code> cuando el usuario autenticado no tiene el permiso necesario.</li>
+            <li>Los errores de dominio y validación se traducen normalmente en <code>400 Bad Request</code>.</li>
+            <li>Los recursos ausentes se exponen como <code>404 Not Found</code> en los casos donde la capa de aplicación o repositorio lanza una excepción de no existencia.</li>
+            <li>Swagger configura la opción de persistir autorización, por lo que el token puede reutilizarse durante la sesión de documentación.</li>
+            <li>La base de datos SQLite se crea automáticamente al iniciar la API, así que no hace falta una migración manual para comenzar a probar el sistema.</li>
+        </ul>
+
+        <h3 class="subsection-title" id="sec-partes-clave">4.6 Partes Fundamentales del Proyecto y por qué son clave</h3>
+        <p>
+            Esta sección resume las piezas que más conviene conocer de memoria porque atraviesan todo el sistema. Si te preguntan “qué es lo importante del proyecto”, acá están las respuestas más directas.
+        </p>
+
+        <div class="callout callout-design" style="margin-bottom: 20px;">
+            <div class="callout-title">Idea general</div>
+            <p>
+                El proyecto funciona bien porque cada parte tiene una responsabilidad concreta: la Web API recibe, la capa de Aplicación coordina, el Dominio protege las reglas y la Infraestructura guarda y conecta con la tecnología real.
+            </p>
+        </div>
+
+        <div class="explanation-block">
+            <h5>Lectura paso a paso de las partes clave</h5>
+            <ul>
+                <li><strong><a href="#inf-uow">Unidad de Trabajo (UnidadDeTrabajo)</a>:</strong> reúne los cambios de varios repositorios y los confirma con una sola llamada a <code>SaveChanges()</code>. Es clave porque evita guardar cosas por separado y mantiene la transacción coherente.</li>
+                <li><strong><a href="#inf-contexto">SGEContext</a>:</strong> es el mapa central de la base de datos. Define las tablas, las conversiones de objetos de valor y los datos semilla, así que es una de las piezas más importantes de la persistencia.</li>
+                <li><strong><a href="#inf-sqlite">SGESqlite</a>:</strong> asegura que la base exista antes de empezar a atender pedidos. Su valor está en el arranque seguro y en evitar inicializaciones repetidas.</li>
+                <li><strong><a href="#web-program">Program.cs</a>:</strong> arma toda la aplicación: registra servicios, configura JWT, levanta Swagger, inicializa la base y ordena el pipeline HTTP. Es el punto de arranque real del sistema.</li>
+                <li><strong><a href="#web-middleware">ManejadorGlobalExcepcionesMiddleware</a>:</strong> convierte errores técnicos en respuestas uniformes. Es clave porque hace que toda la API responda de forma consistente.</li>
+                <li><strong><a href="#web-filtro">FiltroAutorizacion</a>:</strong> marca visualmente en Swagger qué endpoints necesitan Bearer token. Ayuda mucho a estudiar, probar y defender la API sin confundirse con permisos.</li>
+                <li><strong><a href="#web-controllers">Controladores</a>:</strong> reciben el request, extraen el contexto del token, llaman al caso de uso y devuelven HTTP. Son la frontera de entrada del sistema.</li>
+                <li><strong><a href="#app-usecases-usr">Casos de uso</a> y <a href="#app-usecases-exp">expedientes/trámites</a>:</strong> son los que realmente coordinan la lógica del negocio. Si querés explicar cómo funciona el sistema, empezá por ahí.</li>
+                <li><strong><a href="#dom-expediente">Dominio</a>:</strong> contiene las reglas duras del negocio. Sin esta capa, el sistema perdería consistencia y validación.</li>
+            </ul>
+        </div>
+
+        <div class="callout">
+            <div class="callout-title">Cómo defender estas partes en una oral</div>
+            <p>
+                Una forma simple de responder es: decir qué problema resuelve la pieza, en qué capa vive y qué pasaría si no existiera. Por ejemplo, si sacás la Unidad de Trabajo, podés terminar guardando sólo una parte de la operación; si sacás el SGEContext, ya no hay forma de mapear el dominio a SQLite; si sacás los controladores, la aplicación deja de tener entrada HTTP.
+            </p>
+        </div>
+
+        <div class="explanation-block">
+            <h5>Lectura rápida de cada pieza clave</h5>
+            <ul>
+                <li><strong>Unidad de Trabajo:</strong> confirma cambios.</li>
+                <li><strong>SGEContext:</strong> traduce dominio a base.</li>
+                <li><strong>SGESqlite:</strong> inicializa la base de forma segura.</li>
+                <li><strong>Interfaces:</strong> separan lo que se quiere hacer de cómo se hace.</li>
+                <li><strong>Controladores:</strong> reciben HTTP y delegan.</li>
+                <li><strong>Web API:</strong> expone el sistema al exterior.</li>
             </ul>
         </div>
     </section>
