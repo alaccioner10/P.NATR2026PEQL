@@ -37,7 +37,18 @@ public class CambiarPermisosUseCase
             throw new AplicationException("No se pueden modificar los permisos de un administrador.");
         }
 
-        usuarioObjetivo.CambiarPermisos(req.NuevosPermisos);
+        var permisosSolicitados = req.NuevosPermisos.Distinct().ToHashSet();
+        var permisosActuales = usuarioObjetivo.Permisos.ToHashSet();
+
+        foreach (var permiso in permisosActuales.Except(permisosSolicitados).ToArray())
+        {
+            usuarioObjetivo.RemoverPermiso(permiso);
+        }
+
+        foreach (var permiso in permisosSolicitados.Except(permisosActuales).ToArray())
+        {
+            usuarioObjetivo.AsignarPermiso(permiso);
+        }
 
         _userRepo.Modificar(usuarioObjetivo);
         _uow.Guardar();

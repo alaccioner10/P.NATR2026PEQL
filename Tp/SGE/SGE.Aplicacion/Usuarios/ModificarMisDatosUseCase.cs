@@ -26,9 +26,20 @@ public class ModificarMisDatosUseCase
             throw new AplicationException("Usuario no encontrado");
         }
 
-        user.Nombre = !string.IsNullOrWhiteSpace(req.NuevoNombre) ? req.NuevoNombre : user.Nombre;
-        user.Email = !string.IsNullOrWhiteSpace(req.NuevoEmail) ? req.NuevoEmail : user.Email;
-        user.ContrasenaHash = !string.IsNullOrWhiteSpace(req.NuevaClave) ? ContrasenaUtil.Convertir(req.NuevaClave) : user.ContrasenaHash;
+        if (!string.IsNullOrWhiteSpace(req.NuevoNombre))
+        {
+            user.CambiarNombre(req.NuevoNombre);
+        }
+
+        if (!string.IsNullOrWhiteSpace(req.NuevoEmail))
+        {
+            user.CambiarEmail(req.NuevoEmail);
+        }
+
+        if (!string.IsNullOrWhiteSpace(req.NuevaClave))
+        {
+            user.CambiarContrasenaHash(ContrasenaUtil.Convertir(req.NuevaClave));
+        }
 
         _repo.Modificar(user);
         _uow.Guardar();

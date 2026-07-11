@@ -5,11 +5,18 @@ using SGE.Dominio.Excepciones;
 public class Usuario
 {
     public Guid Id{get; private set;}
-    public string Nombre{get; set;}
-    public string Email{get;set;}
-    public string ContrasenaHash{get; set;}
+    public string Nombre{get; private set;}
+    public string Email{get; private set;}
+    public string ContrasenaHash{get; private set;}
     public bool EsAdmin{get;private set;}
-    public IEnumerable<Permiso> Permisos{get;private set;}
+    public IEnumerable<Permiso> Permisos{get; private set;} = [];
+
+    protected Usuario()
+    {
+        Nombre = string.Empty;
+        Email = string.Empty;
+        ContrasenaHash = string.Empty;
+    }
 
     public Usuario(string nombre, string email, string contrasenaHash) : this(Guid.NewGuid(), nombre, email, contrasenaHash,false,[])
     {
@@ -26,7 +33,7 @@ public class Usuario
         Email=email;
         ContrasenaHash=contrasenaHash;
         EsAdmin=esAdmin;
-        Permisos=permisos;
+        Permisos=permisos.Distinct().ToArray();
     }
 
     public static Usuario Reconstruir(Guid id,string nombre, string email, string contrasenaHash, bool esAdmin, IEnumerable<Permiso> permisos)
@@ -34,8 +41,33 @@ public class Usuario
         return new Usuario(id,nombre,email,contrasenaHash,esAdmin,permisos);
     }
 
-    public void CambiarPermisos(IEnumerable<Permiso> nuevosPermisos)
+    public void CambiarNombre(string nombre)
     {
-        Permisos = nuevosPermisos;
+        Nombre = nombre;
+    }
+
+    public void CambiarEmail(string email)
+    {
+        Email = email;
+    }
+
+    public void CambiarContrasenaHash(string contrasenaHash)
+    {
+        ContrasenaHash = contrasenaHash;
+    }
+
+    public void AsignarPermiso(Permiso permiso)
+    {
+        if (Permisos.Contains(permiso))
+        {
+            return;
+        }
+
+        Permisos = Permisos.Append(permiso).ToArray();
+    }
+
+    public void RemoverPermiso(Permiso permiso)
+    {
+        Permisos = Permisos.Where(p => p != permiso).ToArray();
     }
 }
