@@ -1,8 +1,9 @@
 
 using SGE.Aplicacion.Autorizacion;
-using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Excepciones;
+using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Dominio.Expedientes;
+using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
@@ -21,26 +22,26 @@ public class ModificarCaratulaUseCase
 
     public ModificarCaratulaResponseDTO Ejecutar(ModificarCaratulaDTO req, Guid idUsuario)
     {
-       
+
         if (req == null)
         {
-            throw new AplicationException("La solicitud no puede estar vacía."); 
+            throw new AplicationException("La solicitud no puede estar vacía.");
         }
 
-        if(!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteModificacion))
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar expedientes");
         }
 
-        var exp=_iExpRepo.ObtenerPorId(req.Id);
+        var exp = _iExpRepo.ObtenerPorId(req.Id);
         if (exp == null)
         {
             throw new AplicationException("El expediente solicitado no existe");
         }
 
-        Caratula car= new Caratula(req.NuevaCaratula);
+        Caratula car = new Caratula(req.NuevaCaratula);
 
-        exp.ModificarCaratula(car,idUsuario);
+        exp.ModificarCaratula(car, idUsuario);
 
         _iExpRepo.Modificar(exp);
 

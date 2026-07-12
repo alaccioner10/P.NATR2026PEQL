@@ -1,8 +1,9 @@
-using SGE.Aplicacion;
 using SGE.Aplicacion.Autorizacion;
-using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Servicios;
+using SGE.Aplicacion.Tramites.DTOs;
+using SGE.Dominio.Usuarios;
+
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
@@ -23,7 +24,7 @@ public class EliminarTramiteUseCase
 
     public EliminarTramiteResponseDTO Ejecutar(EliminarTramiteDTO req, Guid idUsuario)
     {
-        
+
         if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.TramiteBaja))
         {
             throw new AutorizacionException("El usuario no tiene permisos para eliminar trámites.");

@@ -1,7 +1,5 @@
-using System.Security.Cryptography;
-using SGE.Aplicacion;
 using SGE.Aplicacion.Excepciones;
-using SGE.Aplicacion.Usuarios;
+using SGE.Aplicacion.Servicios;
 using SGE.Aplicacion.Usuarios.DTOs;
 using SGE.Dominio.Usuarios;
 
@@ -11,12 +9,16 @@ public class RegistrarUsuarioUseCase
 {
     private readonly IUnidadDeTrabajo _uow;
     private readonly IUsuarioRepository _userRepo;
+    private readonly IHashService _hashService;
 
-    public RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo)
+
+    public RegistrarUsuarioUseCase(IUnidadDeTrabajo uow, IUsuarioRepository userRepo, IHashService hashService)
     {
         _uow = uow;
         _userRepo = userRepo;
+        _hashService = hashService;
     }
+
 
     public RegistrarUsuarioResponseDTO Ejecutar(RegistrarUsuarioDTO req)
     {
@@ -24,11 +26,11 @@ public class RegistrarUsuarioUseCase
         {
             throw new AplicationException("El email ya está registrado");
         }
-        Usuario user = new Usuario(req.Nombre,req.Email,ContrasenaUtil.Convertir(req.Contrasena));
+        Usuario user = new Usuario(req.Nombre, req.Email, _hashService.Hash(req.Contrasena));
 
         _userRepo.Agregar(user);
         _uow.Guardar();
 
-        return new RegistrarUsuarioResponseDTO(user.Id,user.Nombre,user.Email,user.EsAdmin,user.Permisos);
+        return new RegistrarUsuarioResponseDTO(user.Id, user.Nombre, user.Email, user.EsAdmin, user.Permisos);
     }
 }

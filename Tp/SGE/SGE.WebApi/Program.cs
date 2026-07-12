@@ -17,6 +17,7 @@ using SGE.Infraestructura.Repositorios;
 using SGE.Infraestructura.Servicios;
 using SGE.WebApi;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();

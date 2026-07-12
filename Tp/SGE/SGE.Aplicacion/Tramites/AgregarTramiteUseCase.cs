@@ -1,8 +1,8 @@
-using SGE.Aplicacion;
-using SGE.Dominio.Tramites;
-using SGE.Aplicacion.Tramites.DTOs;
-using SGE.Aplicacion.Servicios;
 using SGE.Aplicacion.Autorizacion;
+using SGE.Aplicacion.Servicios;
+using SGE.Aplicacion.Tramites.DTOs;
+using SGE.Dominio.Tramites;
+using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
@@ -29,7 +29,7 @@ public class AgregarTramiteUseCase
         }
 
         Contenido contenido = new Contenido(req.Contenido);
-        
+
         Tramite tramite = new Tramite(
             req.ExpedienteId,
             (EtiquetaTramite)req.Etiqueta,

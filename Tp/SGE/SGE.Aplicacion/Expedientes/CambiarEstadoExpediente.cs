@@ -1,8 +1,7 @@
 using SGE.Aplicacion.Autorizacion;
-using SGE.Aplicacion.Expedientes.DTOs;
 using SGE.Aplicacion.Excepciones;
-using SGE.Dominio.Tramites;
-using SGE.Dominio.Expedientes;
+using SGE.Aplicacion.Expedientes.DTOs;
+using SGE.Dominio.Usuarios;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
@@ -25,13 +24,13 @@ public class CambiarEstadoExpediente
         {
             throw new AplicationException("La solicitud no puede estar vacia");
         }
-        
-        if(!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteModificacion))
+
+        if (!_autorizacion.PoseeElPermiso(idUsuario, Permiso.ExpedienteModificacion))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar el estado");
         }
 
-        var exp=_iExpRepo.ObtenerPorId(req.IdExp);
+        var exp = _iExpRepo.ObtenerPorId(req.IdExp);
         if (exp == null)
         {
             throw new AplicationException("El expediente solicitado no existe");
@@ -42,6 +41,6 @@ public class CambiarEstadoExpediente
         _iExpRepo.Modificar(exp);
         _uow.Guardar();
 
-        return new CambiarEstadoExpResponseDTO(exp.Id,exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
+        return new CambiarEstadoExpResponseDTO(exp.Id, exp.Estado, exp.UsuarioUltimoCambio, exp.FechaUltimaModificacion);
     }
 }

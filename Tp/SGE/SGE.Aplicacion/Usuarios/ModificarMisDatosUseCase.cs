@@ -1,7 +1,5 @@
-using SGE.Aplicacion;
-using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Excepciones;
-using SGE.Aplicacion.Usuarios;
+using SGE.Aplicacion.Servicios;
 using SGE.Aplicacion.Usuarios.DTOs;
 using SGE.Dominio.Usuarios;
 
@@ -11,18 +9,21 @@ public class ModificarMisDatosUseCase
 {
     private readonly IUsuarioRepository _repo;
     private readonly IUnidadDeTrabajo _uow;
+    private readonly IHashService _hashService;
 
-    public ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo uow)
+
+    public ModificarMisDatosUseCase(IUsuarioRepository repo, IUnidadDeTrabajo uow, IHashService hashService)
     {
         _repo = repo;
         _uow = uow;
+        _hashService = hashService;
     }
 
     public ModificarMisDatosResponseDTO Ejecutar(ModificarMisDatosDTO req, Guid id)
     {
         Usuario? user = _repo.ObtenerPorId(id);
-       
-        if(user == null)
+
+        if (user == null)
         {
             throw new AplicationException("Usuario no encontrado");
         }
@@ -39,7 +40,7 @@ public class ModificarMisDatosUseCase
 
         if (!string.IsNullOrWhiteSpace(req.NuevaClave))
         {
-            user.CambiarContrasenaHash(ContrasenaUtil.Convertir(req.NuevaClave));
+            user.CambiarContrasenaHash(_hashService.Hash(req.NuevaClave));
         }
 
         _repo.Modificar(user);

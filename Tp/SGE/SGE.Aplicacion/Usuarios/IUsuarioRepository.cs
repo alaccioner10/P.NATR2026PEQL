@@ -10,4 +10,5 @@ public interface IUsuarioRepository
     void Eliminar(Guid id);
     Usuario? ObtenerPorEmail(string email);
     bool ExistePorEmail(string email);
+    IEnumerable<Usuario> ObtenerTodos();
 }

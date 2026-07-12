@@ -1,8 +1,10 @@
 using SGE.Aplicacion.Autorizacion;
-using SGE.Dominio.Tramites;
-using SGE.Aplicacion.Tramites.DTOs;
 using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Servicios;
+using SGE.Aplicacion.Tramites.DTOs;
+using SGE.Dominio.Tramites;
+using SGE.Dominio.Usuarios;
+
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
@@ -38,13 +40,13 @@ public class ModificarTramiteUseCase
 
         tramite.ModificarContenido(nuevoContenido, idUsuario);
 
-        _actualizador.Ejecutar(tramite,idUsuario);
+        _actualizador.Ejecutar(tramite, idUsuario);
 
         _uow.Guardar();
 
         return new ModificarTramiteResponseDTO(
-            tramite.Id, 
-            tramite.Contenido.Valor, 
+            tramite.Id,
+            tramite.Contenido.Valor,
             tramite.UsuarioUltCambio,
             tramite.FechaUltModificacion
         );

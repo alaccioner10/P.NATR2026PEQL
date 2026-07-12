@@ -28,7 +28,7 @@ public class UsuarioRepository : IUsuarioRepository
     public void Eliminar(Guid id)
     {
         Usuario? user = _context.Usuarios.FirstOrDefault(e => e.Id.Equals(id));
-        if(user == null)
+        if (user == null)
         {
             throw new RepositoryException("No existe el usuario");
         }
@@ -44,4 +44,10 @@ public class UsuarioRepository : IUsuarioRepository
     {
         return _context.Usuarios.Any(u => u.Email == email);
     }
+
+    public IEnumerable<Usuario> ObtenerTodos()
+    {
+        return _context.Usuarios.ToList();
+    }
+
 }
