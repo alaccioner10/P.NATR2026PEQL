@@ -2954,21 +2954,21 @@ app.Run();</code></pre>
                 <tr>
                     <td>Usuarios</td>
                     <td>GET</td>
-                    <td>/api/usuarios</td>
+                    <td>/api/usuarios/Listar</td>
                     <td>Sí</td>
                     <td>Listar todos los usuarios (Solo Admin)</td>
                 </tr>
                 <tr>
                     <td>Expedientes</td>
                     <td>POST</td>
-                    <td>/api/expedientes</td>
+                    <td>/api/expedientes/Agregar</td>
                     <td>Sí</td>
                     <td>Alta de expediente (Requiere Permiso: ExpedienteAlta)</td>
                 </tr>
                 <tr>
                     <td>Expedientes</td>
                     <td>GET</td>
-                    <td>/api/expedientes</td>
+                    <td>/api/expedientes/Listar</td>
                     <td>No</td>
                     <td>Listar expedientes con filtros</td>
                 </tr>
@@ -2982,14 +2982,14 @@ app.Run();</code></pre>
                 <tr>
                     <td>Expedientes</td>
                     <td>GET</td>
-                    <td>/api/expedientes/{id}</td>
+                    <td>/api/expedientes/Detalles/{id}</td>
                     <td>No</td>
                     <td>Obtener expediente junto a sus trámites asociados</td>
                 </tr>
                 <tr>
                     <td>Expedientes</td>
                     <td>PUT</td>
-                    <td>/api/expedientes/caratula</td>
+                    <td>/api/expedientes/ModificarCaratula</td>
                     <td>Sí</td>
                     <td>Modificar carátula (Requiere Permiso: ExpedienteModificacion)</td>
                 </tr>
@@ -3003,42 +3003,42 @@ app.Run();</code></pre>
                 <tr>
                     <td>Expedientes</td>
                     <td>DELETE</td>
-                    <td>/api/expedientes</td>
+                    <td>/api/expedientes/Eliminar</td>
                     <td>Sí</td>
                     <td>Eliminar expediente (Requiere Permiso: ExpedienteBaja)</td>
                 </tr>
                 <tr>
                     <td>Trámites</td>
                     <td>POST</td>
-                    <td>/api/tramites</td>
+                    <td>/api/tramites/Agregar</td>
                     <td>Sí</td>
                     <td>Alta de trámite (Requiere Permiso: TramiteAlta)</td>
                 </tr>
                 <tr>
                     <td>Trámites</td>
                     <td>PUT</td>
-                    <td>/api/tramites</td>
+                    <td>/api/tramites/Modificar</td>
                     <td>Sí</td>
                     <td>Modificar trámite (Requiere Permiso: TramiteModificacion)</td>
                 </tr>
                 <tr>
                     <td>Trámites</td>
                     <td>DELETE</td>
-                    <td>/api/tramites</td>
+                    <td>/api/tramites/Eliminar</td>
                     <td>Sí</td>
                     <td>Eliminar trámite (Requiere Permiso: TramiteBaja)</td>
                 </tr>
                 <tr>
                     <td>Trámites</td>
                     <td>GET</td>
-                    <td>/api/tramites</td>
+                    <td>/api/tramites/Listar</td>
                     <td>No</td>
                     <td>Listar trámites por expediente</td>
                 </tr>
                 <tr>
                     <td>Trámites</td>
                     <td>GET</td>
-                    <td>/api/tramites/{id}</td>
+                    <td>/api/tramites/Detalles/{id}</td>
                     <td>No</td>
                     <td>Consultar un trámite puntual por ID</td>
                 </tr>
@@ -3087,12 +3087,12 @@ DELETE /api/usuarios/eliminar
 
         <div class="explanation-block">
             <h5>Expedientes</h5>
-            <pre><code class="language-json">POST /api/expedientes
+            <pre><code class="language-json">POST /api/expedientes/Agregar
 {
   "caratula": "Expediente de pruebas"
 }
 
-PUT /api/expedientes/caratula
+PUT /api/expedientes/ModificarCaratula
 {
   "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
   "nuevaCaratula": "Nueva carátula"
@@ -3104,9 +3104,9 @@ PUT /api/expedientes/estado
   "estado": 4
 }
 
-DELETE /api/expedientes
+DELETE /api/expedientes/Eliminar
 {
-  "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+  "expedienteId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 }
 
 GET /api/expedientes/consultar?ExpedienteId=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee</code></pre>
@@ -3114,26 +3114,26 @@ GET /api/expedientes/consultar?ExpedienteId=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
 
         <div class="explanation-block">
             <h5>Trámites</h5>
-            <pre><code class="language-json">POST /api/tramites
+            <pre><code class="language-json">POST /api/tramites/Agregar
 {
   "expedienteId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
   "etiqueta": 0,
   "contenido": "Escrito presentado por la parte actora"
 }
 
-PUT /api/tramites
+PUT /api/tramites/Modificar
 {
   "tramiteId": "ffffffff-1111-2222-3333-444444444444",
   "nuevoContenido": "Contenido actualizado"
 }
 
-DELETE /api/tramites
+DELETE /api/tramites/Eliminar
 {
   "tramiteId": "ffffffff-1111-2222-3333-444444444444"
 }
 
-GET /api/tramites?ExpedienteID=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
-GET /api/tramites/ffffffff-1111-2222-3333-444444444444</code></pre>
+GET /api/tramites/Listar?ExpedienteID=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+GET /api/tramites/Detalles/ffffffff-1111-2222-3333-444444444444</code></pre>
         </div>
 
         <h3 class="subsection-title">4.3 Enumeraciones y permisos reales</h3>
