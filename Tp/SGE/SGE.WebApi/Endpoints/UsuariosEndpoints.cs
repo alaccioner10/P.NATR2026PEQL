@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using SGE.Aplicacion.Usuarios.DTOs;
 using SGE.Aplicacion.Usuarios.UseCases;
@@ -53,7 +54,7 @@ public static class UsuariosEndpoints
         }).RequireAuthorization();
 
         // DELETE /api/usuarios/eliminar - Elimina a un usuario determinado de la base de datos (requiere autorización de administrador)
-        group.MapDelete("/eliminar", (EliminarUsuarioDTO request, EliminarUsuarioUseCase useCase, HttpContext httpContext) =>
+        group.MapDelete("/eliminar", ([FromBody] EliminarUsuarioDTO request, EliminarUsuarioUseCase useCase, HttpContext httpContext) =>
         {
             var idUsuario = ObtenerIdUsuarioDelToken(httpContext);
             var response = useCase.Ejecutar(request, idUsuario);
@@ -61,7 +62,7 @@ public static class UsuariosEndpoints
         }).RequireAuthorization();
 
         // GET /api/usuarios - Obtiene la lista de todos los usuarios del sistema (requiere privilegios de administrador)
-        group.MapGet("/", (ListarUsuariosUseCase useCase, HttpContext httpContext) =>
+        group.MapGet("/Listar", (ListarUsuariosUseCase useCase, HttpContext httpContext) =>
         {
             var idUsuario = ObtenerIdUsuarioDelToken(httpContext);
             var response = useCase.Ejecutar(idUsuario);
