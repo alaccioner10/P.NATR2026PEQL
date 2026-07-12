@@ -50,4 +50,5 @@ public class UsuarioRepository : IUsuarioRepository
         return _context.Usuarios.ToList();
     }
 
+
 }

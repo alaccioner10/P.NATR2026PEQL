@@ -1,5 +1,7 @@
+using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Usuarios.DTOs;
+using SGE.Dominio.Excepciones;
 
 namespace SGE.Aplicacion.Usuarios.UseCases;
 
@@ -17,12 +19,18 @@ public class ConsultarUsuarioUseCase
         var usuario = _userRepo.ObtenerPorId(req.IdUsuario);
         if (usuario == null)
         {
-            throw new AplicationException("El usuario solicitado no existe.");
+            throw new EntidadNoEncontradaException("El usuario solicitado no existe.");
         }
 
-        if (idUsuarioSolicitante != req.IdUsuario && !usuario.EsAdmin)
+        var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);
+        if (solicitante == null)
         {
-            throw new AplicationException("No tienes permiso para consultar este usuario.");
+            throw new AutorizacionException("El usuario solicitante no existe.");
+        }
+
+        if (idUsuarioSolicitante != req.IdUsuario && !solicitante.EsAdmin)
+        {
+            throw new AutorizacionException("No tienes permiso para consultar este usuario.");
         }
 
         return new ConsultarUsuarioResponseDTO(

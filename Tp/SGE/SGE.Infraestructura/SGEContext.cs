@@ -23,24 +23,27 @@ public class SGEContext : DbContext
 
         modelBuilder.Entity<Expediente>(entity =>
         {
-            entity.Property(e => e.Caratula)
-                .HasConversion(
-                    caratula => caratula.Valor,
-                    valor => new Caratula(valor))
-                .HasColumnName("Caratula");
+            entity.ComplexProperty(e => e.Caratula, c =>
+            {
+                c.Property(car => car.Valor)
+                    .HasColumnName("Caratula")
+                    .IsRequired();
+            });
         });
 
         modelBuilder.Entity<Tramite>(entity =>
         {
-            entity.Property(t => t.Contenido)
-                .HasConversion(
-                    contenido => contenido.Valor,
-                    valor => new Contenido(valor))
-                .HasColumnName("Contenido");
+            entity.ComplexProperty(t => t.Contenido, c =>
+            {
+                c.Property(con => con.Valor)
+                 .HasColumnName("Contenido")
+                 .IsRequired();
+            });
         });
 
-        string hashAdmin = ContrasenaUtil.Convertir("admin123");
-        string hashPrueba = ContrasenaUtil.Convertir("prueba123");
+        var hashService = new Servicios.HashService();
+        string hashAdmin = hashService.Hash("admin123");
+        string hashPrueba = hashService.Hash("prueba123");
 
         var adminSemilla = Usuario.Reconstruir(
             id: Guid.Parse("11111111-1111-1111-1111-111111111111"),
