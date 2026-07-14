@@ -1272,27 +1272,13 @@ public class Expediente
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Patrones de Diseño y DDD):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El Expediente como Aggregate Root (Raíz de Agregado):</strong> En el diseño dirigido por el dominio (DDD), un Agregado es un grupo de objetos asociados que se tratan como una unidad transaccional de datos. El <code>Expediente</code> actúa como la Raíz del Agregado (Aggregate Root). Esto significa que es la única puerta de entrada para modificar cualquier dato del expediente o de sus elementos subordinados (como los trámites asociados). Al encapsular las modificaciones a través del expediente, se asegura que las invariantes de negocio (las reglas de consistencia interna) se validen y cumplan en todo momento.</li>
-                <li><strong>Encapsulamiento de Propiedades y Modificadores <code>private set</code>:</strong> Al declarar los setters de las propiedades (como <code>Estado</code> y <code>Caratula</code>) con el modificador <code>private set</code>, prohibimos explícitamente que las capas externas (como la Web API o los servicios de infraestructura) modifiquen directamente el estado del expediente en memoria. Si un programador desea cambiar el estado del expediente, se ve obligado a invocar el método de negocio <code>ActualizarEstado()</code>, lo que garantiza que la transición sea validada por las reglas comerciales vigentes.</li>
-                <li><strong>Materialización de Entidades y el Constructor Privado sin Parámetros:</strong> Entity Framework Core (EF Core) necesita instanciar (hidratar) las entidades al recuperarlas desde la base de datos SQLite. Para ello, requiere un constructor sin parámetros. Al definir <code>private Expediente()</code> con el operador de perdón de nulos <code>null!</code> para la <code>Caratula</code>, permitimos que EF Core cree el objeto de forma técnica y transparente en segundo plano. Dado que es un constructor privado, ningún programador externo puede utilizarlo, protegiendo al objeto de ser instanciado de forma incorrecta o sin datos en otras capas.</li>
-                <li><strong>Factoría Técnica (Factory Method) <code>Reconstruir</code>:</strong> Durante la creación inicial de un expediente, el constructor público asigna un nuevo identificador (<code>Guid.NewGuid()</code>), marca las fechas actuales (<code>DateTime.Now</code>) y define el estado inicial como <code>RecienIniciado</code>. Sin embargo, al recuperar un expediente existente de la base de datos, no queremos asignarle valores nuevos ni mutar su historial de auditoría. El método estático <code>Reconstruir</code> actúa como una factoría técnica dedicada a inicializar un expediente con sus datos históricos reales provenientes de la base de datos sin disparar las reglas y firmas automáticas que se ejecutan durante una creación desde cero.</li>
-                <li><strong>Encapsulación de la Máquina de Estados Lógicos:</strong> El estado de un expediente administrativo no es una variable arbitraria que pueda cambiarse libremente. El método sobrecargado <code>ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)</code> implementa una máquina de estados determinista. Evalúa la etiqueta del último trámite ingresado y realiza la transición adecuada: por ejemplo, ante un trámite de tipo <code>PaseAlArchivo</code>, el estado se actualiza irreversiblemente a <code>Finalizado</code>. Al final de la transición, registra los datos de auditoría (<code>UsuarioUltimoCambio</code> y <code>FechaUltimaModificacion</code>) e informa mediante un valor booleano si la transición de estado fue efectiva.</li>
-                <li><strong>Qué deja listo para el resto del sistema:</strong> Este bloque muestra que <code>Expediente</code> no sólo guarda datos, sino que también protege el ciclo de vida completo del agregado. Cada cambio queda centralizado acá, por eso los casos de uso no modifican campos sueltos: llaman a métodos de la entidad y luego persisten el resultado.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public Guid Id { get; private set; }</code> y el resto de las propiedades:</strong> guardan el estado del expediente, pero desde afuera no se pueden cambiar libremente. Eso obliga a usar los métodos de negocio.</li>
-                <li><strong><code>private Expediente()</code>:</strong> existe para que Entity Framework pueda reconstruir objetos desde SQLite sin ejecutar lógica de creación manual.</li>
-                <li><strong><code>public Expediente(Caratula caratula, Guid user)</code>:</strong> crea un expediente nuevo con id, fechas actuales y estado inicial <code>RecienIniciado</code>.</li>
-                <li><strong><code>private Expediente(...)</code>:</strong> concentra la validación de invariantes básicas como el id no vacío y la fecha de modificación válida.</li>
-                <li><strong><code>Reconstruir(...)</code>:</strong> arma otra vez un expediente desde datos ya guardados, sin inventar valores nuevos.</li>
-                <li><strong><code>RegistrarModificacion(Guid idUser)</code>:</strong> centraliza la auditoría para no repetir la actualización de usuario y fecha en cada método.</li>
-                <li><strong><code>ModificarCaratula(...)</code>:</strong> cambia la carátula y luego registra quién hizo la modificación.</li>
-                <li><strong><code>ActualizarEstado(EtiquetaTramite? ultEtiqueta, Guid idUser)</code>:</strong> traduce la última etiqueta del trámite al estado del expediente y devuelve si el estado cambió.</li>
-                <li><strong><code>ActualizarEstado(EstadoExpediente nuevoEstado, Guid idUser)</code>:</strong> permite forzar un estado concreto cuando el caso de uso ya sabe cuál debe ser el resultado.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Definir <code>Expediente</code> como la única Raíz de Agregado (Aggregate Root) que encapsula su propia máquina de estados (<code>ActualizarEstado</code>), restringiendo los setters como <code>private set</code> y proveyendo un constructor privado sin parámetros para la reconstrucción de EF Core junto a una factoría técnica (<code>Reconstruir</code>).</li>
+                <li><strong>Alternativa Descartada:</strong> Tener una clase meramente anémica (sólo propiedades públicas con `get; set;` sin métodos de negocio) y manejar el cambio de estado y las validaciones de invariantes dentro de los Casos de Uso.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Centraliza las invariantes de negocio (como impedir que un expediente con fecha de última modificación previa a la de creación exista) en un único lugar, evitando inconsistencias. Los setters privados obligan a pasar por los métodos del negocio y previenen manipulaciones arbitrarias de auditoría o de estado en capas externas.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Aumenta la complejidad del mapeo de EF Core al requerir configuración explícita para propiedades complejas y obligar a definir constructores privados exclusivamente para la persistencia. Además, escribir pruebas unitarias requiere instanciar entidades completas respetando sus invariantes rígidas.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Diseñamos el Expediente como un Aggregate Root rico para proteger la consistencia de sus invariantes de negocio en el núcleo del dominio. Al declarar setters privados y exponer métodos explícitos como ModificarCaratula o ActualizarEstado, impedimos que la base de datos o la Web API fuercen transiciones inválidas. La alternativa anémica es riesgosa porque dispersa las reglas de negocio en múltiples casos de uso, duplicando lógica y facilitando la corrupción del estado."</span></li>
             </ul>
         </div>
 
@@ -1320,21 +1306,13 @@ public record class Caratula
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Value Objects y Records):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El concepto de Objeto de Valor (Value Object):</strong> En DDD, no todos los objetos del sistema requieren una identidad única e histórica (como un ID autoincremental). Un <code>Value Object</code> es un objeto que se define únicamente por el conjunto de sus atributos. La <code>Caratula</code> no posee un ciclo de vida independiente ni un identificador único; dos carátulas son idénticas si su texto es el mismo. Al modelarla como un Value Object, simplificamos el modelo mental y evitamos la sobrecarga de generar tablas relacionales adicionales.</li>
-                <li><strong>El tipo <code>record class</code> en C#:</strong> C# provee el tipo <code>record</code> para modelar de forma nativa estructuras de datos inmutables con comparaciones de igualdad basadas en valores en vez de referencias en memoria. Esto significa que si creamos dos objetos de tipo <code>Caratula</code> con el valor `"Expediente de Personal"`, la comparación <code>caratula1 == caratula2</code> evaluará a <code>true</code> de manera automática, sin necesidad de sobrecargar operadores de igualdad complejos.</li>
-                <li><strong>Validación Preventiva en el Constructor:</strong> Un Objeto de Valor no puede entrar en un estado inconsistente. El constructor de <code>Caratula</code> valida preventivamente que el texto provisto no sea nulo ni contenga espacios en blanco mediante <code>string.IsNullOrWhiteSpace()</code>. Si la validación falla, interrumpe el flujo arrojando una <code>DomainException</code> inmediatamente. De este modo, garantizamos que si logramos instanciar una carátula, esta es 100% válida para el sistema. Adicionalmente, aplica un <code>Trim()</code> para normalizar y limpiar el texto de espacios accidentales en los extremos.</li>
-                <li><strong>Para qué se usa en el resto del código:</strong> La carátula entra como texto simple desde la API, pero antes de persistirse se transforma en este Value Object. Eso permite que el sistema detecte errores temprano y que la base de datos reciba un dato normalizado, no una cadena cualquiera.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public record class Caratula</code>:</strong> declara un value object inmutable, pensado para compararse por valor y no por identidad.</li>
-                <li><strong><code>public string Valor { get; }</code>:</strong> guarda el texto real de la carátula y evita que se cambie después de creada.</li>
-                <li><strong>Constructor <code>Caratula(string valor)</code>:</strong> valida que el texto no venga vacío y, si está bien, lo normaliza con <code>Trim()</code>.</li>
-                <li><strong><code>throw new DomainException(...)</code>:</strong> corta la creación cuando la entrada no cumple la regla de negocio.</li>
-                <li><strong><code>ToString()</code>:</strong> devuelve el texto puro de la carátula para mostrarlo o serializarlo de forma simple.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Modelar la carátula como un Objeto de Valor (Value Object) implementado mediante un <code>record class</code> inmutable, con validación de no-vacío y normalización (<code>Trim</code>) en su constructor.</li>
+                <li><strong>Alternativa Descartada:</strong> Representar la carátula como una propiedad simple de tipo `string` directamente en la entidad `Expediente` (y validar el texto en el caso de uso o DTO).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Centraliza la invariante estructural en el propio tipo de dato; un objeto `Caratula` sólo existe si su estado es coherente. Al usar `record class`, obtenemos comparación de igualdad estructural nativa (por valor en vez de por referencia) sin sobrecargar operadores manualmente.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Introduce una clase adicional en el dominio y complejiza el mapeo relacional en EF Core, que debe configurarse explícitamente mediante `.ComplexProperty()` para que la columna en la base de datos siga siendo un string de SQLite.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Elegimos encapsular la carátula en un Value Object en lugar de un string plano para proteger la validez del dato en el núcleo de nuestro dominio. La carátula no tiene identidad propia (dos expedientes con el mismo título tienen carátulas conceptualmente iguales) e incluye reglas de limpieza como Trim y validaciones contra nulos. Al usar record class logramos inmutabilidad e igualdad de valor nativas, lo que simplifica enormemente el código y la consistencia."</span></li>
             </ul>
         </div>
 
@@ -1399,22 +1377,13 @@ public class Tramite
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Entidades Subordinadas y Auditoría):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Entidad Subordinada en el Agregado:</strong> A diferencia de los objetos de valor inmutables, la clase <code>Tramite</code> representa una Entidad puesto que posee una identidad conceptual única representada por su propiedad <code>Id</code>. Sin embargo, no funciona de manera independiente; pertenece al agregado de <code>Expediente</code> y está enlazado a él a través de la clave foránea <code>ExpedienteId</code>.</li>
-                <li><strong>Encapsulamiento del Ciclo de Vida:</strong> De forma homóloga a <code>Expediente</code>, la clase <code>Tramite</code> define sus setters como privados. La única forma de alterar su contenido es invocando el método explícito de negocio <code>ModificarContenido(Contenido nuevoContenido, Guid usuarioId)</code>, que no solo realiza el cambio de texto sino que de forma atómica y obligatoria actualiza la fecha de modificación y la firma de auditoría del usuario que realizó la acción, evitando inconsistencias u omisiones en el log de auditoría.</li>
-                <li><strong>Constructor Privado y Reconstrucción:</strong> Cuenta con el constructor privado sin parámetros requerido por Entity Framework Core para materializar el trámite desde la base de datos sin ejecutar validaciones de creación, y provee el método estático <code>Reconstruir</code> para restaurar el estado original del trámite guardado en SQLite sin mutar la fecha de creación real.</li>
-                <li><strong>Qué devuelve o deja listo:</strong> El método <code>ModificarContenido()</code> no devuelve un objeto nuevo; deja la misma entidad actualizada con nuevo contenido, nuevo usuario responsable y nueva fecha de modificación. Por eso el caso de uso sólo necesita persistir el cambio después.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public Guid Id { get; private set; }</code> y propiedades asociadas:</strong> identifican el trámite y guardan su vínculo con el expediente, su etiqueta, su contenido y su auditoría.</li>
-                <li><strong><code>private Tramite()</code>:</strong> permite que EF Core materialice la entidad desde la base sin pasar por la creación manual.</li>
-                <li><strong><code>public Tramite(...)</code>:</strong> crea un trámite nuevo con id propio y fechas de creación/modificación iniciales.</li>
-                <li><strong><code>private Tramite(...)</code>:</strong> valida el id y la coherencia temporal antes de asignar los datos reales.</li>
-                <li><strong><code>Reconstruir(...)</code>:</strong> recupera un trámite guardado en SQLite y lo deja listo sin cambiar su historia.</li>
-                <li><strong><code>ModificarContenido(...)</code>:</strong> reemplaza el contenido, actualiza el usuario responsable y marca la fecha de modificación actual.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Diseñar `Tramite` como una entidad interna subordinada dentro del Agregado de `Expediente` (con su propio ID único), protegiendo la auditoría obligatoria (`UsuarioUltCambio` y `FechaUltModificacion`) a través del método `ModificarContenido()`.</li>
+                <li><strong>Alternativa Descartada:</strong> Modelar `Tramite` como un Value Object inmutable sin identidad propia.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Un trámite tiene ciclo de vida e historia independiente dentro del expediente; su contenido puede modificarse o corregirse con el tiempo, y necesitamos auditar quién y cuándo realizó la última modificación. Al modelarlo como entidad, podemos asociar un identificador relacional persistente en SQLite.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Genera un acoplamiento donde, para cumplir estrictamente con DDD, cualquier modificación a un `Tramite` debería pasar por métodos en la raíz del agregado (`Expediente`), lo cual incrementaría la complejidad y las firmas del `Expediente` en la lógica de aplicación.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Definimos Tramite como una entidad porque tiene un ciclo de vida propio y mutable (puede ser modificado y auditado individualmente) lo que requiere identidad única (Id). Sin embargo, está supeditado conceptualmente al agregado de Expediente. Los setters privados y el método ModificarContenido garantizan que sea imposible alterar su estado sin registrar la fecha y el usuario responsable en la misma operación de manera atómica."</span></li>
             </ul>
         </div>
 
@@ -1442,20 +1411,13 @@ public record class Contenido
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Value Objects):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Inmutabilidad y Consistencia del Historial de Trámites:</strong> Al igual que la carátula, el contenido de un trámite es un Objeto de Valor (Value Object) modelado como un <code>record class</code>. La inmutabilidad garantiza que, una vez emitido un trámite administrativo, su contenido descriptivo no pueda ser alterado de forma accidental sin pasar por las validaciones de negocio correspondientes, preservando la integridad del historial legal del expediente.</li>
-                <li><strong>Garantía de Calidad de Datos (Invariante):</strong> Centraliza la validación en su constructor arrojando de inmediato una excepción si se intenta crear un trámite con contenido nulo o vacío. Esto evita que la base de datos termine contaminada con descripciones administrativas vacías o sin sentido comercial.</li>
-                <li><strong>Relación con el caso de uso:</strong> El contenido llega como string desde la petición HTTP, pero el caso de uso lo convierte en este Value Object antes de crear el trámite. Así se separa el texto recibido del objeto válido que realmente entiende el dominio.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public record class Contenido</code>:</strong> modela el texto del trámite como un value object, no como una cadena suelta.</li>
-                <li><strong><code>public string Valor { get; }</code>:</strong> conserva el texto interno ya validado y lo deja sólo de lectura.</li>
-                <li><strong>Constructor <code>Contenido(string valor)</code>:</strong> rechaza texto vacío y limpia espacios al inicio o al final.</li>
-                <li><strong><code>throw new DomainException(...)</code>:</strong> detiene la creación cuando el contenido no cumple la regla mínima.</li>
-                <li><strong><code>ToString()</code>:</strong> devuelve el valor textual para mostrarlo o serializarlo con facilidad.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Representar el contenido de un trámite como un Objeto de Valor (Value Object) `Contenido` de tipo `record class` inmutable, validando en su constructor que el valor no esté vacío.</li>
+                <li><strong>Alternativa Descartada:</strong> Modelar el contenido del trámite directamente como una propiedad de tipo `string` en la clase `Tramite`.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Separa las validaciones de formato de texto de la entidad `Tramite`. Evita que existan trámites en la base de datos con contenido vacío o con espacios innecesarios. Se obtiene inmutabilidad y comparación de igualdad basadas en valor de manera gratuita.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Requiere configuraciones adicionales en EF Core (mapping de propiedad compleja en `SGEContext.cs`), agregando una pequeña sobrecarga sintáctica en la inicialización y mapeos.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Decidimos que el contenido de un trámite sea un Value Object porque, al igual que la carátula, no tiene identidad propia y debe ser inmutable para proteger el historial documental. Al encapsularlo en la clase Contenido, garantizamos que ningún trámite se cree sin un cuerpo de texto válido, ya que el constructor arrojará una DomainException si la cadena está vacía o es espacio en blanco."</span></li>
             </ul>
         </div>
 
@@ -1509,23 +1471,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Seguridad y Privilegios en el Dominio):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Seguridad a nivel de Entidad de Dominio:</strong> La clase <code>Usuario</code> encapsula la identidad y los privilegios granulares. Las propiedades críticas como <code>EsAdmin</code> y la colección de <code>Permisos</code> poseen setters privados (<code>private set</code>). Esto impide que las capas externas del sistema modifiquen arbitrariamente los permisos o promuevan una cuenta ordinaria a cuenta de administrador a través de asignaciones directas de propiedades en memoria.</li>
-                <li><strong>Asignación Controlada de Permisos:</strong> Los permisos de un usuario no administrador únicamente se pueden actualizar a través de la llamada al método de negocio <code>CambiarPermisos(IEnumerable&lt;Permiso&gt; nuevosPermisos)</code>. Esto nos permite centralizar reglas (por ejemplo, que los administradores no requieran permisos explícitos ya que los heredan todos por defecto) en el corazón del dominio.</li>
-                <li><strong>Restauración sin Pérdida de Estado:</strong> Provee un factory method <code>Reconstruir</code> para hidratar las cuentas de usuario y sus colecciones de permisos desde la base de datos de manera atómica, manteniendo los hashes de contraseñas correctos y los GUIDs originales de auditoría.</li>
-                <li><strong>Qué representa para la aplicación:</strong> Este objeto concentra identidad, credenciales y permisos en un solo lugar. Gracias a eso, los casos de uso de usuarios sólo tienen que pedirle al dominio que cambie permisos o guardar la entidad; no tienen que reinventar reglas de seguridad.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public Guid Id { get; private set; }</code>:</strong> identifica al usuario de forma única y no se puede cambiar desde afuera.</li>
-                <li><strong><code>Nombre</code>, <code>Email</code> y <code>ContrasenaHash</code>:</strong> guardan los datos principales de autenticación y perfil.</li>
-                <li><strong><code>EsAdmin</code> y <code>Permisos</code>:</strong> modelan el nivel de acceso del usuario dentro del sistema.</li>
-                <li><strong>Constructor público <code>Usuario(string nombre, string email, string contrasenaHash)</code>:</strong> crea un usuario nuevo de forma estándar y lo deja como no administrador por defecto.</li>
-                <li><strong>Constructor privado:</strong> valida el id y centraliza la asignación de todos los campos reales.</li>
-                <li><strong><code>Reconstruir(...)</code>:</strong> permite hidratar usuarios ya existentes desde la base sin alterar sus datos históricos.</li>
-                <li><strong><code>CambiarPermisos(...)</code>:</strong> reemplaza la colección de permisos del usuario cuando un caso de uso autorizado lo requiere.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Definir `Usuario` como una Entidad autónoma, guardando el email y el nombre como `string` de texto plano con getters públicos y setters privados (con excepción de los setters públicos en la documentación previa para simplificación), y encapsulando la modificación de permisos en el método de negocio `CambiarPermisos()`.</li>
+                <li><strong>Alternativa Descartada:</strong> Hacer que la propiedad `Email` sea una propiedad compleja (`ComplexProperty`) encapsulada en una clase `Email` autovalidada.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Mantener las propiedades básicas como `string` simplifica drásticamente el mapeo en EF Core y optimiza los filtros directos por base de datos (por ejemplo, buscar un usuario por email al iniciar sesión). El control de permisos centralizado asegura que ningún usuario convencional pueda promoverse a administrador arbitrariamente en memoria.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Permite que se instancien usuarios con emails sin formato válido o vacíos en el dominio si no se controlan con validaciones en la capa de aplicación o DTOs.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Elegimos modelar las propiedades de perfil (Nombre, Email) como strings sencillos por practicidad en el mapeo relacional y velocidad en las búsquedas en la base de datos (por ejemplo, al verificar unicidad del mail o en el Login). La seguridad y roles de acceso están protegidos encapsulando los permisos en el objeto Usuario con setters privados, permitiendo cambios de permisos únicamente a través del método de negocio CambiarPermisos."</span></li>
             </ul>
         </div>
     </section>
@@ -1595,26 +1547,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Casos de Uso e Inyección de Dependencias):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El Patrón Command/Caso de Uso:</strong> En la arquitectura limpia, la capa de Aplicación contiene las reglas de proceso de la aplicación (los casos de uso). Esta clase coordina el flujo de datos desde el exterior, valida los permisos de seguridad y delega la lógica de negocio pura a los objetos del dominio. No contiene lógica de base de datos directa, lo que permite que sea fácil de testear de forma aislada.</li>
-                <li><strong>Inyección de Dependencias desacoplada (Constructor):</strong> Mediante el constructor, inyecta interfaces abstractas (<code>IUnidadDeTrabajo</code>, <code>IExpedienteRepository</code>, <code>IAutorizacionService</code>). Al depender de interfaces en lugar de implementaciones concretas (como una base de datos específica o un proveedor de JWT real), cumplimos con el principio de Inversión de Dependencias (Dependency Inversion Principle - SOLID), facilitando cambiar el motor de almacenamiento sin alterar una sola línea de lógica empresarial.</li>
-                <li><strong>Control Preventivo de Autorización:</strong> Invoca a <code>_autorizacion.PoseeElPermiso()</code> pasando el GUID del usuario y el permiso requerido <code>Permiso.ExpedienteAlta</code> antes de realizar cualquier operación. Si el chequeo falla, interrumpe el hilo arrojando una <code>AutorizacionException</code>. Esto actúa como un escudo de seguridad antes de procesar o guardar datos.</li>
-                <li><strong>Orquestación y Persistencia Transaccional:</strong> Transforma el string simple del DTO de entrada en un Value Object de tipo <code>Caratula</code> (lo que dispara sus validaciones internas). Crea la entidad de dominio <code>Expediente</code> y la registra en memoria en el repositorio mediante <code>Agregar()</code>. Finalmente, llama a <code>_uow.Guardar()</code> para consolidar la transacción a nivel físico, garantizando consistencia ACID.</li>
-                <li><strong>Mapeo a DTOs de Salida (Data Transfer Objects):</strong> Para evitar que la entidad de dominio <code>Expediente</code> se exponga directamente hacia el exterior (lo que acoplaría el modelo de dominio a la API y podría provocar bucles de serialización infinita), el caso de uso devuelve un objeto plano e inmutable de tipo <code>AgregarExpedienteResponse</code> que solo contiene los datos esenciales para la UI.</li>
-                <li><strong>Qué devuelve y por qué:</strong> Devuelve un DTO de respuesta con la información recién creada para que la API pueda confirmar el alta sin exponer la entidad completa. Ese retorno sirve para mostrar el id generado, el estado inicial y las fechas de auditoría.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly IUnidadDeTrabajo _uow;</code> y <code>private readonly IExpedienteRepository _iExpRepo;</code>:</strong> guardan las piezas necesarias para persistir el expediente sin depender de una base concreta.</li>
-                <li><strong><code>private readonly IAutorizacionService _autorizacion;</code>:</strong> permite verificar si el usuario tiene permiso antes de tocar datos.</li>
-                <li><strong>Constructor:</strong> recibe las dependencias por inyección y deja al caso de uso listo para orquestar el proceso.</li>
-                <li><strong><code>if (!_autorizacion.PoseeElPermiso(...))</code>:</strong> corta la ejecución si el usuario no está habilitado para crear expedientes.</li>
-                <li><strong><code>Caratula car = new Caratula(req.Caratula);</code>:</strong> transforma el texto de entrada en un objeto de dominio validado.</li>
-                <li><strong><code>Expediente exp = new Expediente(car, idUsuario);</code>:</strong> crea el expediente nuevo con su estado inicial y auditoría.</li>
-                <li><strong><code>_iExpRepo.Agregar(exp);</code> y <code>_uow.Guardar();</code>:</strong> registran y confirman el alta de forma transaccional.</li>
-                <li><strong><code>return new AgregarExpedienteResponse(...)</code>:</strong> devuelve al controlador los datos útiles del expediente recién creado.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Diseñar la creación de expedientes como un Caso de Uso (`AgregarExpedienteUseCase`) desacoplado de la API y de la infraestructura, inyectando interfaces abstractas (`IExpedienteRepository`, `IUnidadDeTrabajo`, `IAutorizacionService`) en su constructor.</li>
+                <li><strong>Alternativa Descartada:</strong> Escribir la lógica de autorización, instanciación del dominio y persistencia del expediente directamente dentro de los métodos del controlador/endpoint en la Web API (código espagueti).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Separa las responsabilidades. El caso de uso orquesta la secuencia de acciones pero no sabe qué base de datos se usa ni cómo se valida el token JWT. Esto permite probar el flujo de negocio con pruebas unitarias rápidas utilizando mocks para las dependencias.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Introduce una capa adicional de abstracción (DTOs de entrada y salida, interfaces y clases UseCase) que incrementa el número total de archivos y genera un costo sintáctico mayor para operaciones que inicialmente parecen simples altas de datos.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"El caso de uso coordina la lógica de la aplicación sin acoplarse a detalles técnicos. Inyectamos IExpedienteRepository e IAutorizacionService para cumplir con el Principio de Inversión de Dependencias (DIP) de SOLID. Así, el caso de uso es agnóstico del motor de base de datos (SQLite) y del sistema de autenticación (JWT). Colocar esta lógica en los controladores violaría la cohesión y dificultaría las pruebas unitarias."</span></li>
             </ul>
         </div>
 
@@ -1667,24 +1606,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Cascada Programática y Consistencia):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Validación Defensiva del DTO de Entrada:</strong> Comprueba inmediatamente si la solicitud entrante <code>req</code> es nula. En arquitecturas REST, un cuerpo JSON mal estructurado puede ser deserializado como nulo; atrapar este caso temprano evita excepciones genéricas del sistema como `NullReferenceException`, arrojando en su lugar una excepción controlada de aplicación (<code>AplicationException</code>).</li>
-                <li><strong>Manejo de Eliminación en Cascada en Capa de Aplicación:</strong> La eliminación de un registro padre (el expediente) requiere la eliminación de todos sus hijos (los trámites) para mantener la integridad referencial. Aunque esto podría delegarse a reglas de cascada automáticas (ON DELETE CASCADE) de SQLite, realizarlo de forma explícita y programática a nivel de aplicación ofrece mayor visibilidad, portabilidad entre diferentes motores de bases de datos y facilita el logging de auditoría de cada trámite removido.</li>
-                <li><strong>Transaccionalidad Asegurada:</strong> Al recuperar y eliminar todos los trámites vinculados mediante <code>_iTramRepo.Eliminar(t.Id)</code> en un bucle antes de eliminar el expediente con <code>_iExpRepo.Eliminar()</code>, se encolan todas las instrucciones de borrado en el Change Tracker. El llamado final a <code>_uow.Guardar()</code> ejecuta todas estas operaciones en un único bloque transaccional. Si alguna falla, se revierte todo, impidiendo que queden trámites huérfanos.</li>
-                <li><strong>Qué deja listo al terminar:</strong> El caso de uso no sólo borra el expediente; también limpia sus trámites y deja a la base en un estado coherente. Por eso el retorno es un DTO simple con el id eliminado, para que la API pueda confirmar la operación sin mostrar detalles internos.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly ITramiteRepository _iTramRepo;</code>:</strong> permite buscar y borrar todos los trámites vinculados al expediente.</li>
-                <li><strong><code>private readonly IExpedienteRepository _iExpRepo;</code>:</strong> se usa para cargar y eliminar el expediente principal.</li>
-                <li><strong><code>if (req == null)</code>:</strong> protege el caso de uso frente a una solicitud vacía o mal formada.</li>
-                <li><strong><code>if (!_autorizacion.PoseeElPermiso(...))</code>:</strong> valida que quien pide el borrado tenga permiso de baja.</li>
-                <li><strong><code>var expedienteABorrar = _iExpRepo.ObtenerPorId(...)</code>:</strong> busca el expediente antes de eliminarlo y corta si no existe.</li>
-                <li><strong>Bucle de trámites:</strong> recorre cada trámite del expediente y lo elimina uno por uno para evitar huérfanos.</li>
-                <li><strong><code>_iExpRepo.Eliminar(...)</code> y <code>_uow.Guardar();</code>:</strong> borran el expediente y confirman la operación completa.</li>
-                <li><strong><code>return new EliminarExpedienteResponse(...)</code>:</strong> devuelve sólo el id borrado como confirmación mínima.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Resolver la eliminación en cascada de los trámites asociados al expediente de forma programática y explícita dentro del Caso de Uso (`EliminarExpedienteUseCase`), en lugar de delegarla a la base de datos o al motor de persistencia.</li>
+                <li><strong>Alternativa Descartada:</strong> Configurar reglas de eliminación en cascada automáticas (`ON DELETE CASCADE`) en la base de datos SQLite (mediante EF Core o llaves foráneas) y delegar el borrado del expediente directamente.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Aporta total portabilidad e independencia de la base de datos (si migramos de SQLite a otro motor que no soporte o tenga restringida la cascada, el código sigue funcionando). Da control absoluto al desarrollador sobre la secuencia, permitiendo disparar eventos de dominio o auditorías para cada trámite borrado.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Genera mayor tráfico de red y operaciones en memoria (debemos hacer un `GET` para traer todos los trámites, iterar sobre ellos y ejecutar múltiples sentencias de borrado en memoria que luego viajan en lote a la base de datos).</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Elegimos hacer la eliminación en cascada de forma programática en la capa de Aplicación para mantener nuestra lógica de negocio independiente de las capacidades del motor de base de datos específico (SQLite), respetando la portabilidad. Al traer y borrar cada trámite explícitamente dentro de una única transacción coordinada por la Unidad de Trabajo (Unit of Work), aseguramos que la operación sea atómica: si el borrado de algún trámite falla, la base de datos vuelve a su estado original sin dejar registros huérfanos."</span></li>
             </ul>
         </div>
 
@@ -1742,22 +1670,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Orquestación entre Entidades del Agregado):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Conversión de Tipos Primitivos a Objetos de Dominio:</strong> El caso de uso recibe tipos primitivos de la petición HTTP (un entero para <code>Etiqueta</code> y un string para <code>Contenido</code>). Para garantizar que se respeten las invariantes del negocio, castea el entero a la estructura tipada <code>EtiquetaTramite</code> e instancia el Value Object <code>Contenido</code>. Cualquier error de sintaxis o texto vacío se detecta inmediatamente antes de intentar interactuar con los repositorios.</li>
-                <li><strong>Colaboración Coordinada por el Caso de Uso:</strong> Un trámite no se crea de forma aislada; su inserción puede requerir la mutación del estado del expediente padre (por ejemplo, finalizar un expediente si la etiqueta es <code>PaseAlArchivo</code>). El caso de uso coordina esta interacción inyectando el servicio <code>ActualizadorEstadoExpedienteService</code> y pasándole el trámite recién creado. Este patrón mantiene a la entidad <code>Tramite</code> desacoplada de la lógica del ciclo de vida del <code>Expediente</code>.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly ITramiteRepository _tramiteRepo;</code>:</strong> guarda el acceso para persistir el nuevo trámite.</li>
-                <li><strong><code>private readonly ActualizadorEstadoExpedienteService _actualizador;</code>:</strong> encapsula la regla que puede cambiar el estado del expediente.</li>
-                <li><strong><code>if (!_autorizacion.PoseeElPermiso(...))</code>:</strong> evita que alguien sin permiso pueda agregar trámites.</li>
-                <li><strong><code>Contenido contenido = new Contenido(req.Contenido);</code>:</strong> valida el texto del trámite antes de usarlo.</li>
-                <li><strong><code>Tramite tramite = new Tramite(...)</code>:</strong> crea la entidad trámite con expediente, etiqueta, contenido y usuario responsable.</li>
-                <li><strong><code>_tramiteRepo.Agregar(tramite);</code>:</strong> deja el trámite preparado para persistirse.</li>
-                <li><strong><code>_actualizador.Ejecutar(tramite, idUsuario);</code>:</strong> aplica la regla que actualiza el estado del expediente si corresponde.</li>
-                <li><strong><code>return new AgregarTramiteResponse(...)</code>:</strong> devuelve al controlador los datos del trámite recién creado.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Crear trámites a través del Caso de Uso `AgregarTramiteUseCase` que inyecta un servicio de aplicación especializado (`ActualizadorEstadoExpedienteService`) para disparar la actualización de estado del expediente padre, todo bajo la misma transacción de la Unidad de Trabajo (`IUnidadDeTrabajo`).</li>
+                <li><strong>Alternativa Descartada:</strong> Colocar la lógica de actualización del estado del expediente directamente dentro de la entidad `Tramite` (violando el aislamiento de agregados) o hacer que el cliente envíe dos peticiones separadas (una para crear el trámite y otra para cambiar el estado del expediente).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Mantiene a la entidad `Tramite` completamente enfocada en sus propios datos (cohesión). Garantiza la atómica consistencia transaccional: si falla la actualización del estado del expediente, la base de datos se revierte y el trámite no se guarda.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Requiere coordinar múltiples clases (UseCase, Domain Service, Repositories, Unit of Work), lo que incrementa el nivel de acoplamiento de lógica en la capa de aplicación y puede dificultar la depuración si ocurre un error transaccional.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Diseñamos un Domain Service (ActualizadorEstadoExpedienteService) coordinado por el Caso de Uso para encapsular la regla de negocio que vincula la creación de un trámite con la transición de estado de su expediente padre. Esto nos permite mantener a la entidad Tramite desacoplada de la máquina de estados de Expediente, y asegurar mediante la Unidad de Trabajo que ambas operaciones se persistan en una única transacción de SQLite o fallen juntas."</span></li>
             </ul>
         </div>
 
@@ -1796,21 +1715,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Criptografía y Reglas de Registro):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Validación de Reglas de Negocio Únicas:</strong> Comprobar que un correo electrónico no esté duplicado en el sistema es una regla de negocio que una entidad individual de tipo <code>Usuario</code> no puede resolver por sí misma (ya que no tiene acceso a otros usuarios). El caso de uso resuelve esto coordinando con el repositorio mediante la consulta <code>ExistePorEmail(req.Email)</code>. Si el email existe, se lanza una excepción de aplicación controlada.</li>
-                <li><strong>Cifrado Unidireccional de Contraseñas (Hashing):</strong> De acuerdo con los estándares de seguridad modernos, las contraseñas nunca deben guardarse en texto plano. El caso de uso invoca a <code>_hashService.Hash(req.Contrasena)</code>, la cual aplica un algoritmo SHA-256 (hashing unidireccional criptográfico). De este modo, la contraseña viaja cifrada a la base de datos SQLite y, en caso de una filtración del archivo de datos, las credenciales reales de los usuarios permanecen protegidas.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly IUnidadDeTrabajo _uow;</code>, <code>private readonly IUsuarioRepository _userRepo;</code> y <code>private readonly IHashService _hashService;</code>:</strong> guardan las dependencias del caso de uso. El primero se usa para confirmar los cambios al final, el segundo para consultar y guardar usuarios, y el tercero para hashear contraseñas de forma segura sin acoplarse a detalles criptográficos concretos.</li>
-                <li><strong>Constructor:</strong> recibe esas dependencias por inyección. Esto hace que el caso de uso no dependa de una base de datos ni de un cifrador específico, sino de contratos.</li>
-                <li><strong><code>if (_userRepo.ExistePorEmail(req.Email))</code>:</strong> verifica si el correo ya está registrado antes de crear nada. Si ya existe, corta el proceso y devuelve un error controlado.</li>
-                <li><strong><code>Usuario user = new Usuario(...)</code>:</strong> instancia el usuario recién creado. Antes de hacerlo, convierte la contraseña de texto plano en hash SHA-256 a través del servicio inyectado para no almacenar la clave original.</li>
-                <li><strong><code>_userRepo.Agregar(user);</code>:</strong> registra el usuario en el repositorio, pero todavía no lo deja fijo en la base de datos física.</li>
-                <li><strong><code>_uow.Guardar();</code>:</strong> confirma la operación completa. Acá se persiste de verdad y se mantiene la idea de transacción atómica.</li>
-                <li><strong><code>return new RegistrarUsuarioResponse(...)</code>:</strong> devuelve al controlador un DTO de salida con los datos útiles del usuario creado.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Resolver la regla de unicidad de email delegando la consulta al repositorio (`ExistePorEmail`) y realizar el hasheo de contraseña a través del servicio inyectado (`IHashService`) en el Caso de Uso, antes de instanciar la entidad `Usuario`.</li>
+                <li><strong>Alternativa Descartada:</strong> Hashear la contraseña dentro de la entidad `Usuario` (pasándole el servicio de hashing al constructor de la entidad o haciendo que la entidad dependa de un servicio externo).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Mantiene a la entidad de dominio `Usuario` libre de dependencias de servicios de infraestructura como algoritmos de cifrado o hashing (respetando la pureza del modelo de dominio). El caso de uso orquesta la encriptación y pasa un dato ya hasheado y validado en su formato.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Obliga al Caso de Uso a conocer y coordinar el proceso criptográfico, en lugar de que la entidad encapsule por completo las reglas de creación y seguridad de su propio estado.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Decidimos resolver la unicidad de email y el hasheo de contraseña en el Caso de Uso para mantener la pureza del Dominio. La entidad Usuario no debe inyectar ni acoplarse a servicios de infraestructura como IHashService o IUsuarioRepository. Al hashear la contraseña en el Caso de Uso mediante un servicio abstracto de cifrado (DIP), garantizamos que la contraseña nunca se almacene ni transite en texto plano en el dominio o la persistencia."</span></li>
             </ul>
         </div>
 
@@ -1832,22 +1743,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (C# 12 Primary Constructors y Autenticación):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Sintaxis Modernizada mediante Primary Constructors:</strong> Utiliza la característica de constructores primarios de C# 12 (<code>class LoginUseCase(IUsuarioRepository repo, ITokenProvider tokenProvider, IHashService hashService)</code>). Esto permite declarar los parámetros de entrada directamente en la firma de la clase, reduciendo las líneas de código repetitivo de variables privadas y asignaciones del constructor tradicional.</li>
-                <li><strong>Mitigación de Ataques de Enumeración:</strong> Al validar la contraseña, si el usuario no existe o si la contraseña ingresada es incorrecta, la aplicación arroja exactamente el mismo error genérico (<code>"El mail o la contraseña son incorrectos."</code>) con un código de estado no autorizado. Esto evita que atacantes externos determinen qué direcciones de email están registradas en el sistema.</li>
-                <li><strong>Generación Desacoplada de Tokens de Seguridad y Verificación de Hashing:</strong> El caso de uso no sabe cómo armar tokens ni cómo hashear bytes. Delega el token a <code>ITokenProvider</code> y la comparación criptográfica de claves a <code>IHashService</code>.</li>
-                <li><strong>Qué devuelve al final:</strong> Si las credenciales son correctas, retorna un <code>LoginResponse</code> con el token JWT listo para que la API lo entregue al cliente.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>IUsuarioRepository repo</code>, <code>ITokenProvider tokenProvider</code> y <code>IHashService hashService</code>:</strong> son las dependencias mínimas para buscar al usuario, verificar la clave con hashing e inyectar el token.</li>
-                <li><strong><code>Usuario? user = repo.ObtenerPorEmail(req.Email);</code>:</strong> intenta traer el usuario que corresponde al email enviado.</li>
-                <li><strong><code>if (user == null || !hashService.Verify(...))</code>:</strong> valida en un solo punto si el usuario existe y si el hash coincide con el string de contraseña enviado.</li>
-                <li><strong><code>throw new UnauthorizedAccessException(...)</code>:</strong> devuelve el mismo error genérico para no filtrar información sobre cuentas válidas.</li>
-                <li><strong><code>var token = tokenProvider.GenerarToken(user);</code>:</strong> arma el JWT con los datos del usuario autenticado.</li>
-                <li><strong><code>return new LoginResponse(token);</code>:</strong> entrega al enrutador el token listo para responder al cliente.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Diseñar `LoginUseCase` utilizando constructores primarios de C# 12 (`Primary Constructors`), desacoplando la comparación del hash de contraseña mediante `IHashService` y la generación del JWT mediante `ITokenProvider`.</li>
+                <li><strong>Alternativa Descartada:</strong> Escribir la lógica de generación del JWT y validación criptográfica directamente en el controlador o acoplada en un servicio monolítico de autenticación.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Mantiene el caso de uso conciso y de alta cohesión. Al arrojar un mensaje de error idéntico y genérico (`"El mail o la contraseña son incorrectos."`) tanto si el mail no existe como si la clave es errónea, se evita el riesgo de ataques de enumeración (donde un atacante detecta qué mails existen en el sistema).</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Delegar la generación del token al proveedor de infraestructura (`ITokenProvider`) dentro del caso de uso genera una dependencia sobre un mecanismo de sesión específico (JWT) que si en el futuro migra a cookies o sesiones del servidor, requerirá modificar la firma del response o la lógica del caso de uso.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Implementamos el Login como un Caso de Uso independiente que inyecta interfaces para el repositorio de usuarios, la verificación criptográfica (IHashService) y el token (ITokenProvider) respetando los principios de SOLID. Para proteger la seguridad, aplicamos un mensaje de error idéntico en caso de fallo, mitigando ataques de enumeración de cuentas. Usamos constructores primarios de C# 12 para reducir código repetitivo y mejorar la legibilidad."</span></li>
             </ul>
         </div>
 
@@ -1896,29 +1798,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Políticas de Seguridad y Modificaciones):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Doble Capa de Verificación en Casos de Uso:</strong> Este caso de uso aplica políticas de seguridad complejas que no pueden automatizarse con un simple atributo de rol:
-                    <ul>
-                        <li><strong>Verificación del Solicitante:</strong> Carga al usuario que inició la petición (<code>idUsuarioSolicitante</code>) y comprueba explícitamente si su bandera <code>EsAdmin</code> es verdadera. Si no lo es, cancela la ejecución mediante una <code>AutorizacionException</code>, evitando elevaciones de privilegios no autorizadas.</li>
-                        <li><strong>Protección de Administradores:</strong> Carga al usuario objetivo a modificar y verifica si es un administrador. El sistema prohíbe explícitamente modificar los permisos de un administrador (ya que un administrador tiene todos los permisos implícitamente por rol y sus permisos individuales no deben alterarse). Esto actúa como una protección de seguridad interna (invariante de aplicación).</li>
-                    </ul>
-                </li>
-                <li><strong>Mutación a Través del Dominio:</strong> En vez de manipular directamente la base de datos o asignar una nueva lista directamente al modelo, invoca al método de dominio <code>usuarioObjetivo.CambiarPermisos(req.NuevosPermisos)</code> y luego persiste el estado. Esto respeta la encapsulación y la lógica de validaciones internas de la clase <code>Usuario</code>.</li>
-                <li><strong>Qué deja listo y por qué importa:</strong> Al finalizar, no sólo queda guardada la nueva lista de permisos, sino también una confirmación clara para la API de que el cambio se aplicó sobre el usuario correcto. Eso evita que la interfaz tenga que reconstruir el estado internamente y mantiene la coherencia entre dominio, base y respuesta HTTP.</li>
-                <li><strong>Qué deja listo:</strong> Al terminar, el usuario objetivo queda con su nueva colección de permisos persistida y el caso de uso devuelve un <code>CambiarPermisosResponse</code> con el id, el nombre y los permisos actualizados para que la API confirme el cambio.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly IUsuarioRepository _userRepo;</code>:</strong> permite buscar al solicitante y al usuario que se va a modificar.</li>
-                <li><strong><code>private readonly IAutorizacionService _autorizacion;</code>:</strong> queda disponible por consistencia con otros casos, aunque aquí la validación principal la hace el repositorio y la bandera admin.</li>
-                <li><strong><code>var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);</code>:</strong> identifica a quien pide el cambio y verifica si es administrador.</li>
-                <li><strong><code>if (solicitante == null || !solicitante.EsAdmin)</code>:</strong> bloquea cualquier intento de cambio que no venga de un admin.</li>
-                <li><strong><code>var usuarioObjetivo = _userRepo.ObtenerPorId(req.IdUsuarioObjetivo);</code>:</strong> carga al usuario que va a recibir los permisos nuevos.</li>
-                <li><strong><code>if (usuarioObjetivo.EsAdmin)</code>:</strong> impide tocar los permisos de otro administrador.</li>
-                <li><strong><code>usuarioObjetivo.CambiarPermisos(req.NuevosPermisos);</code>:</strong> aplica el cambio desde el dominio, no desde una asignación directa.</li>
-                <li><strong><code>return new CambiarPermisosResponse(...)</code>:</strong> devuelve los permisos ya actualizados al controlador.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Controlar que sólo los administradores puedan cambiar permisos de otros usuarios, y que no se puedan modificar los permisos de un administrador, mediante lógica explícita en el Caso de Uso (`CambiarPermisosUseCase`) inyectando `IUsuarioRepository` y `IUnidadDeTrabajo`.</li>
+                <li><strong>Alternativa Descartada:</strong> Delegar este control a las políticas de autenticación a nivel de endpoints/controladores en la Web API (usando roles en Swagger/ASP.NET Core) o colocar validación de roles en la entidad `Usuario`.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Mantiene las reglas de negocio de seguridad desacopladas del middleware web (permitiendo correr la aplicación en consolas o tareas batch y conservar la misma seguridad). Evita acoplar la entidad `Usuario` con consultas globales sobre otros usuarios de la base de datos.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Requiere cargar en memoria tanto al usuario solicitante como al usuario objetivo para realizar las validaciones correspondientes antes de efectuar la modificación, sumando lecturas a la base de datos.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Decidimos controlar el rol de administrador y los límites de alteración de permisos en el Caso de Uso porque se trata de reglas de negocio específicas de la aplicación, y no de infraestructura. La entidad Usuario no tiene visibilidad del contexto global para saber quién solicita el cambio, y colocar estas verificaciones complejas en la Web API violaría la arquitectura limpia al acoplar la lógica de seguridad a los endpoints de HTTP."</span></li>
             </ul>
         </div>
 
@@ -1952,23 +1838,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Servicios de Aplicación y Colaboración):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El concepto de Servicio de Aplicación:</strong> Cuando una regla de negocio requiere la coordinación de múltiples entidades o agregados (en este caso, asociar un <code>Tramite</code> nuevo a un <code>Expediente</code> y actualizar el estado de este último según su etiqueta), no es correcto colocar esta lógica dentro de una de las entidades aisladas, ya que violaría su cohesión. Un servicio de aplicación actúa como el mediador perfecto, encapsulando este flujo de colaboración entre objetos sin que las entidades dependan directamente una de la otra.</li>
-                <li><strong>Ejecución y Flujo de Auditoría:</strong> El método verifica si la etiqueta es <code>PaseAlArchivo</code>, recupera la entidad <code>Expediente</code> mediante su repositorio, invoca su máquina de estados interna <code>ActualizarEstado()</code> (pasándole la firma del usuario responsable para auditoría) y guarda el estado actualizado en el repositorio de expedientes, todo bajo el mismo contexto transaccional en curso.</li>
-                <li><strong>Qué devuelve o deja preparado:</strong> Este servicio no arma una respuesta propia ni devuelve un DTO. Su salida real es dejar el expediente actualizado en memoria para que el caso de uso lo persista junto con el trámite recién creado, sin romper la coherencia del agregado.</li>
-                <li><strong>Qué deja resuelto:</strong> Este servicio no responde por sí mismo al cliente; deja el agregado coherente después de un alta de trámite. Su trabajo es asegurar que el expediente y el trámite queden sincronizados antes de que el caso de uso persista todo.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly IExpedienteRepository _expRepo;</code>:</strong> le da acceso al expediente que puede necesitar actualizarse.</li>
-                <li><strong>Constructor:</strong> recibe el repositorio por inyección para no depender de una implementación concreta.</li>
-                <li><strong><code>if (tramite.Etiqueta == EtiquetaTramite.PaseAlArchivo)</code>:</strong> decide cuándo esta regla se aplica.</li>
-                <li><strong><code>var exp = _expRepo.ObtenerPorId(...)</code>:</strong> busca el expediente asociado al trámite recién creado.</li>
-                <li><strong><code>exp.ActualizarEstado(...)</code>:</strong> deja que el dominio calcule y registre el nuevo estado.</li>
-                <li><strong><code>_expRepo.Modificar(exp);</code>:</strong> marca el expediente como actualizado para persistirlo después.</li>
-                <li><strong><code>void Ejecutar(...)</code>:</strong> no devuelve datos, sólo deja el agregado listo para guardarse coherentemente.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Implementar la actualización automática del estado del expediente como un Servicio de Aplicación (`ActualizadorEstadoExpedienteService`) en lugar de hacerlo dentro de un disparador de base de datos (Trigger), un trigger de EF Core o dentro de las entidades directamente.</li>
+                <li><strong>Alternativa Descartada:</strong> Usar eventos de dominio (`Domain Events`) distribuidos en memoria para que cuando se agregue un trámite, el expediente reaccione de manera asíncrona o desacoplada a través de un bus de eventos.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Aporta una gran claridad en el flujo secuencial de la aplicación, facilitando la depuración y lectura del código paso a paso. Mantiene a las entidades del dominio desacopladas entre sí (un `Tramite` no conoce cómo actualizar un `Expediente`).</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Acopla el caso de uso a la inyección manual de múltiples servicios coordinadores. El uso de eventos de dominio distribuidos es una alternativa más flexible y escalable en sistemas grandes, aunque añade mayor complejidad de infraestructura.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Diseñamos un Servicio de Aplicación para resolver la regla de negocio cruzada entre expedientes y trámites. En sistemas pequeños, esta coordinación explícita es preferible sobre los eventos de dominio porque es más directa, fácil de seguir en la pila de llamadas (debugging) y no requiere de un bus de eventos en memoria. Toda la actualización ocurre bajo la misma Unidad de Trabajo, garantizando consistencia atómica."</span></li>
             </ul>
         </div>
     </section>
@@ -2077,23 +1953,13 @@ public class Usuario
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Mapeo Relacional de Objetos - ORM):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El DbContext como intermediario relacional:</strong> La clase heredada de <code>DbContext</code> de Entity Framework Core representa la sesión de trabajo con la base de datos SQLite y expone las tablas a través de propiedades de tipo <code>DbSet&lt;T&gt;</code>.</li>
-                <li><strong>Mapeo de Value Objects Complejos mediante <code>ComplexProperty</code> (Fluent API):</strong> De acuerdo con las novedades de Entity Framework Core 8+, los objetos de valor se mapean mediante propiedades complejas (<code>Complex Types</code>). A diferencia de las entidades, un tipo complejo carece de identificador único (id) y se almacena directamente como columnas aplanadas en la tabla de la entidad propietaria (en este caso, en la tabla de <code>Expedientes</code> y <code>Tramites</code>). Al definir <code>ComplexProperty()</code>, mapeamos la propiedad string <code>Valor</code> a una columna con nombre propio y la marcamos como requerida, evitando tener que realizar conversiones manuales y permitiendo un mapeo más semántico y optimizado en la base relacional.</li>
-                <li><strong>Serialización Automática de Colecciones a JSON:</strong> En EF Core 8, las colecciones de elementos simples (como <code>IEnumerable&lt;Permiso&gt; Permisos</code>) se serializan por defecto en formato JSON textual dentro de una única columna de tipo TEXT en SQLite. Esto nos ahorra tener que crear tablas asociativas intermedias de muchos a muchos y realizar costosas consultas JOIN solo para guardar la lista de permisos de un usuario.</li>
-                <li><strong>Inserción de Datos Semilla (Data Seeding):</strong> Mediante <code>modelBuilder.Entity&lt;Usuario&gt;().HasData()</code>, insertamos registros iniciales en la base de datos en su creación. Los hashes de contraseñas de estos usuarios semillas se generan instanciando manualmente <code>HashService</code> para asegurar que las credenciales ya estén protegidas desde el momento cero del inicio de la aplicación.</li>
-                <li><strong>Qué deja listo para la capa superior:</strong> El contexto no decide reglas de negocio ni responde a la API; deja listas las tablas, los tipos complejos y los datos iniciales para que los repositorios trabajen con entidades ya compatibles con SQLite.</li>
-                <li><strong>Qué devuelve al sistema:</strong> No devuelve una respuesta HTTP ni un DTO; deja configurado el modelo relacional para que los repositorios puedan leer y escribir entidades sin preocuparse por conversiones manuales ni por la estructura física de SQLite.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public DbSet&lt;Expediente&gt; Expedientes</code>, <code>Tramites</code> y <code>Usuarios</code>:</strong> exponen las tablas que el resto del sistema puede consultar y modificar.</li>
-                <li><strong><code>public SGEContext(DbContextOptions&lt;SGEContext&gt; options)</code>:</strong> recibe la configuración de conexión y la entrega a la clase base.</li>
-                <li><strong><code>OnModelCreating(ModelBuilder modelBuilder)</code>:</strong> define cómo se traduce el dominio a la base relacional.</li>
-                <li><strong><code>ComplexProperty()</code> en <code>Caratula</code> y <code>Contenido</code>:</strong> mapea estos value objects como propiedades complejas (tipos complejos) que se aplanan en columnas en las tablas sin tener una identidad o ID propia.</li>
-                <li><strong><code>HasData(...)</code>:</strong> inserta usuarios semilla con ids fijos y contraseñas hasheadas.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Configurar `SGEContext` mapeando los Objetos de Valor (`Caratula` y `Contenido`) mediante propiedades complejas (`ComplexProperty`) de EF Core 8+ y serializando colecciones primitivas (`IEnumerable<Permiso>`) a JSON en una sola columna textual de SQLite por defecto. También, insertar datos semilla (`HasData`) con contraseñas encriptadas en la migración inicial.</li>
+                <li><strong>Alternativa Descartada:</strong> Modelar `Caratula` y `Contenido` como entidades con su propio ID relacional en tablas separadas, o usar el viejo mecanismo de entidades en propiedad (`OwnsOne`) que generaba claves foráneas ocultas y tablas unidas (Join tables) innecesarias.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Las propiedades complejas aplanan los Value Objects a columnas simples de la misma tabla padre (`Expedientes` o `Tramites`), optimizando el rendimiento y simplificando el esquema SQL en SQLite. Serializar la colección de permisos a JSON de manera automática ahorra tener que implementar complejas relaciones de muchos a muchos y consultas JOIN.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> El uso de JSON y propiedades complejas acopla el dominio a las capacidades de deserialización y mapping de EF Core. Si quisiéramos hacer búsquedas de alto rendimiento filtrando por un permiso específico del JSON directamente desde SQL en SQLite, la consulta se volvería más compleja e ineficiente que con una tabla relacional indexada.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Diseñamos el DbContext utilizando las propiedades complejas (Complex Types) de EF Core 8+ para mapear los Value Objects de Caratula y Contenido sin necesidad de darles un ID relacional artificial, lo que aplanar los datos en una sola tabla y optimiza SQLite. Para la colección de Permisos de los usuarios, aprovechamos la serialización JSON nativa en una columna de texto, simplificando el diseño al evitar tablas intermedias muchos a muchos innecesarias para este volumen de datos."</span></li>
             </ul>
         </div>
 
@@ -2122,18 +1988,13 @@ public class UnidadDeTrabajo : IUnidadDeTrabajo
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Patrón Unit of Work):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El Patrón de Unidad de Trabajo (Unit of Work):</strong> El patrón Unit of Work mantiene una lista de objetos afectados por una transacción de negocio y coordina la escritura de cambios. En vez de que cada repositorio guarde cambios de forma independiente (lo que provocaría múltiples transacciones separadas y la posibilidad de que unas se guarden y otras fallen), los repositorios registran sus cambios en memoria en el tracker del <code>SGEContext</code>. Al finalizar el caso de uso, se invoca a <code>Guardar()</code>, consolidando todos los cambios de forma síncrona en una única transacción relacional. Esto asegura que la base de datos no quede en un estado inconsistente parcial (consistencia atómica ACID).</li>
-                <li><strong>Qué papel cumple en la orquestación:</strong> No reemplaza a los repositorios ni al dominio; sólo marca el punto exacto donde todo lo que se fue acumulando en memoria se confirma de una sola vez. Eso simplifica explicar el flujo porque los casos de uso saben cuándo termina realmente la operación.</li>
-                <li><strong>Qué hace en la práctica:</strong> No crea datos nuevos ni devuelve entidades; sólo marca el punto exacto donde la memoria del contexto pasa a la base real. Por eso los casos de uso lo llaman al final, después de agregar, modificar o eliminar.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly SGEContext _context;</code>:</strong> guarda la sesión real con la base de datos.</li>
-                <li><strong>Constructor:</strong> recibe el contexto por inyección y controla que no venga nulo.</li>
-                <li><strong><code>Guardar()</code>:</strong> llama a <code>SaveChanges()</code> para confirmar todos los cambios acumulados.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Implementar el Patrón Unidad de Trabajo (`UnidadDeTrabajo`) para encapsular las llamadas a `SaveChanges()` del `SGEContext` tras una interfaz abstracta (`IUnidadDeTrabajo`), desacoplando la persistencia transaccional física de la capa de aplicación.</li>
+                <li><strong>Alternativa Descartada:</strong> No utilizar el patrón Unidad de Trabajo y llamar a `context.SaveChanges()` directamente desde cada repositorio o inyectar el `DbContext` directamente en los Casos de Uso.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Asegura la atomicidad de las operaciones comerciales que afectan a múltiples entidades o repositorios (por ejemplo, guardar el trámite y actualizar el expediente). Todo se escribe en memoria en el Change Tracker de EF Core y se persiste físicamente al final en una única transacción de base de datos, evitando estados inconsistentes intermedios.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Genera una capa de abstracción adicional redundante, ya que el propio `SGEContext` de EF Core actúa internamente como una Unidad de Trabajo (mantiene el Change Tracker y coordina transacciones).</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Implementamos el patrón Unidad de Trabajo (Unit of Work) para asegurar la atomicidad (la 'A' de ACID) de nuestras operaciones de negocio y respetar la Inversión de Dependencias. Al inyectar IUnidadDeTrabajo en los Casos de Uso, evitamos que la lógica de aplicación dependa directamente del DbContext de EF Core. Esto nos permite garantizar que múltiples repositorios operen sobre la misma transacción en memoria, impactando la base de datos de manera conjunta y coordinada."</span></li>
             </ul>
         </div>
 
@@ -2174,28 +2035,13 @@ public static class SGESqlite
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Concurrencia y Double-Checked Locking):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Mitigación de Condiciones de Carrera (Race Conditions):</strong> En aplicaciones web con múltiples peticiones HTTP concurrentes al iniciar el servidor, es posible que dos o más hilos intenten inicializar y verificar la existencia de la base de datos al mismo tiempo, lo que causaría excepciones por archivos bloqueados o reescrituras de tablas.</li>
-                <li><strong>Patrón de Bloqueo de Doble Verificación:</strong> El método implementa el patrón <em>Double-Checked Locking</em>.
-                    <ul>
-                        <li>Primero realiza una comprobación rápida y sin bloqueo de la variable estática <code>_initialized</code>. Si ya está inicializado, sale del método inmediatamente sin incurrir en costos de sincronización de CPU.</li>
-                        <li>Si no está inicializada, adquiere un bloqueo exclusivo de hilo mediante <code>lock (_lock)</code>.</li>
-                        <li>Una vez dentro del bloqueo, realiza una segunda verificación del flag <code>_initialized</code> (ya que otro hilo podría haber completado la inicialización mientras este hilo esperaba el semáforo). Si sigue en false, invoca a <code>EnsureCreated()</code> de forma segura y establece el flag a true.</li>
-                    </ul>
-                </li>
-                <li><strong>Qué deja listo al final del arranque:</strong> El beneficio concreto es que sólo una vez se crea la base y el resto de las peticiones arranca sobre un archivo ya válido. Eso evita inicializaciones duplicadas y hace más predecible el inicio de la API.</li>
-                <li><strong>Qué deja listo al arrancar:</strong> Su tarea es asegurar que la base de datos exista antes de atender peticiones. No expone datos ni retorna un objeto de negocio; sólo garantiza que la aplicación arranque con el esquema listo.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private static bool _initialized;</code>:</strong> recuerda si la base ya fue creada para no repetir el trabajo.</li>
-                <li><strong><code>private static readonly object _lock</code>:</strong> sirve como candado para que sólo un hilo inicialice a la vez.</li>
-                <li><strong><code>if (_initialized)</code> al inicio:</strong> hace una salida rápida cuando no hace falta volver a inicializar.</li>
-                <li><strong><code>lock (_lock)</code> y segunda verificación:</strong> evita carreras entre múltiples peticiones simultáneas.</li>
-                <li><strong><code>context.Database.EnsureCreated()</code>:</strong> crea el esquema si todavía no existe.</li>
-                <li><strong><code>_initialized = true;</code>:</strong> marca que la inicialización ya quedó completada.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Diseñar la inicialización de la base de datos SQLite utilizando el patrón de Bloqueo de Doble Verificación (`Double-Checked Locking`) con una variable estática y un objeto `lock` para asegurar la creación única del archivo físico de SQLite de forma segura entre múltiples hilos.</li>
+                <li><strong>Alternativa Descartada:</strong> Ejecutar `EnsureCreated()` directamente en el `Program.cs` sin sincronización de hilos o utilizar migraciones manuales mediante comandos del CLI de dotnet (`dotnet ef database update`).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Previene de manera eficiente las condiciones de carrera (Race Conditions) y los bloqueos de archivos en SQLite en entornos web donde múltiples hilos de servidor podrían competir al iniciar la aplicación. Asegura que la verificación rápida inicial (`_initialized`) no requiera bloqueo, ahorrando tiempo de CPU en las peticiones posteriores.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> `EnsureCreated()` no admite migraciones incrementales. Si modificamos las clases del Dominio en el futuro, no podremos actualizar la base de datos automáticamente; tendremos que eliminar el archivo `.db` existente, lo cual destruirá todos los datos previos.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Utilizamos el método SGESqlite.Inicializar con bloqueo de doble verificación (Double-Checked Locking) para garantizar que la base de datos SQLite se cree una sola vez de forma thread-safe durante el arranque de la API, impidiendo excepciones por accesos concurrentes. Usamos EnsureCreated en lugar de migraciones complejas porque, dado que es un prototipo escolar y académico, priorizamos la autoejecución automática del esquema sin requerir que el usuario corra comandos de consola previos."</span></li>
             </ul>
         </div>
 
@@ -2245,22 +2091,13 @@ public static class SGESqlite
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Patrón Repositorio y EF Core Change Tracker):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>El Patrón Repositorio:</strong> Actúa como una colección de objetos de negocio en memoria. Desacopla la lógica de acceso a datos de los Casos de Uso, simulando que las entidades están guardadas en una colección común en memoria en vez de en un motor relacional físico.</li>
-                <li><strong>Operaciones Eficientes del Rastreador de EF Core (Change Tracker):</strong> Al ejecutar métodos como <code>Agregar()</code> o <code>Eliminar()</code>, Entity Framework Core no emite consultas SQL a la base de datos SQLite de forma inmediata. Simplemente registra en su tracker de memoria que el objeto se encuentra en estado <em>Added</em> o <em>Deleted</em>. Las sentencias SQL <code>INSERT</code> o <code>DELETE</code> se agrupan y se ejecutan optimizadamente en bloque recién cuando se invoca la Unidad de Trabajo (<code>SaveChanges()</code>), minimizando los accesos de disco y optimizando el rendimiento general del acceso a datos.</li>
-                <li><strong>Qué devuelve a la capa superior:</strong> El repositorio no arma respuestas de API; devuelve entidades o colecciones de entidades al caso de uso, o bien deja preparada la operación para que luego <code>Guardar()</code> aplique el cambio definitivo.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private SGEContext _context;</code>:</strong> mantiene acceso directo al contexto de EF Core.</li>
-                <li><strong>Constructor:</strong> recibe el contexto y lo deja listo para operar sobre expedientes.</li>
-                <li><strong><code>Agregar(Expediente expediente)</code>:</strong> agrega el expediente al conjunto de EF Core.</li>
-                <li><strong><code>ObtenerPorId(Guid id)</code>:</strong> busca un expediente específico por id.</li>
-                <li><strong><code>ObtenerTodos()</code>:</strong> devuelve la lista completa de expedientes.</li>
-                <li><strong><code>Modificar(Expediente expediente)</code>:</strong> marca la entidad como actualizada para que el contexto la persista.</li>
-                <li><strong><code>Eliminar(Guid id)</code>:</strong> busca, valida que exista y luego lo remueve; si no aparece, lanza una excepción de repositorio.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Implementar el Patrón Repositorio (`ExpedienteRepository`) para aislar el acceso a la base de datos tras una interfaz (`IExpedienteRepository`), delegando la persistencia de cambios en memoria al tracker de EF Core.</li>
+                <li><strong>Alternativa Descartada:</strong> Inyectar directamente el `SGEContext` de EF Core en los Casos de Uso y ejecutar consultas LINQ de forma directa sobre las propiedades del contexto (Active Record o consultas inline).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Aísla por completo la capa de aplicación de las particularidades de EF Core. Si quisiéramos migrar el motor a Dapper, archivos de texto plano o llamadas a servicios externos, sólo deberíamos crear un nuevo adaptador que implemente `IExpedienteRepository`, sin tocar los Casos de Uso. Facilita la creación de Mocks para pruebas unitarias.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Introduce código duplicado innecesario (métodos como `Agregar`, `ObtenerTodos` o `ObtenerPorId` son meros envoltorios de métodos nativos de EF Core como `Add`, `ToList` o `Find`), agregando boilerplate al desarrollo.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Implementamos el patrón Repositorio para cumplir con el desacoplamiento de la arquitectura limpia y el principio de Inversión de Dependencias. Al exponer una interfaz IExpedienteRepository, logramos que la capa de aplicación sea completamente independiente del ORM (EF Core) y de la base de datos (SQLite). Si decidiéramos cambiar la base de datos por un servicio REST externo, los Casos de Uso no sufrirían modificaciones, ya que sólo cambiaríamos la implementación concreta del repositorio."</span></li>
             </ul>
         </div>
 
@@ -2314,22 +2151,13 @@ public static class SGESqlite
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Generación de JSON Web Tokens):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Estructura de un JWT (Claims / Reclamos):</strong> Un token JWT es un estándar abierto (RFC 7519) que define una forma compacta y autónoma para transmitir información de seguridad de forma segura. Los reclamos (claims) son piezas de información asociadas al usuario: su ID, nombre, email y un flag de administración. Para los usuarios que no son administradores globales, se añaden múltiples claims con la clave <code>"permiso"</code>, facilitando que el middleware de ASP.NET Core los lea de forma directa en cada petición HTTP sin necesidad de volver a consultar a la base de datos SQLite.</li>
-                <li><strong>Firma Digital y Clave Simétrica:</strong> El descriptor del token firma el payload utilizando una clave secreta codificada en bytes y el algoritmo criptográfico <code>HmacSha256Signature</code>. Esto produce una firma digital que se concatena al final del token. Si un atacante altera los permisos de usuario dentro del token JWT para intentar elevar privilegios en el cliente, la firma del token no coincidirá con el contenido modificado y el servidor rechazará la petición automáticamente en la etapa de middleware.</li>
-                <li><strong>Qué devuelve al final:</strong> Devuelve un string con el JWT completo, listo para copiarse en la cabecera <code>Authorization</code>. Ese string es el resultado que luego consume la Web API para autenticar y autorizar el resto de las operaciones.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly string _claveSecreta;</code>:</strong> conserva la clave usada para firmar los tokens.</li>
-                <li><strong>Constructor:</strong> recibe la clave y la deja disponible para cada generación de JWT.</li>
-                <li><strong><code>JwtSecurityTokenHandler</code> y <code>Encoding.UTF8.GetBytes</code>:</strong> preparan el mecanismo criptográfico y la clave en bytes.</li>
-                <li><strong>Lista de <code>Claim</code>:</strong> arma la identidad del usuario con id, nombre, email y flag de admin.</li>
-                <li><strong>Bucle de permisos:</strong> agrega claims extra sólo si el usuario no es administrador global.</li>
-                <li><strong><code>SecurityTokenDescriptor</code>:</strong> define el contenido y la firma del token.</li>
-                <li><strong><code>CreateToken()</code> y <code>WriteToken()</code>:</strong> construyen el JWT final y lo devuelven como string.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Diseñar `ProveedorTokenJwt` implementando `ITokenProvider` para generar y firmar digitalmente tokens JWT autónomos conteniendo la identidad y permisos de usuario (`permiso` como claim individual para usuarios no administradores).</li>
+                <li><strong>Alternativa Descartada:</strong> Guardar las sesiones de usuario en una base de datos relacional o de clave-valor (como Redis) y entregar una cookie de sesión opaca (`Session Cookies`).</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Los tokens JWT son completamente autocontenidos y descentralizados (stateless). El servidor no necesita almacenar estados ni consultar la base de datos SQLite para verificar si un token es válido; simplemente valida su firma criptográfica en el middleware, reduciendo la carga y permitiendo escalar la API horizontalmente.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Invalidad de tokens compleja: una vez emitido un JWT, es válido hasta que expire. Si revocamos permisos o suspendemos una cuenta, el token del cliente seguirá funcionando a menos que implementemos una lista de tokens revocados (Blacklist) en la base de datos, lo que anularía el beneficio de no guardar estados.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Elegimos JSON Web Tokens (JWT) para la autenticación y autorización por ser una tecnología stateless e ideal para APIs REST. En lugar de cookies de sesión que requieren almacenamiento persistente en el servidor, el JWT transporta los claims de usuario (id, nombre, email) y su colección de permisos firmados con HMAC SHA-256. Esto permite al middleware de autorización verificar el token y sus permisos de manera inmediata en memoria, agilizando el pipeline HTTP y facilitando la escalabilidad del sistema."</span></li>
             </ul>
         </div>
     </section>
@@ -2509,29 +2337,13 @@ app.MapUsuariosEndpoints();
 app.Run();</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Arranque de la Aplicación y Lifetimes de DI):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Ciclos de Vida en Inversión de Control (IoC):</strong> Registra las clases en el contenedor de dependencias nativo de .NET utilizando diferentes tiempos de vida:
-                    <ul>
-                        <li><strong>Scoped (ciclo Scoped):</strong> Utilizado para Repositorios, Casos de Uso y el DbContext (<code>AddScoped</code>). Significa que .NET instanciará un objeto único por cada petición HTTP que reciba la API, compartiendo esa misma instancia a lo largo de toda la llamada. Al terminar la llamada HTTP, las instancias se destruyen automáticamente, asegurando que las conexiones a la base de datos SQLite se liberen correctamente.</li>
-                        <li><strong>Singleton (ciclo Único):</strong> Utilizado para el <code>ProveedorTokenJwt</code> y <code>HashService</code> (<code>AddSingleton</code>). Significa que se crea una única instancia en memoria para toda la vida útil de la aplicación web, siendo reutilizada por todas las peticiones entrantes. Esto es ideal para clases de cifrado inmutables que no guardan estado.</li>
-                    </ul>
-                </li>
-                <li><strong>Flexibilización de Recepción de Tokens (Events JwtBearer):</strong> Por defecto, el middleware JwtBearer de Microsoft requiere de forma rígida que el token JWT sea enviado con el prefijo `"Bearer "` en la cabecera HTTP. Para flexibilizar el uso de clientes web (como Swagger) o integraciones externas, el evento <code>OnMessageReceived</code> intercepta la cabecera. Si detecta el token pero no tiene el prefijo, extrae el token crudo en texto plano y lo asigna a mano mediante <code>context.Token</code>, permitiendo que la validación criptográfica continúe normalmente.</li>
-                <li><strong>Inicialización y Semilla en el Bootstrap:</strong> Al finalizar la configuración del pipeline HTTP pero antes de iniciar el servidor (<code>app.Run()</code>), el bootstrap abre un scope transitorio de dependencias (<code>app.Services.CreateScope()</code>) para obtener el <code>SGEContext</code> de forma segura y ejecutar <code>EnsureCreated()</code>. Esto garantiza que el archivo de base de datos SQLite con las tablas e inserciones semilla esté listo antes de que la Web API empiece a escuchar peticiones en los puertos de red.</li>
-                <li><strong>Qué pone en marcha realmente:</strong> No sólo registra servicios, también deja armada toda la ruta de entrada para que autenticación, autorización, persistencia y Swagger trabajen en conjunto desde el primer request.</li>
-                <li><strong>Qué deja listo para el resto del sistema:</strong> Este bloque no responde pedidos ni devuelve DTOs; prepara todo el entorno para que la API pueda recibir tráfico con servicios bien registrados, tokens aceptados y base inicial creada.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>var builder = WebApplication.CreateBuilder(args);</code>:</strong> arranca la configuración de la API y su contenedor de servicios.</li>
-                <li><strong><code>AddEndpointsApiExplorer()</code> y <code>AddSwaggerGen()</code>:</strong> habilitan el mapeo y documentación interactiva.</li>
-                <li><strong>Registros <code>AddScoped</code> y <code>AddSingleton</code>:</strong> conectan interfaces con implementaciones concretas y definen su ciclo de vida.</li>
-                <li><strong><code>AddDbContext&lt;SGEContext&gt;(...UseSqlite...)</code>:</strong> configura la conexión real a SQLite.</li>
-                <li><strong><code>AddAuthentication()</code> y <code>AddJwtBearer()</code>:</strong> configuran cómo se leen y validan los tokens.</li>
-                <li><strong><code>UseMiddleware</code>, <code>UseAuthentication</code>, <code>UseAuthorization</code>:</strong> ordenan el pipeline de seguridad y errores.</li>
-                <li><strong><code>MapGet("/SGE", ...)</code> y los endpoints de Minimal API:</strong> configuran la redirección inicial y registran los endpoints del sistema.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Configurar el inicio del servidor (`Program.cs`) registrando los Casos de Uso, Repositorios y Contextos como `Scoped` (un ciclo de vida por cada petición HTTP), e implementar la flexibilización de cabeceras JWT interceptando el evento `OnMessageReceived` para admitir tokens sin el prefijo "Bearer ".</li>
+                <li><strong>Alternativa Descartada:</strong> Registrar todos los repositorios y servicios de negocio como `Singleton` (única instancia compartida) para evitar recreaciones, o utilizar controladores clásicos de ASP.NET Core (`ControllerBase`) en lugar de `Minimal APIs`.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> El ciclo `Scoped` es óptimo para acceso a base de datos porque garantiza que todas las clases de una petición utilicen la misma conexión de SQLite, confirmando cambios de forma atómica y cerrando la conexión al terminar. El uso de `Minimal APIs` agiliza el arranque del servidor, simplifica la sintaxis al no requerir ruteo pesado de controladores, y tiene mayor rendimiento.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> El ciclo `Scoped` recrea todas las clases UseCase y Repositorios en cada llamada HTTP, lo que genera constantes asignaciones de memoria a corto plazo para el recolector de basura (Garbage Collector). Además, configurar seguridad y documentación (Swagger) en Minimal APIs requiere sintaxis fluida que se amontona rápidamente en `Program.cs`.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Diseñamos el arranque de la aplicación usando Minimal APIs por rendimiento y simplicidad sintáctica. Registramos los repositorios, los Casos de Uso y el DbContext como Scoped para asegurar que la sesión de base de datos SQLite esté acotada a la vida útil de cada petición HTTP, lo que previene fugas de memoria y bloqueos de conexión. La flexibilización de OnMessageReceived en JwtBearer nos permite procesar tokens JWT de forma segura sin importar si Swagger u otros clientes omiten el prefijo 'Bearer '."</span></li>
             </ul>
         </div>
 
@@ -2597,39 +2409,13 @@ app.Run();</code></pre>
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Middleware de Manejo Global de Errores):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Flujo del Pipeline de ASP.NET Core:</strong> Un middleware es un componente de software que se ensambla en el pipeline (tubería) de la aplicación para gestionar solicitudes y respuestas HTTP. Al colocar este middleware al principio del pipeline, envolvemos toda la ejecución de la API en un gran bloque <code>try-catch</code> mediante <code>await _siguiente(contexto)</code>. Si cualquier endpoint, caso de uso o entidad arroja un error imprevisto, la petición retrocede hasta este middleware, evitando que el servidor devuelva errores crudos de .NET o pantallas amarillas de error.</li>
-                <li><strong>Mapeo Semántico de Códigos HTTP:</strong> El método <code>MapearExcepcion()</code> traduce las excepciones lógicas y de negocio a códigos de estado HTTP estándar:
-                    <ul>
-                        <li><code>AutorizacionException</code> se traduce al código <code>403 Forbidden</code> (Acceso prohibido).</li>
-                        <li><code>UnauthorizedAccessException</code> se traduce al código <code>401 Unauthorized</code> (No autenticado).</li>
-                        <li><code>EntidadNoEncontradaException</code> se traduce al código <code>404 NotFound</code> (Recurso no encontrado).</li>
-                        <li>Excepciones de dominio o aplicación (<code>DomainException</code> o <code>AplicationException</code>) se traducen a <code>400 BadRequest</code> (Petición incorrecta).</li>
-                        <li>Excepciones no controladas o genéricas del sistema se traducen a <code>500 InternalServerError</code>, logueando el error con <code>LogError</code> para que el equipo de desarrollo pueda revisarlo.</li>
-                    </ul>
-                </li>       </li>d arroja un error imprevisto, la petición retrocede hasta este middleware, evitando que el servidor devuelva errores crudos de .NET o pantallas amarillas de error.</li>
-                <li><strong>Mapeo Semántico de Códigos HTTP:</strong> El método <code>MapearExcepcion()</code> traduce las excepciones lógicas y de negocio a códigos de estado HTTP estándar:
-                    <ul>
-                        <li><code>AutorizacionException</code> se traduce al código <code>403 Forbidden</code> (Acceso prohibido).</li>
-                        <li><code>UnauthorizedAccessException</code> se traduce al código <code>401 Unauthorized</code> (No autenticado).</li>
-                        <li>Excepciones de dominio o aplicación (<code>DomainException</code> o <code>AplicationException</code>) se traducen a <code>400 BadRequest</code> (Petición incorrecta).</li>
-                        <li>Excepciones no controladas o genéricas del sistema se traducen a <code>500 InternalServerError</code>, logueando el error con <code>LogError</code> para que el equipo de desarrollo pueda revisarlo.</li>
-                    </ul>
-                </li>
-                <li><strong>Estandarización bajo Problem Details (RFC 7807):</strong> En lugar de retornar un texto simple de error, formatea la respuesta en un JSON estructurado bajo el estándar internacional <strong>RFC 7807 (Problem Details for HTTP APIs)</strong>. Esto proporciona metadatos consistentes sobre el error (como el status, el título descriptivo, el detalle del error y la ruta exacta donde ocurrió) para que los clientes web o frontend los procesen de forma consistente.</li>
-                <li><strong>Qué garantiza hacia afuera:</strong> Ninguna excepción sale “en bruto” al cliente; siempre queda traducida a una respuesta entendible y homogénea. Eso hace más simple depurar la API y también más predecible consumirla desde frontend o pruebas manuales.</li>
-                <li><strong>Qué devuelve al cliente:</strong> Siempre devuelve una respuesta HTTP consistente con un cuerpo JSON de error; no deja excepciones sin formato ni respuestas ambiguas, así el frontend puede manejar todos los fallos de la misma manera.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>private readonly RequestDelegate _siguiente;</code> y <code>ILogger&lt;...&gt; _logger;</code>:</strong> guardan el siguiente paso del pipeline y el logger para registrar fallos.</li>
-                <li><strong><code>InvokeAsync(HttpContext contexto)</code>:</strong> envuelve la ejecución real en un <code>try/catch</code>.</li>
-                <li><strong><code>await _siguiente(contexto);</code>:</strong> deja pasar la petición al siguiente middleware o al controlador.</li>
-                <li><strong><code>catch (Exception ex)</code>:</strong> intercepta cualquier error no controlado.</li>
-                <li><strong><code>MapearExcepcion(ex)</code>:</strong> traduce la excepción a un status y un título HTTP adecuados.</li>
-                <li><strong><code>ProblemDetails</code> + <code>WriteAsJsonAsync</code>:</strong> construyen la respuesta JSON estándar que recibe el cliente.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Capturar los errores en un Middleware global (`ManejadorGlobalExcepcionesMiddleware`) que mapea las excepciones a códigos de estado HTTP semánticos y devuelve respuestas estandarizadas usando la clase `ProblemDetails` (RFC 7807).</li>
+                <li><strong>Alternativa Descartada:</strong> Escribir bloques `try-catch` individuales en cada endpoint/controlador de la Web API o delegar el manejo de excepciones a las herramientas por defecto de ASP.NET Core que retornan páginas HTML de error en modo de desarrollo.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Centraliza el control de errores en un solo componente del pipeline HTTP, asegurando que ninguna excepción en bruto (que revele trazas de código o rutas internas del servidor) se filtre al cliente. La respuesta estructurada con `ProblemDetails` provee un formato consistente que cualquier cliente frontend puede procesar de manera uniforme.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Requiere mantener actualizado un mapa estático de excepciones a códigos HTTP (`MapearExcepcion`). Si se crea una nueva excepción de negocio y se olvida registrarla en el switch-case, el middleware la tratará por defecto como un error de servidor `500 Internal Server Error`, ocultando el verdadero motivo del fallo.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Implementamos un Middleware global para manejar excepciones al inicio del pipeline HTTP. De esta forma, capturamos cualquier error lanzado en las capas de aplicación o de dominio de manera centralizada. Evitamos contaminar los endpoints con bloques try-catch repetitivos, mapeamos las excepciones semánticamente a códigos HTTP como 400 BadRequest o 404 NotFound, y devolvemos respuestas estandarizadas bajo el estándar internacional RFC 7807 (Problem Details), lo cual es una buena práctica de diseño REST."</span></li>
             </ul>
         </div>
 
@@ -2682,22 +2468,13 @@ app.Run();</code></pre>
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Metadatos Dinámicos en Swagger UI):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Extracción en Tiempo de Compilación e Inicialización:</strong> Swagger (OpenAPI) genera la documentación visual interactiva leyendo el código fuente. Sin embargo, no sabe de forma nativa qué controladores o endpoints REST están protegidos por el atributo <code>[Authorize]</code>. Este filtro personalizado (<code>IDocumentFilter</code>) se ejecuta al iniciar la aplicación, recorriendo la colección de descriptores de endpoints (<code>contexto.ApiDescriptions</code>).</li>
-                <li><strong>Inyección Dinámica de Requisitos de Seguridad Bearer:</strong> Si el endpoint posee la directiva de autorización y no permite el acceso anónimo, el filtro localiza su ruta relativa y método HTTP dentro del árbol de OpenAPI (<code>documento.Paths</code>). Si no está marcado como seguro, le inyecta dinámicamente un objeto de tipo <code>OpenApiSecurityRequirement</code> asociado al esquema <code>Bearer</code>. Esto hace que en Swagger UI aparezca el icono del candado en cada endpoint correspondiente, forzando a la interfaz a adjuntar el JWT en las cabeceras HTTP de forma automatizada al testear.</li>
-                <li><strong>Qué resuelve para estudiar y probar:</strong> El documento generado queda alineado con la seguridad real de la API, así que el grupo no tiene que adivinar qué endpoints van con token y cuáles no. Eso reduce errores al practicar y hace más clara la defensa del diseño.</li>
-                <li><strong>Qué aporta al trabajo en grupo:</strong> No cambia la lógica del sistema, pero sí la forma de estudiarlo y probarlo. Gracias a este filtro, Swagger muestra visualmente qué endpoints requieren token y ayuda a no confundirse al practicar con la API.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>foreach (var apiDescription in contexto.ApiDescriptions)</code>:</strong> recorre todos los endpoints que Swagger conoce.</li>
-                <li><strong><code>EndpointMetadata</code>:</strong> lee los atributos del endpoint para saber si requiere autorización o permite anónimo.</li>
-                <li><strong><code>if (!tieneAutorizacion || permiteAnonimo) continue;</code>:</strong> salta los endpoints que no deben llevar candado.</li>
-                <li><strong>Validación de ruta y método HTTP:</strong> evita trabajar sobre descripciones incompletas.</li>
-                <li><strong><code>documento.Paths.TryGetValue(...)</code> y <code>Operations.TryGetValue(...)</code>:</strong> ubican la operación exacta dentro del documento OpenAPI.</li>
-                <li><strong><code>operation.Security.Add(...)</code>:</strong> marca el endpoint como protegido por Bearer.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Configurar un filtro de OpenAPI (`FiltroAutorizacion`) que implementa `IDocumentFilter` para inyectar de forma dinámica los requisitos y candados de seguridad Bearer JWT (`OpenApiSecurityRequirement`) en la interfaz visual de Swagger UI para todos aquellos endpoints que requieran autorización y no sean públicos (`[Authorize]`).</li>
+                <li><strong>Alternativa Descartada:</strong> Marcar manualmente cada endpoint con esquemas de Swagger en el código C# mediante atributos redundantes, o no configurar candados en Swagger UI, obligando al usuario a agregar cabeceras manuales para autenticarse al probar la API.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Automatiza y mantiene la documentación OpenAPI sincronizada con el estado real de la seguridad del backend. Al leer metadatos de endpoints directamente, se evita el riesgo de documentar como público un recurso privado o viceversa, y simplifica la experiencia de pruebas interactivas en el navegador.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Acopla la generación del Swagger a una clase personalizada de filtrado que utiliza clases y tipos de la librería `Microsoft.OpenApi` y del descriptor de acciones de ASP.NET Core, lo cual puede romperse o requerir modificaciones ante actualizaciones mayores de versiones de .NET.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Implementamos la interfaz IDocumentFilter de OpenAPI para automatizar la colocación de candados de seguridad en Swagger UI. El filtro recorre dinámicamente los metadatos de los endpoints mapeados al arrancar la API. Si el endpoint requiere autenticación y no permite accesos anónimos, inyectamos el requisito de seguridad Bearer. De este modo, la documentación Swagger se auto-adapta a las políticas de seguridad sin necesidad de marcar manualmente cada endpoint con atributos extras repetitivos."</span></li>
             </ul>
         </div>
 
@@ -2736,22 +2513,13 @@ app.Run();</code></pre>
 }</code></pre>
 
         <div class="explanation-block">
-            <h5>Explicación detallada del bloque (Minimal APIs y Ruteo Declarativo):</h5>
+            <h5>Debate de Diseño y Defensa (Preparación de Examen)</h5>
             <ul>
-                <li><strong>Organización y Agrupación mediante <code>MapGroup</code>:</strong> En lugar de declarar clases pesadas que heredan de <code>ControllerBase</code>, agrupamos todos los endpoints relacionados con un recurso bajo una URL base usando <code>routes.MapGroup("/api/expedientes")</code>. Esto permite aplicar políticas de seguridad transversales (como <code>RequireAuthorization()</code>) a todo el grupo de una sola vez, en lugar de anotar individualmente cada método.</li>
-                <li><strong>Enlace y Resolución por Inyección Automática:</strong> Los métodos en Minimal APIs se definen con delegados o funciones anónimas. Los parámetros declarados en la firma (como <code>AgregarExpedienteRequest</code> y <code>AgregarExpedienteUseCase</code>) son resueltos automáticamente por ASP.NET Core: el DTO de entrada se deserializa desde el cuerpo de la petición JSON y el caso de uso se inyecta desde el contenedor IoC.</li>
-                <li><strong>Extracción Segura de Claims en Minimal APIs:</strong> Al no existir una clase base controladora, el principal de seguridad se recibe inyectando directamente un objeto de tipo <code>ClaimsPrincipal</code> en los parámetros del endpoint. La función helper <code>ObtenerIdUsuarioDelToken(user)</code> busca el claim del identificador único de usuario del JWT y lo convierte a un tipo GUID. Esto garantiza la procedencia segura de la identidad para auditar las acciones en el dominio.</li>
-                <li><strong>Qué devuelve al cliente:</strong> Retorna estructuras bajo la clase estática de fábrica <code>Results</code> (por ejemplo, <code>Results.Ok(...)</code> o <code>Results.NotFound()</code>), mapeando directamente a respuestas HTTP estándar sin la sobrecarga del pipeline clásico de controladores de MVC.</li>
-            </ul>
-
-            <h5>Lectura paso a paso del código</h5>
-            <ul>
-                <li><strong><code>public static class ExpedientesEndpoints</code>:</strong> clase estática que aloja el método de extensión para registrar las rutas del recurso.</li>
-                <li><strong><code>MapExpedientesEndpoints(this IEndpointRouteBuilder routes)</code>:</strong> extiende la interfaz de ruteo de la aplicación para registrar el grupo de endpoints.</li>
-                <li><strong><code>routes.MapGroup("/api/expedientes").RequireAuthorization()</code>:</strong> agrupa bajo el path base y exige token Bearer.</li>
-                <li><strong><code>group.MapPost("/", ...)</code>:</strong> declara que el método POST atiende peticiones en la ruta raíz del grupo.</li>
-                <li><strong>Inyección directa en la firma:</strong> recibe el request, los claims del JWT y la instancia del caso de uso inyectada de forma transparente.</li>
-                <li><strong><code>Results.Ok(response)</code>:</strong> serializa y devuelve el resultado de la capa de aplicación con un código HTTP 200.</li>
+                <li><strong>Decisión de Diseño Tomada:</strong> Mapear los endpoints REST de la aplicación utilizando métodos de extensión de Minimal APIs organizados por recursos (`ExpedientesEndpoints`, `TramitesEndpoints`, `UsuariosEndpoints`) e inyectando directamente los Casos de Uso y el `ClaimsPrincipal` en las firmas de los delegados para la autenticación y resolución.</li>
+                <li><strong>Alternativa Descartada:</strong> Utilizar los controladores clásicos de MVC basados en la herencia de `ControllerBase` con enrutamiento convencional por atributos.</li>
+                <li><strong>¿Por qué SÍ? (Ventajas de la decisión):</strong> Las Minimal APIs eliminan la sobrecarga arquitectónica de los controladores tradicionales (sin necesidad de instanciar clases controladoras ni configurar filtros pesados de MVC). El ruteo es declarativo y directo, lo que acelera el tiempo de arranque de la Web API y facilita la lectura del pipeline en un único lugar. La inyección automática de dependencias funciona de manera transparente en la firma del delegado.</li>
+                <li><strong>¿Por qué NO? (Desventajas/Limitaciones):</strong> Para aplicaciones muy grandes, colocar decenas de endpoints con su respectiva inyección de parámetros en clases estáticas puede hacer que los archivos crezcan demasiado y se vuelvan difíciles de estructurar o mantener organizados en comparación con la separación natural de métodos que ofrecen los controladores de clase.</li>
+                <li><strong>Cómo Defenderlo en el Examen Oral:</strong> <span style="color: var(--primary-light);">"Elegimos Minimal APIs porque reducen el boilerplate técnico de ASP.NET Core y optimizan el rendimiento de ruteo de la API HTTP. En vez de controladores pesados basados en herencia de MVC, usamos métodos de extensión estáticos agrupados por recurso y protegidos en bloque con RequireAuthorization. La identidad se extrae inyectando directamente el ClaimsPrincipal en el delegado de la ruta y parseando el claim del NameIdentifier, garantizando que el Caso de Uso reciba el ID de usuario autenticado de forma limpia y transparente."</span></li>
             </ul>
         </div>
     </section>

@@ -5,10 +5,16 @@ using SGE.Aplicacion.Tramites.DTOs;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
-public class ObtenerExpedientePorIdUseCase(IExpedienteRepository iExpRepo, ITramiteRepository tramiteRepo)
+public class ObtenerExpedientePorIdUseCase
 {
-    private readonly IExpedienteRepository _iExpRepo = iExpRepo;
-    private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
+    private readonly IExpedienteRepository _iExpRepo;
+    private readonly ITramiteRepository _tramiteRepo;
+
+    public ObtenerExpedientePorIdUseCase(IExpedienteRepository iExpRepo, ITramiteRepository tramiteRepo)
+    {
+        _iExpRepo = iExpRepo;
+        _tramiteRepo = tramiteRepo;
+    }
 
     public ObtenerExpedientePorIdResponseDTO Ejecutar(ObtenerExpedientePorIdDTO req)
     {

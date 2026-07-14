@@ -3,9 +3,14 @@ using SGE.Aplicacion.Tramites.DTOs;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
-public class ConsultarTramiteUseCase(ITramiteRepository tramiteRepo)
+public class ConsultarTramiteUseCase
 {
-    private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
+    private readonly ITramiteRepository _tramiteRepo;
+
+    public ConsultarTramiteUseCase(ITramiteRepository tramiteRepo)
+    {
+        _tramiteRepo = tramiteRepo;
+    }
 
     public ConsultarTramiteResponseDTO Ejecutar(ConsultarTramiteDTO req)
     {

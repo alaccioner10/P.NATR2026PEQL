@@ -1,7 +1,7 @@
 namespace SGE.Dominio.Usuarios;
 
 using SGE.Dominio.Excepciones;
-using SGE.Dominio.Usuarios;
+
 public class Usuario
 {
     public Guid Id { get; private set; }

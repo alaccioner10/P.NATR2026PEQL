@@ -2,9 +2,14 @@ using SGE.Aplicacion.Expedientes.DTOs;
 
 namespace SGE.Aplicacion.Expedientes.UseCases;
 
-public class ListaExpedientesUseCase(IExpedienteRepository iExpRepo)
+public class ListaExpedientesUseCase
 {
-    private readonly IExpedienteRepository _iExpRepo = iExpRepo;
+    private readonly IExpedienteRepository _iExpRepo;
+
+    public ListaExpedientesUseCase(IExpedienteRepository iExpRepo)
+    {
+        _iExpRepo = iExpRepo;
+    }
 
     public List<ConsultarExpedienteResponseDTO> Ejecutar(ListarExpedientesDTO req)
     {

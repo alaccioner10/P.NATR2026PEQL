@@ -3,9 +3,14 @@ using SGE.Aplicacion.Tramites.DTOs;
 
 namespace SGE.Aplicacion.Tramites.UseCases;
 
-public class ListarTramitesPorExpedienteUseCase(ITramiteRepository tramiteRepo)
+public class ListarTramitesPorExpedienteUseCase
 {
-    private readonly ITramiteRepository _tramiteRepo = tramiteRepo;
+    private readonly ITramiteRepository _tramiteRepo;
+
+    public ListarTramitesPorExpedienteUseCase(ITramiteRepository tramiteRepo)
+    {
+        _tramiteRepo = tramiteRepo;
+    }
 
     public List<ListarTramitesPorExpedienteResponseDTO> Ejecutar(ListarTramitesPorExpedienteDTO req)
     {
