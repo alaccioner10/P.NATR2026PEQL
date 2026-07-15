@@ -1,3 +1,4 @@
+using SGE.Aplicacion.Autorizacion;
 using SGE.Aplicacion.Excepciones;
 using SGE.Aplicacion.Servicios;
 using SGE.Aplicacion.Usuarios.DTOs;
@@ -20,8 +21,14 @@ public class RegistrarUsuarioUseCase
     }
 
 
-    public RegistrarUsuarioResponseDTO Ejecutar(RegistrarUsuarioDTO req)
+    public RegistrarUsuarioResponseDTO Ejecutar(RegistrarUsuarioDTO req, Guid idUsuarioSolicitante)
     {
+        var solicitante = _userRepo.ObtenerPorId(idUsuarioSolicitante);
+        if (solicitante == null || !solicitante.EsAdmin)
+        {
+            throw new AutorizacionException("Solo un administrador puede registrar usuarios.");
+        }
+
         if (_userRepo.ExistePorEmail(req.Email))
         {
             throw new AplicationException("El email ya está registrado");

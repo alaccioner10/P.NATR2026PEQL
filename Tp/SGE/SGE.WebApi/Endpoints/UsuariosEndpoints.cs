@@ -15,12 +15,13 @@ public static class UsuariosEndpoints
         // Define el grupo de rutas base para la gestión de usuarios
         var group = app.MapGroup("/api/usuarios");
 
-        // POST /api/usuarios/registrar - Registra un nuevo usuario común en el sistema (ruta pública)
-        group.MapPost("/registrar", (RegistrarUsuarioDTO request, RegistrarUsuarioUseCase useCase) =>
+        // POST /api/usuarios/registrar - Registra un nuevo usuario en el sistema (requiere autorización de administrador)
+        group.MapPost("/registrar", (RegistrarUsuarioDTO request, RegistrarUsuarioUseCase useCase, HttpContext httpContext) =>
         {
-            var response = useCase.Ejecutar(request);
+            var idUsuario = ObtenerIdUsuarioDelToken(httpContext);
+            var response = useCase.Ejecutar(request, idUsuario);
             return Results.Ok(response);
-        });
+        }).RequireAuthorization();
 
         // POST /api/usuarios/login - Valida las credenciales de un usuario y retorna un Token JWT de sesión (ruta pública)
         group.MapPost("/login", (LoginDTO request, LoginUseCase useCase) =>
